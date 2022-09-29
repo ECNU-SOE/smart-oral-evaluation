@@ -39,10 +39,10 @@ public class JsonUtil {
     }
 
 
-
     /**
      * 对象转为Json字符串
-     * @param data
+     *
+     * @param obj
      * @return
      */
     public static String obj2Json(Object obj) {
@@ -51,23 +51,25 @@ public class JsonUtil {
             jsonStr = mapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
             //e.printStackTrace();
-            log.error("json格式化异常:{}",e);
+            log.error("json格式化异常:{}", e);
         }
         return jsonStr;
     }
+
     /**
      * json字符串转为对象
-     * @param str
-     * @param valueType
+     *
+     * @param jsonStr
+     * @param beanType
      * @return
      */
     public static <T> T json2Obj(String jsonStr, Class<T> beanType) {
         T obj = null;
         try {
             obj = mapper.readValue(jsonStr, beanType);
-        } catch (Exception e){
+        } catch (Exception e) {
             //e.printStackTrace();
-            log.error("json格式化异常:{}",e);
+            log.error("json格式化异常:{}", e);
         }
         return obj;
     }
@@ -75,6 +77,7 @@ public class JsonUtil {
 
     /**
      * json数据转换成pojo对象list
+     *
      * @param jsonData
      * @param beanType
      * @return
@@ -86,14 +89,15 @@ public class JsonUtil {
             return list;
         } catch (Exception e) {
             //e.printStackTrace();
-            log.error("json格式化异常:{}",e);
+            log.error("json格式化异常:{}", e);
         }
         return null;
     }
 
     /**
      * 对象转为byte数组
-     * @param data
+     *
+     * @param obj
      * @return
      */
     public static byte[] obj2Bytes(Object obj) {
@@ -102,17 +106,17 @@ public class JsonUtil {
             byteArr = mapper.writeValueAsBytes(obj);
         } catch (JsonProcessingException e) {
             //e.printStackTrace();
-            log.error("json格式化异常:{}",e);
+            log.error("json格式化异常:{}", e);
         }
         return byteArr;
     }
 
 
-
     /**
      * byte数组转为对象
+     *
      * @param byteArr
-     * @param valueType
+     * @param beanType
      * @return
      */
     public static <T> T bytes2Obj(byte[] byteArr, Class<T> beanType) {
@@ -121,7 +125,7 @@ public class JsonUtil {
             obj = mapper.readValue(byteArr, beanType);
         } catch (Exception e) {
             //e.printStackTrace();
-            log.error("json格式化异常:{}",e);
+            log.error("json格式化异常:{}", e);
         }
         return obj;
     }

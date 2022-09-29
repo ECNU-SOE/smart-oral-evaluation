@@ -11,9 +11,9 @@
     <modules>
         <module>soe-common</module>
         <module>soe-user</module>
-        <module>soe-gateway</module>
         <module>soe-corpus</module>
         <module>soe-evaluate</module>
+        <module>soe-gateway</module>
     </modules>
 
     <properties>
@@ -80,8 +80,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
-
 
             <!--mybatis plus和springboot整合-->
             <dependency>
