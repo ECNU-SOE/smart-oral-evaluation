@@ -4,40 +4,24 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
-import org.apache.commons.codec.Resources;
-import org.apache.commons.io.IOUtils;
+import okhttp3.*;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.WebProperties;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.util.ResourceUtils;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 /*评测示例默认为中文句子题型的示例,
 其他试题示例请到Demo中查看试题示例与音频示例并注意修改相关评测参数值,
 到平台文档下方进行音频试题示例下载也可以*/
-public class ReadSentence extends WebSocketListener {
+public class ReadChapter extends WebSocketListener {
     private static final String hostUrl ="https://ise-api.xfyun.cn/v2/open-ise";//开放评测地址
     private static final String appid = "9864a388";//控制台获取
     private static final String apiSecret = "NmJlNDQ3MWE3YmZlMDkwM2RkMWVkYjVj";//控制台获取
@@ -47,12 +31,12 @@ public class ReadSentence extends WebSocketListener {
     private static final String ent="cn_vip";//语言标记参数 ent(cn_vip中文,en_vip英文)
 
     //题型、文本、音频要请注意做同步变更(如果是英文评测,请注意变更ent参数的值)
-    private static final String category="read_sentence";//题型
-    private String text="今天天气怎么样";//评测试题,英文试题:[content]\nthere was a gentleman live near my house.
+    private static final String category="read_chapter";//题型
+    private String text="今天天气\n怎么样";//评测试题,英文试题:[content]\nthere was a gentleman live near my house.
 
     //private static  String file;
 
-    private static final String file = "C:\\Users\\Lenovo\\Desktop\\smart-oral-evaluation-main\\soe-evaluate\\src\\main\\resources\\static\\iseAudio\\sentence\\read_sentence_cn.mp3";//评测音频,如传mp3格式请改变参数aue的值为lame
+    private static final String file = "C:\\Users\\Lenovo\\Desktop\\smart-oral-evaluation-main\\soe-evaluate\\src\\main\\resources\\static\\iseAudio\\sentence\\read_sentence_cn.pcm";//评测音频,如传mp3格式请改变参数aue的值为lame
     public static final int StatusFirstFrame = 0;//第一帧
     public static final int StatusContinueFrame = 1;//中间帧
     public static final int StatusLastFrame = 2;//最后一帧
@@ -68,9 +52,8 @@ public class ReadSentence extends WebSocketListener {
     private static long beginTime=(new Date()).getTime();
     private static long endTime=(new Date()).getTime();
 
-    public ReadSentence() throws IOException {
+    public ReadChapter() throws IOException {
     }
-
 
     public static void main(String[] args) throws Exception {
 
@@ -82,8 +65,9 @@ public class ReadSentence extends WebSocketListener {
         OkHttpClient client = new OkHttpClient.Builder().build();
         String url = authUrl.replace("http://", "ws://").replace("https://", "wss://");//将url中的 schema http://和https://分别替换为ws:// 和 wss://
         Request request = new Request.Builder().url(url).build();//url
-        WebSocket webSocket = client.newWebSocket(request, new ReadSentence());
+        WebSocket webSocket = client.newWebSocket(request, new ReadChapter());
     }
+
     public String getText(){
         return this.text;
     }
@@ -191,7 +175,7 @@ public class ReadSentence extends WebSocketListener {
                         .add("tte", "utf-8")
                         .add("cmd", "ssb")
                         .add("auf", "audio/L16;rate=16000")
-                        .add("aue", "lame")
+                        .add("aue", "raw")
                         //评测文本(new String(new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF })+text)
                         .add("text",'\uFEFF'+text)//Base64.getEncoder().encodeToString(text.getBytes())
                 ).add("data", new ParamBuilder()
@@ -206,7 +190,7 @@ public class ReadSentence extends WebSocketListener {
         p.add("business", new ParamBuilder()
                 .add("cmd", "auw")
                 .add("aus", aus)
-                .add("aue", "lame")
+                .add("aue", "raw")
         ).add("data",new ParamBuilder()
                 .add("status",status)
                 .add("data",data)
@@ -304,10 +288,10 @@ public class ReadSentence extends WebSocketListener {
                         //getRootElement();获得根标签
                         Element root = read.getRootElement();
 
-                        Element read_sentence = root.element("read_sentence").element("rec_paper").element("read_sentence");
-                        Attribute fluency_score = read_sentence.attribute("fluency_score");
+                        Element read_chapter = root.element("read_chapter").element("rec_paper").element("read_chapter");
+                        Attribute fluency_score = read_chapter.attribute("fluency_score");
                         System.out.println(fluency_score.getValue());
-                        System.out.println(read_sentence.asXML());
+                        System.out.println(read_chapter.asXML());
 
 
 
