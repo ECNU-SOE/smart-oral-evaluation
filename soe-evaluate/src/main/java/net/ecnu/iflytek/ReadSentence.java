@@ -53,6 +53,8 @@ public class ReadSentence extends WebSocketListener {
     //private static  String file;
 
     private static final String file = "C:\\Users\\Lenovo\\Desktop\\smart-oral-evaluation-main\\soe-evaluate\\src\\main\\resources\\static\\iseAudio\\sentence\\read_sentence_cn.mp3";//评测音频,如传mp3格式请改变参数aue的值为lame
+//    private static final String file = "C:\\Users\\Lenovo\\Desktop\\smart-oral-evaluation-main1\\smart-oral-evaluation\\soe-evaluate\\src\\main\\resources\\static\\iseAudio\\sentence\\read_sentence_cn.pcm";//评测音频,如传mp3格式请改变参数aue的值为lame
+//    private static final String file = "/Users/lyw/projects/smart-oral-evaluation/soe-evaluate/src/main/resources/read_sentence_cn.pcm";
     public static final int StatusFirstFrame = 0;//第一帧
     public static final int StatusContinueFrame = 1;//中间帧
     public static final int StatusLastFrame = 2;//最后一帧
