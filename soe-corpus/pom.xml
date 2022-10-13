@@ -26,7 +26,7 @@
             </exclusions>
         </dependency>
 
-        <!--阿里云OSS 对象文件存储-->
+        <!--BEGIN 阿里云OSS 对象文件存储-->
         <dependency>
             <groupId>com.aliyun.oss</groupId>
             <artifactId>aliyun-sdk-oss</artifactId>
@@ -48,6 +48,15 @@
             <version>2.3.3</version>
         </dependency>
         <!--END 阿里云OSS 对象文件存储-->
+
+        <!--腾讯云 SOE-->
+        <dependency>
+            <groupId>com.tencentcloudapi</groupId>
+            <artifactId>tencentcloud-sdk-java-soe</artifactId>
+            <!-- go to https://search.maven.org/search?q=tencentcloud-sdk-java and get the latest version. -->
+            <version>3.1.561</version>
+        </dependency>
+
 
     </dependencies>
 
