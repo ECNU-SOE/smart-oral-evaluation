@@ -189,12 +189,12 @@ public class CommonUtil {
         return Hashing.murmur3_32().hashUnencodedChars(param).padToLong();
     }
 
-    /**
-     * URL增加前缀
-     */
-    public static String addUrlPrefix(String url) {
-        return IDUtil.geneSnowFlakeID() + "&" + url;
-    }
+//    /**
+//     * URL增加前缀
+//     */
+//    public static String addUrlPrefix(String url) {
+//        return IDUtil.geneSnowFlakeID() + "&" + url;
+//    }
 
     /**
      * 移除URL前缀
