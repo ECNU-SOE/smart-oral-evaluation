@@ -48,7 +48,7 @@
 
         <!--跳过单元测试-->
         <skipTests>true</skipTests>
-        <docker.image.prefix>soe</docker.image.prefix>
+        <docker.image.prefix>dcloud</docker.image.prefix>
 
     </properties>
 

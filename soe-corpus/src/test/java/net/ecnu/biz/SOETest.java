@@ -25,9 +25,9 @@ import java.util.UUID;
 public class SOETest {
 
     @Test
-    public void evaluateTest() {
+    public void evaluateTest(){
         try {
-            String file = "/Users/lyw/projects/smart-oral-evaluation/soe-corpus/src/main/resources/read_sentence_cn.mp3"; //本地音频文件
+            String file = "C:\\Users\\Lenovo\\Desktop\\smart-oral-evaluation-main\\soe-corpus\\src\\main\\resources\\read_sentence_cn.mp3"; //本地音频文件
             int PKG_SIZE = 2 * 1024; //分片大小
             // 实例化一个认证对象，入参需要传入腾讯云账户secretId，secretKey
             String appid = "1301114428";
@@ -77,7 +77,6 @@ public class SOETest {
                 resp = client.TransmitOralProcessWithInit(req);
             }
             // 输出json格式的字符串回包
-            if (resp == null) return;
             System.out.println(TransmitOralProcessWithInitResponse.toJsonString(resp));
             // 也可以取出单个值。
             // 你可以通过官网接口文档或跳转到response对象的定义处查看返回字段的定义
