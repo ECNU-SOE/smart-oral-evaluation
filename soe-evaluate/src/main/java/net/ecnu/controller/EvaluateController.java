@@ -13,19 +13,9 @@ public class EvaluateController {
     @Autowired
     FileService fileService;
 
-    @PostMapping("uploadSentence")
-    public Result sentenceEvaluate (@RequestPart("audio") MultipartFile audio) throws Exception {
-        Result result = fileService.sentenceEvaluete(audio);
-        return result;
-    }
-    @PostMapping("uploadWord")
-    public Result wordEvaluate (@RequestPart("audio") MultipartFile audio) throws Exception {
-        Result result = fileService.wordEvaluate(audio);
-        return result;
-    }
-    @PostMapping("uploadChapter")
-    public Result chapterEvaluate (@RequestPart("audio") MultipartFile audio) throws Exception {
-        Result result = fileService.chapterEvaluate(audio);
+    @PostMapping("upload")
+    public Result sentenceEvaluate (@RequestPart("audio") MultipartFile audio,@RequestPart("text") String text) throws Exception {
+        Result result = fileService.evaluate(audio,text);
         return result;
     }
 
