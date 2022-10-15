@@ -19,8 +19,7 @@ public class EvaluateController {
 
     @PostMapping("evaluate")
     public JsonData upload(@RequestPart("file") MultipartFile file) {
-        fileService.evaluate();
-        return null;
+        return JsonData.buildSuccess("this is evaluate interface");
     }
 }
 
