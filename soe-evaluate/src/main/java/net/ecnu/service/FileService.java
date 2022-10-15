@@ -6,4 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface FileService {
     public Result sentenceEvaluete(MultipartFile file);
+    public Result wordEvaluate(MultipartFile file);
+    public Result chapterEvaluate(MultipartFile file);
+
 }
