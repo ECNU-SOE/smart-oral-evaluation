@@ -1,0 +1,51 @@
+package net.ecnu.service.impl;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
+import com.aliyun.oss.model.PutObjectResult;
+import com.tencentcloudapi.common.Credential;
+import com.tencentcloudapi.common.exception.TencentCloudSDKException;
+import com.tencentcloudapi.soe.v20180724.SoeClient;
+import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitRequest;
+import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitResponse;
+import lombok.extern.slf4j.Slf4j;
+import net.ecnu.service.CommonService;
+import net.ecnu.service.FileService;
+import net.ecnu.util.CommonUtil;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+@Service
+@Slf4j
+public class CommonServiceImpl implements CommonService {
+
+    @Override
+    public Object listMotherTongue() {
+        try {
+            File file = ResourceUtils.getFile("classpath:static/MotherTongueList.json");
+            String content = FileUtils.readFileToString(file, "UTF-8");
+            List<Object> languages = JSON.parseArray(content);
+            //处理返回结果
+            Map<String, Object> result = new HashMap<>(2);
+            result.put("size", languages.size());
+            result.put("languages", languages);
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}
