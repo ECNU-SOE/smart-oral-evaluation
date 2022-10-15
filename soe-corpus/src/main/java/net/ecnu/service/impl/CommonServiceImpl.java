@@ -16,6 +16,7 @@ import net.ecnu.service.FileService;
 import net.ecnu.util.CommonUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,7 +36,9 @@ public class CommonServiceImpl implements CommonService {
     @Override
     public Object listMotherTongue() {
         try {
-            File file = ResourceUtils.getFile("classpath:static/MotherTongueList.json");
+//            File file = ResourceUtils.getFile("classpath:static/MotherTongueList.json");
+            ClassPathResource classPathResource = new ClassPathResource("static/MotherTongueList.json");
+            File file = classPathResource.getFile();
             String content = FileUtils.readFileToString(file, "UTF-8");
             List<Object> languages = JSON.parseArray(content);
             //处理返回结果
