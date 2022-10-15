@@ -18,7 +18,7 @@ import java.util.UUID;
 @Service
 public class FileServiceImpl implements FileService {
     @Override
-    public Result evaluate(MultipartFile audio,String text) {
+    public Result evaluate(MultipartFile audio,String text,String mode) {
         Result result = new Result();
         try {
 
@@ -43,12 +43,16 @@ public class FileServiceImpl implements FileService {
             req.setSessionId(sessionId); //唯一标识
             req.setRefText(text); //文本
             req.setWorkMode(0L); //0,流式分片,1一次性评测
-            if(text.length()<=1){
+            if("0".equals(mode)){
                 req.setEvalMode(0L); //评估模式,0,单词.1,句子,2,段落,3自由说,4单词纠错
-            }else if(text.length()>1&&text.length()<=30){
+            }else if("1".equals(mode)){
                 req.setEvalMode(1L);
-            }else{
+            }else if("2".equals(mode)){
                 req.setEvalMode(2L);
+            }else if(mode.isEmpty()){
+                return null;
+            }else{
+                return null;
             }
 
             req.setScoreCoeff(1.0f); //评估难度
