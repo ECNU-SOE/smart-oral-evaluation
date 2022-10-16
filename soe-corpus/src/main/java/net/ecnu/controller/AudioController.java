@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/record/v1")
-public class RecordController {
+@RequestMapping("/api/audio/v1")
+public class AudioController {
 
     @Autowired
     private FileService fileService;

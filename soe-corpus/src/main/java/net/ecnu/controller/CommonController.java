@@ -17,10 +17,17 @@ public class CommonController {
     @Autowired
     private CommonService commonService;
 
+    @PostMapping("hello_world")
+    public JsonData upload(@RequestPart("file") MultipartFile file) {
+        return JsonData.buildSuccess("hello world");
+    }
+
     @GetMapping("languages")
     public JsonData languages() {
         Object data = commonService.listMotherTongue();
         return JsonData.buildSuccess(data);
     }
+
+
 }
 

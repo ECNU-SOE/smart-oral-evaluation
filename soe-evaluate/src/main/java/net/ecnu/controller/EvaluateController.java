@@ -14,8 +14,9 @@ public class EvaluateController {
     FileService fileService;
 
     @PostMapping("upload")
-    public Result sentenceEvaluate (@RequestPart("audio") MultipartFile audio,@RequestPart("text") String text) throws Exception {
-        Result result = fileService.evaluate(audio,text);
+    public Result sentenceEvaluate(@RequestPart("audio") MultipartFile audio,
+                                   @RequestPart("text") String text) throws Exception {
+        Result result = fileService.evaluate(audio, text);
         return result;
     }
 
