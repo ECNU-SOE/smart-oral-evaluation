@@ -5,6 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface FileService {
-    Result evaluate(MultipartFile file,String text);
+    Result evaluate(MultipartFile file,String text,String mode);
 
 }
