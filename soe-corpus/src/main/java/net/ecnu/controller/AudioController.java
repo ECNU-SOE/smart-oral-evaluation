@@ -14,6 +14,9 @@ public class AudioController {
     @Autowired
     private FileService fileService;
 
+    /**
+     * 音频上传
+     */
     @PostMapping("upload")
     public JsonData upload(@RequestPart("file") MultipartFile file) {
         return JsonData.buildSuccess(fileService.uploadVoiceRecord(file));
