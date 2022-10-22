@@ -1,25 +1,17 @@
 package net.ecnu;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.domain.Corpus;
 import net.ecnu.mapper.CorpusDao;
-import net.ecnu.util.SOEWordUtil;
-import org.apache.ibatis.annotations.Mapper;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.List;
-
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = EvaluateApplication.class)
