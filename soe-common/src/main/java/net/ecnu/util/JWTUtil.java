@@ -14,17 +14,17 @@ public class JWTUtil {
     /**
      * 主题
      */
-    private static final String SUBJECT = "dcloud-short-link";
+    private static final String SUBJECT = "smart-oral-evaluation";
 
     /**
      * 加密密钥
      */
-    private static final String SECRET = "dcloud-short-link";
+    private static final String SECRET = "smart-oral-evaluation";
 
     /**
      * 令牌前缀
      */
-    private static final String TOKNE_PREFIX = "dcloud-link";
+    private static final String TOKEN_PREFIX = "soe-token-";
 
     /**
      * token过期时间，7天
@@ -32,44 +32,47 @@ public class JWTUtil {
     private static final long EXPIRED = 1000 * 60 * 60 * 24 * 7;
 
     /**
-     * 生成token
-     *
-     * @param loginUser
-     * @return
+     * 生成JWT
      */
-    public static String geneJsonWebTokne(LoginUser loginUser) {
+    public static String geneJsonWebToken(LoginUser loginUser) {
         if (loginUser == null) {
-            throw new NullPointerException("对象为空");
+            throw new NullPointerException("loginUser can't be null when geneJsonWebToken");
         }
         String token = Jwts.builder().setSubject(SUBJECT)
-            .claim("head_img", loginUser.getHeadImg())
-            .claim("account_no", loginUser.getAccountNo())
-            .claim("username", loginUser.getUsername())
-            .claim("mail", loginUser.getMail())
-            .claim("phone", loginUser.getPhone())
-            .claim("auth", loginUser.getAuth())
-            .setIssuedAt(new Date())
-            .setExpiration(new Date(CommonUtil.getCurrentTimestamp() + EXPIRED))
-            .signWith(SignatureAlgorithm.HS256, SECRET).compact();
-        token = TOKNE_PREFIX + token;
+                .claim("loginUser", loginUser)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(CommonUtil.getCurrentTimestamp() + EXPIRED))
+                .signWith(SignatureAlgorithm.HS256, SECRET).compact();
+        token = TOKEN_PREFIX + token;
         return token;
     }
 
-
     /**
-     * 解密jwt
-     *
-     * @param token
-     * @return
+     * 解密JWT
      */
-    public static Claims checkJWT(String token) {
+    public static LoginUser checkJWT(String token) {
         try {
-            final Claims claims = Jwts.parser().setSigningKey(SECRET)
-                .parseClaimsJws(token.replace(TOKNE_PREFIX, "")).getBody();
-            return claims;
+            Claims claims = Jwts.parser().setSigningKey(SECRET)
+                    .parseClaimsJws(token.replace(TOKEN_PREFIX, "")).getBody();
+            String loginUserJson = JsonUtil.obj2Json(claims.get("loginUser"));
+            return JsonUtil.json2Obj(loginUserJson, LoginUser.class);
         } catch (Exception e) {
             log.error("JWT解密失败");
             return null;
         }
     }
+
+
+//    /**
+//     * 解密JWT
+//     */
+//    public static Claims checkJWT(String token) {
+//        try {
+//            return Jwts.parser().setSigningKey(SECRET)
+//                    .parseClaimsJws(token.replace(TOKEN_PREFIX, "")).getBody();
+//        } catch (Exception e) {
+//            log.error("JWT解密失败");
+//            return null;
+//        }
+//    }
 }

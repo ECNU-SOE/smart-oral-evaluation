@@ -36,26 +36,11 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
 
         if (StringUtils.isNotBlank(accessToken)) {
-            Claims claims = JWTUtil.checkJWT(accessToken);
-            if (claims == null) {//未登录
+            LoginUser loginUser = JWTUtil.checkJWT(accessToken);
+            if (loginUser == null) {// 未登录 or token过期
                 CommonUtil.sendJsonMessage(response, JsonData.buildResult(BizCodeEnum.ACCOUNT_UNLOGIN));
                 return false;
             }
-            long accountNo = Long.parseLong(claims.get("account_no").toString());
-            String headImg = (String) claims.get("head_img");
-            String username = (String) claims.get("username");
-            String mail = (String) claims.get("mail");
-            String phone = (String) claims.get("phone");
-            String auth = (String) claims.get("auth");
-
-            LoginUser loginUser = LoginUser.builder()
-                    .accountNo(accountNo)
-                    .auth(auth)
-                    .phone(phone)
-                    .headImg(headImg)
-                    .mail(mail)
-                    .username(username)
-                    .build();
 
             //通过Attribute
             //request.setAttribute("loginUser",loginUser);

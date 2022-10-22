@@ -1,6 +1,10 @@
 package net.ecnu.controller;
 
+import net.ecnu.controller.request.UserRegisterReq;
+import net.ecnu.service.UserService;
 import net.ecnu.util.JsonData;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -8,8 +12,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user/v1")
 public class UserController {
 
-    @GetMapping("test")
-    public JsonData test() {
-        return JsonData.buildError("hello world");
+    @Autowired
+    private UserService userService;
+
+    /**
+     * 用户注册
+     */
+    @PostMapping("register")
+    public JsonData register(@RequestBody @Validated UserRegisterReq userRegisterReq) {
+        Object data = userService.register(userRegisterReq);
+        return JsonData.buildSuccess(data);
     }
 }
