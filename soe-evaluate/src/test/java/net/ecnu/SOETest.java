@@ -7,7 +7,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.domain.Corpus;
 import net.ecnu.mapper.CorpusDao;
+import net.ecnu.util.SOEWordUtil;
 import org.apache.ibatis.annotations.Mapper;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,5 +40,13 @@ public class SOETest {
         System.out.println("一共多少页："+page.getPages());
         System.out.println("一共多少条数据："+page.getTotal());
         System.out.println("数据："+page.getRecords());
+    }
+
+    @Test
+    public void testRegu() throws JSONException {
+        String reg = "^[A-Za-z]{1,10}[1-4]{1}$";
+        String str = "tian";
+        boolean flag = str.matches(reg);
+        System.out.println(flag);
     }
 }

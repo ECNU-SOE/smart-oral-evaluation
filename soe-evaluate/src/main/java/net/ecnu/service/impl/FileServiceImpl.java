@@ -7,6 +7,10 @@ import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitReque
 import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitResponse;
 import net.ecnu.controller.Result;
 import net.ecnu.service.FileService;
+import net.ecnu.util.SOEFileUtil;
+import net.ecnu.util.SOEWordUtil;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,11 +22,11 @@ import java.util.UUID;
 @Service
 public class FileServiceImpl implements FileService {
     @Override
-    public Result evaluate(MultipartFile audio,String text,String mode) {
+    public Result evaluate(MultipartFile audio,String text,String pinyin,String mode) {
         Result result = new Result();
         try {
 
-            File file = this.getFile(audio);
+            File file = SOEFileUtil.MultipartFile2File(audio);
 
             int PKG_SIZE = 2 * 1024; //分片大小
             String secretId = "AKIDZNBuVGvNrnbJoBYv9gr3EQWUJ8w1DPWS";
@@ -41,7 +45,14 @@ public class FileServiceImpl implements FileService {
             req.setVoiceEncodeType(1L);  //语音数据类型1:pcm
             req.setVoiceFileType(3L); //语音文件类型1: raw，2: wav，3: mp3，4: speex
             req.setSessionId(sessionId); //唯一标识
-            req.setRefText(text); //文本
+            if(pinyin.isEmpty()){//普通评测模式
+                req.setRefText(text);
+                req.setTextMode(0L); //文本格式.0普通文本 1,音素结构
+            }else{//指定拼音评测模式
+                String s = SOEWordUtil.formatText(text,pinyin);
+                req.setRefText(s); //文本
+                req.setTextMode(1L); //文本格式.0普通文本 1,音素结构
+            }
             req.setWorkMode(0L); //0,流式分片,1一次性评测
             if("0".equals(mode)){
                 req.setEvalMode(0L); //评估模式,0,单词.1,句子,2,段落,3自由说,4单词纠错
@@ -54,18 +65,16 @@ public class FileServiceImpl implements FileService {
             }else{
                 return null;
             }
-
             req.setScoreCoeff(1.0f); //评估难度
             req.setServerType(1L); //服务类型.0英文,1中文
             req.setIsAsync(0L); //异步
             req.setIsQuery(0L); //轮询
-            req.setTextMode(0L); //文本格式.0普通文本 1,音素结构
 
             TransmitOralProcessWithInitResponse resp = null;
 
             //将文件装换成base64
             //byte[] data = Files.readAllBytes(Paths.get(file));
-            byte[] data = this.File2byte(file);
+            byte[] data = SOEFileUtil.File2byte(file);
             int pkgNum = (int) Math.ceil((double) data.length / PKG_SIZE);
             for (int i = 1; i <= pkgNum; i++) {
                 int lastIndex = i * PKG_SIZE;
@@ -99,69 +108,9 @@ public class FileServiceImpl implements FileService {
             }
         } catch (TencentCloudSDKException e) {
             e.printStackTrace();
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
         }
         return result;
-    }
-
-    private File getFile(MultipartFile multipartFile){
-        File file = null;
-        //判断是否为null
-        if (multipartFile.equals("") || multipartFile.getSize() <= 0) {
-            return file;
-        }
-        //MultipartFile转换为File
-        InputStream ins = null;
-        OutputStream os = null;
-        try {
-            ins = multipartFile.getInputStream();
-            file = new File(multipartFile.getOriginalFilename());
-            os = new FileOutputStream(file);
-            int bytesRead = 0;
-            byte[] buffer = new byte[8192];
-            while ((bytesRead = ins.read(buffer, 0, 8192)) != -1) {
-                os.write(buffer, 0, bytesRead);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally {
-            if(os != null){
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if(ins != null){
-                try {
-                    ins.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return file;
-    }
-
-    private byte[] File2byte(File tradeFile){
-        byte[] buffer = null;
-        try
-        {
-            FileInputStream fis = new FileInputStream(tradeFile);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            byte[] b = new byte[1024];
-            int n;
-            while ((n = fis.read(b)) != -1)
-            {
-                bos.write(b, 0, n);
-            }
-            fis.close();
-            bos.close();
-            buffer = bos.toByteArray();
-        }catch (FileNotFoundException e){
-            e.printStackTrace();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-        return buffer;
     }
 }
