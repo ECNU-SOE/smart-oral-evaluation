@@ -18,7 +18,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author LYW
- * @since 2022-10-22
+ * @since 2022-10-23
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -30,8 +30,8 @@ public class UserDO implements Serializable {
     /**
      * 用户账号id
      */
-    @TableId(value = "account_id", type = IdType.NONE)
-    private String accountId;
+    @TableId(value = "account_no", type = IdType.NONE)
+    private String accountNo;
 
     /**
      * 身份认证id
@@ -96,7 +96,7 @@ public class UserDO implements Serializable {
     /**
      * 删除标识位
      */
-    private Integer del;
+    private Boolean del;
 
     /**
      * 创建时间

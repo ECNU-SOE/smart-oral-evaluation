@@ -7,9 +7,11 @@ import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitReque
 import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitResponse;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.CorpusApplication;
+import net.ecnu.util.IDUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.commons.util.IdUtils;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
@@ -85,5 +87,12 @@ public class SOETest {
             e.printStackTrace();
         }
 
+    }
+
+    @Test
+    public void IDTest(){
+        System.out.println(IDUtil.getSnowflakeId());
+        //1584108301652725760
+        //1584108469131284480
     }
 }

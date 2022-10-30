@@ -61,18 +61,4 @@ public class JWTUtil {
             return null;
         }
     }
-
-
-//    /**
-//     * 解密JWT
-//     */
-//    public static Claims checkJWT(String token) {
-//        try {
-//            return Jwts.parser().setSigningKey(SECRET)
-//                    .parseClaimsJws(token.replace(TOKEN_PREFIX, "")).getBody();
-//        } catch (Exception e) {
-//            log.error("JWT解密失败");
-//            return null;
-//        }
-//    }
 }

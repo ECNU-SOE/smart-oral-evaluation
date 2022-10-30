@@ -1,7 +1,7 @@
 package net.ecnu.controller;
 
 
-import net.ecnu.service.FileService;
+import net.ecnu.service.OssService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,14 +12,15 @@ import org.springframework.web.multipart.MultipartFile;
 public class AudioController {
 
     @Autowired
-    private FileService fileService;
+    private OssService ossService;
 
     /**
      * 音频上传
      */
     @PostMapping("upload")
     public JsonData upload(@RequestPart("file") MultipartFile file) {
-        return JsonData.buildSuccess(fileService.uploadVoiceRecord(file));
+        Object data = ossService.uploadAudio(file);
+        return JsonData.buildSuccess(data);
     }
 }
 
