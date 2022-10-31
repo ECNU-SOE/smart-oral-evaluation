@@ -25,9 +25,6 @@ public class EvaluateController {
         String text = params.getParameter("text");
         String pinyin = params.getParameter("pinyin");
         String mode = params.getParameter("mode");
-        if (pinyin.isEmpty()){
-            System.out.println("拼音为空");
-        }
         Result result = fileService.evaluate(audio, text, pinyin,mode);
         return result;
     }

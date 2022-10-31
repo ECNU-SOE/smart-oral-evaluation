@@ -27,7 +27,7 @@ public class SOEWordUtil {
             JSONArray pron2 = new JSONArray();
             //String reg = "^[A-Za-z]{1,10}[1-4]{1}$";
             String reg = "^[A-Za-z]{1,10}[1-4]{1}$";
-            if(pinyinArray[i].matches(reg)){
+            if(pinyinArray[i].matches(reg)&&pinyinArray[i]!="me"){
                 pron2.put(pinyinArray[i]);
                 pron1.put(0,pron2);
                 word.put("pron",pron1 );

@@ -5,19 +5,19 @@ import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.soe.v20180724.SoeClient;
 import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitRequest;
 import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitResponse;
+import com.tencentcloudapi.soe.v20180724.models.WordRsp;
 import net.ecnu.controller.Result;
 import net.ecnu.service.FileService;
 import net.ecnu.util.SOEFileUtil;
 import net.ecnu.util.SOEWordUtil;
+import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -99,12 +99,25 @@ public class FileServiceImpl implements FileService {
                 result.setPronFluency(resp.getPronFluency().toString());
                 result.setPronCompletion(resp.getPronCompletion().toString());
 
+                WordRsp[] words1 = resp.getWords();
+
+                //将所有得分不超过85分的汉字加入返回集合
+                List<JSONObject> words = new ArrayList<>();
+                for(int k = 0; k< words1.length; k++){
+                        if(words1[k].getPronAccuracy()<85|| words1[k].getPronFluency()<0.85)
+                            if(!"*".equals(words1[k].getWord())){
+                                JSONObject temp_json = new JSONObject();
+                                temp_json.put("word", words1[k].getWord().toString());
+                                temp_json.put("PronAccuracy", words1[k].getPronAccuracy().toString());
+                                temp_json.put("PronFluency", words1[k].getPronFluency().toString());
+                                words.add(temp_json);
+                            }
+                }
+                result.setWords(words);
+
 
                 // 输出json格式的字符串回包
                 System.out.println(TransmitOralProcessWithInitResponse.toJsonString(resp));
-                // 也可以取出单个值。
-                // 你可以通过官网接口文档或跳转到response对象的定义处查看返回字段的定义
-                System.out.println(resp.getPronAccuracy());
             }
         } catch (TencentCloudSDKException e) {
             e.printStackTrace();
