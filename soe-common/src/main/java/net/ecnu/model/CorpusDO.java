@@ -2,9 +2,13 @@ package net.ecnu.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
+
 import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,7 +18,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author LYW
- * @since 2022-10-20
+ * @since 2022-11-01
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -26,13 +30,18 @@ public class CorpusDO implements Serializable {
     /**
      * 语料id
      */
-      @TableId(value = "corpus_id", type = IdType.AUTO)
-    private String corpusId;
+    @TableId(value = "id", type = IdType.NONE)
+    private String id;
 
     /**
      * 语料类型
      */
     private Integer type;
+
+    /**
+     * 难易程度
+     */
+    private Integer level;
 
     /**
      * 汉语拼音
@@ -52,7 +61,7 @@ public class CorpusDO implements Serializable {
     /**
      * 逻辑删除位
      */
-    private Integer del;
+    private Boolean del;
 
     /**
      * 创建时间

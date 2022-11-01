@@ -9,6 +9,7 @@ import net.ecnu.mapper.UserMapper;
 import net.ecnu.model.LoginUser;
 import net.ecnu.model.UserDO;
 import net.ecnu.service.UserService;
+import net.ecnu.util.IDUtil;
 import net.ecnu.util.JWTUtil;
 import net.ecnu.util.JsonData;
 import org.apache.commons.codec.digest.Md5Crypt;
@@ -37,7 +38,7 @@ public class UserServiceImpl implements UserService {
         if (userDO != null) throw new BizException(BizCodeEnum.ACCOUNT_REPEAT);
         //处理生成userDO对象，插入数据库
         UserDO newUserDO = new UserDO();
-        newUserDO.setAccountNo("account_" + UUID.randomUUID());
+        newUserDO.setAccountNo("user_" + IDUtil.getSnowflakeId());
         newUserDO.setNickName(userReq.getPhone());
         newUserDO.setPhone(userReq.getPhone());
 

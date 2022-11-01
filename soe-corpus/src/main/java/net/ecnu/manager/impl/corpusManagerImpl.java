@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
 import net.ecnu.controller.request.CorpusFilterReq;
+import net.ecnu.controller.request.CorpusReq;
 import net.ecnu.manager.CorpusManager;
 import net.ecnu.mapper.CorpusMapper;
 import net.ecnu.model.CorpusDO;
@@ -25,5 +26,11 @@ public class corpusManagerImpl implements CorpusManager {
     public IPage<CorpusDO> pageByFilter(CorpusFilterReq corpusFilter, Page<CorpusDO> corpusDOPage) {
         return corpusMapper.selectPage(corpusDOPage, new QueryWrapper<CorpusDO>()
                 .eq("del", 0));
+    }
+
+    @Override
+    public int add(CorpusDO corpusDO) {
+        int rows = corpusMapper.insert(corpusDO);
+        return rows;
     }
 }
