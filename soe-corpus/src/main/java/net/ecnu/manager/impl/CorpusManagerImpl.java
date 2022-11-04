@@ -6,18 +6,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
 import net.ecnu.controller.request.CorpusFilterReq;
-import net.ecnu.controller.request.CorpusReq;
 import net.ecnu.manager.CorpusManager;
 import net.ecnu.mapper.CorpusMapper;
 import net.ecnu.model.CorpusDO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 @Component
 @Slf4j
-public class corpusManagerImpl implements CorpusManager {
+public class CorpusManagerImpl implements CorpusManager {
 
     @Autowired
     private CorpusMapper corpusMapper;

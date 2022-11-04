@@ -1,4 +1,4 @@
-package net.ecnu.model;
+package net.ecnu.model.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

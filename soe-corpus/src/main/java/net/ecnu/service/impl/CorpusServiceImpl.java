@@ -1,6 +1,5 @@
 package net.ecnu.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import net.ecnu.controller.request.CorpusFilterReq;
@@ -9,17 +8,14 @@ import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.manager.CorpusManager;
 import net.ecnu.model.CorpusDO;
 import net.ecnu.mapper.CorpusMapper;
-import net.ecnu.model.LoginUser;
-import net.ecnu.model.PageData;
+import net.ecnu.model.common.LoginUser;
+import net.ecnu.model.common.PageData;
 import net.ecnu.service.CorpusService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.util.IDUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.commons.util.IdUtils;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 /**
  * <p>

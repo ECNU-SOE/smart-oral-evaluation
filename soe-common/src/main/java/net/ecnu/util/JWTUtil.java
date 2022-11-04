@@ -4,7 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
-import net.ecnu.model.LoginUser;
+import net.ecnu.model.common.LoginUser;
 
 import java.util.Date;
 

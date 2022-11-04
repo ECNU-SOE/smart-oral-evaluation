@@ -6,19 +6,14 @@ import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.manager.UserManager;
 import net.ecnu.mapper.UserMapper;
-import net.ecnu.model.LoginUser;
+import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.UserDO;
 import net.ecnu.service.UserService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.JWTUtil;
-import net.ecnu.util.JsonData;
-import org.apache.commons.codec.digest.Md5Crypt;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.UUID;
 
 
 @Service

@@ -1,11 +1,10 @@
 package net.ecnu.interceptor;
 
-import io.jsonwebtoken.Claims;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import net.ecnu.enums.BizCodeEnum;
-import net.ecnu.model.LoginUser;
+import net.ecnu.model.common.LoginUser;
 import net.ecnu.util.CommonUtil;
 import net.ecnu.util.JWTUtil;
 import net.ecnu.util.JsonData;
