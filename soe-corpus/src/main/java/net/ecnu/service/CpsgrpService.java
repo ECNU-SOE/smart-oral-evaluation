@@ -1,6 +1,7 @@
 package net.ecnu.service;
 
 import net.ecnu.controller.request.CpsgrpCreateReq;
+import net.ecnu.controller.request.CpsgrpFilterReq;
 import net.ecnu.model.CpsgrpDO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -23,4 +24,6 @@ public interface CpsgrpService extends IService<CpsgrpDO> {
     Object del(String cpsgrpId);
 
     Object detail(String cpsgrpId);
+
+    Object pageByFilter(CpsgrpFilterReq cpsgrpFilter);
 }

@@ -1,9 +1,11 @@
 package net.ecnu.service.impl;
 
 import net.ecnu.controller.request.CpsgrpCreateReq;
+import net.ecnu.controller.request.CpsgrpFilterReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.interceptor.LoginInterceptor;
+import net.ecnu.manager.CpsgrpManager;
 import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.mapper.CorpusMapper;
 import net.ecnu.mapper.CpsrcdMapper;
@@ -42,6 +44,9 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     private CpsrcdManager cpsrcdManager;
 
     @Autowired
+    private CpsgrpManager cpsgrpManager;
+
+    @Autowired
     private CpsgrpMapper cpsgrpMapper;
 
     @Autowired
@@ -72,7 +77,7 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
             cpsrcdMapper.insert(cpsrcdDOS.get(i));
         }
         rows += cpsrcdDOS.size();
-        return rows;
+        return cpsgrpDO.getId();
     }
 
     @Override
@@ -105,6 +110,12 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         List<CpsrcdVO> cpsrcdVOS = cpsrcdDOS.stream().map(this::beanProcess).collect(Collectors.toList());
         cpsgrpVO.setCpsrcdList(cpsrcdVOS);
         return cpsgrpVO;
+    }
+
+    @Override
+    public Object pageByFilter(CpsgrpFilterReq cpsgrpFilter) {
+        List<CpsgrpVO> cpsgrpVOS = cpsgrpManager.listByFilter(cpsgrpFilter);
+        return cpsgrpVOS;
     }
 
     /**

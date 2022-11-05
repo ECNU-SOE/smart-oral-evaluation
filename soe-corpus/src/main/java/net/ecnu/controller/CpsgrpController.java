@@ -1,16 +1,11 @@
 package net.ecnu.controller;
 
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import net.ecnu.controller.group.Create;
-import net.ecnu.controller.request.CorpusFilterReq;
-import net.ecnu.controller.request.CorpusReq;
 import net.ecnu.controller.request.CpsgrpCreateReq;
-import net.ecnu.service.CorpusService;
+import net.ecnu.controller.request.CpsgrpFilterReq;
 import net.ecnu.service.CpsgrpService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,6 +14,18 @@ public class CpsgrpController {
 
     @Autowired
     private CpsgrpService cpsgrpService;
+
+    /**
+     * 获取题目组列表
+     */
+    @PostMapping("list")
+    public JsonData list(@RequestParam(value = "cur", defaultValue = "1") int cur,
+                         @RequestParam(value = "size", defaultValue = "50") int size,
+                         @RequestBody CpsgrpFilterReq cpsgrpFilter) {
+        Object data = cpsgrpService.pageByFilter(cpsgrpFilter);
+        return JsonData.buildSuccess(data);
+    }
+
     /**
      * 查询语料组详情
      */
@@ -27,7 +34,6 @@ public class CpsgrpController {
         Object data = cpsgrpService.detail(cpsgrpId);
         return JsonData.buildSuccess(data);
     }
-
 
     /**
      * 创建语料组（试卷，作业，测验等类型）
