@@ -149,12 +149,15 @@ public class FileServiceImpl implements FileService {
             for(int j=0;j<=5;j++){
                 if(corpuses.get(i).getType()==j){
                     if(list.get(j).get("word")==null){
-                        list.get(j).put("word",corpuses.get(i).getRefText());
-                        List<String> temp_s = new ArrayList<>();
-                        temp_s.add(corpuses.get(i).getId());
-                        list.get(j).put("corpus_id",temp_s);
+                        List<String> list_word = new ArrayList<>();
+                        list_word.add(corpuses.get(i).getRefText());
+                        list.get(j).put("word",list_word);
+                        List<String> list_id = new ArrayList<>();
+                        list_id.add(corpuses.get(i).getId());
+                        list.get(j).put("corpus_id",list_id);
                     }else{
-                        String temp_word = list.get(j).get("word") + " " + corpuses.get(i).getRefText();
+                        List<String> temp_word = (List<String>) list.get(j).get("word");
+                        temp_word.add(corpuses.get(i).getRefText());
                         list.get(j).replace("word",temp_word);
                         List<String> temp_id = (List<String>)list.get(j).get("corpus_id");
                         temp_id.add(corpuses.get(i).getId());
@@ -164,7 +167,7 @@ public class FileServiceImpl implements FileService {
                 }
             }
         }
-        //System.out.println("list 是: " + list);
+        System.out.println("list 是: " + list);
         return list;
     }
 }
