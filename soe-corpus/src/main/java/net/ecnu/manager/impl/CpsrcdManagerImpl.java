@@ -25,4 +25,11 @@ public class CpsrcdManagerImpl implements CpsrcdManager {
         return cpsrcdMapper.selectList(new QueryWrapper<CpsrcdDO>()
                 .eq("cpsgrp_id", cpsgrpId));
     }
+
+    @Override
+    public List<CpsrcdDO> getCorpusesByGroupId(String cpsgrpId) {
+        return cpsrcdMapper.getCorpusesByGroupIdMapper(cpsgrpId);
+    }
+
+
 }

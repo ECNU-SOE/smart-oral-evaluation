@@ -7,9 +7,11 @@ import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitReque
 import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitResponse;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.CorpusApplication;
+import net.ecnu.service.FileService;
 import net.ecnu.util.IDUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.commons.util.IdUtils;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -25,6 +27,14 @@ import java.util.UUID;
 @SpringBootTest(classes = CorpusApplication.class)
 @Slf4j
 public class SOETest {
+    @Autowired
+    private FileService fileService;
+
+    @Test
+    public void testFileImpl(){
+        String s ="cpsgrp_1588871928125460480";
+        Object o = fileService.getCorpusesByGroupId(s);
+    }
 
     @Test
     public void evaluateTest(){

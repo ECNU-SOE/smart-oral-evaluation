@@ -9,4 +9,6 @@ import java.util.List;
 public interface CpsrcdManager {
 
     List<CpsrcdDO> listByCpsgrpId(String cpsgrpId);
+
+    List<CpsrcdDO> getCorpusesByGroupId(String cpsgrpId);
 }
