@@ -25,6 +25,8 @@ public class CpsgrpManagerImpl implements CpsgrpManager {
     @Autowired
     private CpsgrpMapper cpsgrpMapper;
 
+
+
     @Override
     public int insert(CpsgrpDO cpsgrpDO) {
         return cpsgrpMapper.insert(cpsgrpDO);
@@ -34,4 +36,5 @@ public class CpsgrpManagerImpl implements CpsgrpManager {
     public List<CpsgrpVO> listByFilter(CpsgrpFilterReq cpsgrpFilter) {
         return null;
     }
+
 }

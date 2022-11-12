@@ -23,13 +23,10 @@ public class CpsrcdManagerImpl implements CpsrcdManager {
     @Override
     public List<CpsrcdDO> listByCpsgrpId(String cpsgrpId) {
         return cpsrcdMapper.selectList(new QueryWrapper<CpsrcdDO>()
-                .eq("cpsgrp_id", cpsgrpId));
+                .eq("cpsgrp_id", cpsgrpId)
+                .orderByAsc("type")
+                .orderByAsc("'order'")
+        );
     }
-
-    @Override
-    public List<CpsrcdDO> getCorpusesByGroupId(String cpsgrpId) {
-        return cpsrcdMapper.getCorpusesByGroupIdMapper(cpsgrpId);
-    }
-
 
 }

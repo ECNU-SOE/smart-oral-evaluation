@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface FileService {
-    Result evaluate(MultipartFile file,String text,String pinyin,String mode);
+    Result evaluate(MultipartFile file,String text,String pinyin,int mode);
 
-    List<JSONObject> getCorpusesByGroupId(String cpsgrpId);
+    JSONObject getCorpusesByGroupId(String cpsgrpId);
 }

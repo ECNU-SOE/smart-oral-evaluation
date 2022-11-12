@@ -17,8 +17,4 @@ import java.util.List;
  */
 @Mapper
 public interface CpsrcdMapper extends BaseMapper<CpsrcdDO> {
-
-    @Select("select * from cpsrcd where cpsgrp_id = #{cpsgrpId} order by 'type','order';")
-    List<CpsrcdDO> getCorpusesByGroupIdMapper(String cpsgrpId);
-
 }

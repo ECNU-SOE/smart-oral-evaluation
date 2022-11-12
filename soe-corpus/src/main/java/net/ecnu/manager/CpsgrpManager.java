@@ -16,4 +16,5 @@ public interface CpsgrpManager {
     int insert(CpsgrpDO cpsgrpDO);
 
     List<CpsgrpVO> listByFilter(CpsgrpFilterReq cpsgrpFilter);
+
 }

@@ -1,5 +1,6 @@
 package net.ecnu.biz;
 
+import com.alibaba.fastjson.JSONObject;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.soe.v20180724.SoeClient;
@@ -7,6 +8,8 @@ import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitReque
 import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitResponse;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.CorpusApplication;
+import net.ecnu.manager.CpsrcdManager;
+import net.ecnu.model.CpsrcdDO;
 import net.ecnu.service.FileService;
 import net.ecnu.util.IDUtil;
 import org.junit.Test;
@@ -21,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
 
 @RunWith(SpringRunner.class)
@@ -30,10 +34,14 @@ public class SOETest {
     @Autowired
     private FileService fileService;
 
+    @Autowired
+    private CpsrcdManager cpsrcdManager;
+
     @Test
-    public void testFileImpl(){
-        String s ="cpsgrp_1588871928125460480";
-        Object o = fileService.getCorpusesByGroupId(s);
+    public void testTGX(){
+        String s = "cpsgrp_1588871928125460480";
+        JSONObject json = fileService.getCorpusesByGroupId(s);
+        System.out.println("json = " + json);
     }
 
     @Test
