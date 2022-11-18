@@ -130,9 +130,9 @@ public class FileServiceImpl implements FileService {
                     }
                 }
 
-                result.setWrong_words(words);
-                result.setTotal_words_count(words1.length-1);
-                result.setWrong_words_count(wrong_words);
+                result.setWrongwWords(words);
+                result.setTotalWordsCount(words1.length-1);
+                result.setWrongWordsCount(wrong_words);
 
 
                 // 输出json格式的字符串回包

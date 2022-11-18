@@ -15,9 +15,9 @@ public class Result {
     private String PronAccuracy;     //准确度
     private String PronFluency;      //流利度
     private String PronCompletion;   //完整度
-    private List<JSONObject> wrong_words;
-    private int total_words_count;
-    private int wrong_words_count;
+    private List<JSONObject> WrongWords;
+    private int TotalWordsCount;
+    private int WrongWordsCount;
 /*
     private String Phone;            //音素
     private String DetectedStress;   //用户是否重音
