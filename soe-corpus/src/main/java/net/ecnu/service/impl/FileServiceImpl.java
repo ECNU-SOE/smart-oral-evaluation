@@ -37,7 +37,7 @@ public class FileServiceImpl implements FileService {
 
 
     @Override
-    public Result evaluate(MultipartFile audio,String text,String pinyin,int mode) {
+    public Result evaluate(MultipartFile audio,String text,String pinyin,String mode) {
         Result result = new Result();
         try {
 
@@ -69,11 +69,11 @@ public class FileServiceImpl implements FileService {
                 req.setTextMode(1L); //文本格式.0普通文本 1,音素结构
             }
             req.setWorkMode(0L); //0,流式分片,1一次性评测
-            if(mode==0){
+            if("0".equals(mode)){
                 req.setEvalMode(0L); //评估模式,0,单词.1,句子,2,段落,3自由说,4单词纠错
-            }else if(mode==1||mode==2){
+            }else if("1".equals(mode)||"2".equals(mode)){
                 req.setEvalMode(1L);
-            }else if(mode==3){
+            }else if("3".equals(mode)||"5".equals(mode)){
                 req.setEvalMode(2L);
             }else{
                 return null;
@@ -113,20 +113,26 @@ public class FileServiceImpl implements FileService {
                 result.setPronCompletion(resp.getPronCompletion().toString());
 
                 WordRsp[] words1 = resp.getWords();
-
+                int wrong_words =0;
                 //将所有得分不超过85分的汉字加入返回集合
                 List<JSONObject> words = new ArrayList<>();
-                for(int k = 0; k< words1.length; k++){
-                        if(words1[k].getPronAccuracy()<85|| words1[k].getPronFluency()<0.85)
+                if ("Finished".equals(resp.getStatus())){
+                    for(int k = 0; k< words1.length; k++){
+                        if(words1[k].getPronAccuracy()<90|| words1[k].getPronFluency()<0.90)
                             if(!"*".equals(words1[k].getWord())){
+                                wrong_words++;//统计错字字数
                                 JSONObject temp_json = new JSONObject();
                                 temp_json.put("word", words1[k].getWord().toString());
                                 temp_json.put("PronAccuracy", words1[k].getPronAccuracy().toString());
                                 temp_json.put("PronFluency", words1[k].getPronFluency().toString());
                                 words.add(temp_json);
                             }
+                    }
                 }
-                result.setWords(words);
+
+                result.setWrong_words(words);
+                result.setTotal_words_count(words1.length-1);
+                result.setWrong_words_count(wrong_words);
 
 
                 // 输出json格式的字符串回包

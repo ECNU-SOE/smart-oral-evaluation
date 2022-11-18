@@ -24,20 +24,9 @@ public class EvaluateController {
 
     @PostMapping("upload")
     @ResponseBody
-    public Result sentenceEvaluate(@RequestBody List<JSONObject> request) {
-        Result result = new Result();
-        for(int i=0;i<request.size();i++){
-            int type =(int)request.get(i).get("type");
-            MultipartFile audio =(MultipartFile)request.get(i).get("audio");
-            String text = null;
-            String pinyin =null;
-            List<JSONObject> refText =(List<JSONObject>)request.get(i).get("refText");
-            for(int j=0;j<refText.size();j++){
-                text = (String)refText.get(j).get("word")+"";
-                pinyin = (String)refText.get(j).get("pinyin")+"";
-            }
-            result = fileService.evaluate(audio, text.trim(), pinyin.trim(), type);
-        }
+    public Result sentenceEvaluate(@RequestPart("audio") MultipartFile audio, @RequestParam("text") String text,
+                                   @RequestParam("pinyin")String pinyin,@RequestParam("mode") String mode) {
+        Result result = fileService.evaluate(audio, text, pinyin,mode);
         return result;
     }
 

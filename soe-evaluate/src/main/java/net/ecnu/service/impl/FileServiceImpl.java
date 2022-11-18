@@ -1,5 +1,7 @@
 package net.ecnu.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.soe.v20180724.SoeClient;
@@ -7,20 +9,29 @@ import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitReque
 import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitResponse;
 import com.tencentcloudapi.soe.v20180724.models.WordRsp;
 import net.ecnu.controller.Result;
+import net.ecnu.domain.Cpsgrp;
+import net.ecnu.domain.Cpsrcd;
+import net.ecnu.mapper.CpsgrpDao;
+import net.ecnu.mapper.CpsrcdDao;
 import net.ecnu.service.FileService;
 import net.ecnu.util.SOEFileUtil;
 import net.ecnu.util.SOEWordUtil;
-import org.json.JSONArray;
 import org.json.JSONException;
-import com.alibaba.fastjson.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.File;
 import java.util.*;
 
 @Service
 public class FileServiceImpl implements FileService {
+
+    @Autowired
+    private CpsrcdDao cpsrcdDao;
+
+    @Autowired
+    private CpsgrpDao cpsgrpDao;
     @Override
     public Result evaluate(MultipartFile audio,String text,String pinyin,String mode) {
         Result result = new Result();
@@ -56,12 +67,10 @@ public class FileServiceImpl implements FileService {
             req.setWorkMode(0L); //0,流式分片,1一次性评测
             if("0".equals(mode)){
                 req.setEvalMode(0L); //评估模式,0,单词.1,句子,2,段落,3自由说,4单词纠错
-            }else if("1".equals(mode)){
+            }else if("1".equals(mode)||"2".equals(mode)){
                 req.setEvalMode(1L);
-            }else if("2".equals(mode)){
+            }else if("3".equals(mode)||"5".equals(mode)){
                 req.setEvalMode(2L);
-            }else if(mode.isEmpty()){
-                return null;
             }else{
                 return null;
             }
@@ -100,20 +109,26 @@ public class FileServiceImpl implements FileService {
                 result.setPronCompletion(resp.getPronCompletion().toString());
 
                 WordRsp[] words1 = resp.getWords();
-
+                int wrong_words =0;
                 //将所有得分不超过85分的汉字加入返回集合
                 List<JSONObject> words = new ArrayList<>();
-                for(int k = 0; k< words1.length; k++){
-                        if(words1[k].getPronAccuracy()<85|| words1[k].getPronFluency()<0.85)
+                if ("Finished".equals(resp.getStatus())){
+                    for(int k = 0; k< words1.length; k++){
+                        if(words1[k].getPronAccuracy()<90|| words1[k].getPronFluency()<0.90)
                             if(!"*".equals(words1[k].getWord())){
+                                wrong_words++;//统计错字字数
                                 JSONObject temp_json = new JSONObject();
                                 temp_json.put("word", words1[k].getWord().toString());
                                 temp_json.put("PronAccuracy", words1[k].getPronAccuracy().toString());
                                 temp_json.put("PronFluency", words1[k].getPronFluency().toString());
                                 words.add(temp_json);
                             }
+                    }
                 }
-                result.setWords(words);
+
+                result.setWrong_words(words);
+                result.setTotal_words_count(words1.length-1);
+                result.setWrong_words_count(wrong_words);
 
 
                 // 输出json格式的字符串回包
@@ -125,5 +140,145 @@ public class FileServiceImpl implements FileService {
             throw new RuntimeException(e);
         }
         return result;
+    }
+
+    @Override
+    public JSONObject getCorpusesByGroupId(String cpsgrpId) {
+        List<Cpsrcd> corpuses = cpsrcdDao.selectList(new QueryWrapper<Cpsrcd>()
+                .eq("cpsgrp_id",cpsgrpId)
+                .orderByAsc("type")
+        );
+        Cpsgrp cpsgrp = cpsgrpDao.selectById(cpsgrpId);
+        JSONObject json = new JSONObject();
+        json.put("id",cpsgrp.getId());
+        json.put("name",cpsgrp.getName());
+        json.put("type",cpsgrp.getType());
+        json.put("description",cpsgrp.getDescription());
+        json.put("endTime",cpsgrp.getEndTime());
+        json.put("creator",cpsgrp.getCreator());
+        json.put("gmtCreate",cpsgrp.getGmtCreate());
+        json.put("gmtModified",cpsgrp.getGmtModified());
+        List<JSONObject> list = new ArrayList<>();
+        for(int i=0;i<corpuses.size();i++){
+            JSONObject o = new JSONObject();
+            //如果list为空则创建list的第一项
+            if(corpuses.get(i).getType()==1) {
+                //否则遍历list，查看是否已经存在对应type的项
+                boolean exist = false;
+                //假设所有的corpus_list的项都已经满了
+                boolean full =true;
+                for(int j=0;j<list.size();j++){
+                    int temp_type = (int)list.get(j).get("type");
+                    if(temp_type==1)
+                        exist = true;
+                    List<JSONObject> temp_json= (List<JSONObject>)list.get(j).get("corpus_list");
+                    if(temp_json.size()<4&&temp_type==1)
+                        full=false;
+                }
+                //如果list为空,或者list中不存在对应type的项,或者存在但已满则新建json加入corpus_list
+                if(exist==false||full==true||list.isEmpty()) {
+                    o.put("type",corpuses.get(i).getType());
+                    List<JSONObject> corpus_list =new ArrayList<>();
+                    JSONObject corpus_json = new JSONObject();
+                    corpus_json.put("id",corpuses.get(i).getId());
+                    corpus_json.put("refText",corpuses.get(i).getRefText());
+                    corpus_json.put("order",corpuses.get(i).getOrder());
+                    corpus_json.put("pinyin",corpuses.get(i).getPinyin());
+                    corpus_json.put("level",corpuses.get(i).getLevel());
+                    corpus_list.add(corpus_json);
+                    o.put("corpus_list",corpus_list);
+                    list.add(o);
+                }else{
+                    //找到list中对应的项并插入
+                    for(int j=0;j<list.size();j++){
+                        List<JSONObject> temp_corpus_list = (List<JSONObject>)list.get(j).get("corpus_list");
+                        if((int)list.get(j).get("type")==1&&temp_corpus_list.size()<4){
+                            JSONObject temp_json = new JSONObject();
+                            temp_json.put("id",corpuses.get(i).getId());
+                            temp_json.put("refText",corpuses.get(i).getRefText());
+                            temp_json.put("order",corpuses.get(i).getOrder());
+                            temp_json.put("pinyin",corpuses.get(i).getPinyin());
+                            temp_json.put("level",corpuses.get(i).getLevel());
+                            temp_corpus_list.add(temp_json);
+                        }
+                    }
+                }
+            }else if(corpuses.get(i).getType()==2){
+                boolean exist = false;
+                boolean full =true;
+                for(int j=0;j<list.size();j++){
+                    int temp_type = (int)list.get(j).get("type");
+                    if(temp_type==2)
+                        exist = true;
+                    List<JSONObject> temp_json= (List<JSONObject>)list.get(j).get("corpus_list");
+                    if(temp_json.size()<2&&temp_type==2)
+                        full=false;
+                }
+                if(exist==false||full==true||list.isEmpty()) {
+                    o.put("type",corpuses.get(i).getType());
+                    List<JSONObject> corpus_list =new ArrayList<>();
+                    JSONObject corpus_json = new JSONObject();
+                    corpus_json.put("id",corpuses.get(i).getId());
+                    corpus_json.put("refText",corpuses.get(i).getRefText());
+                    corpus_json.put("order",corpuses.get(i).getOrder());
+                    corpus_json.put("pinyin",corpuses.get(i).getPinyin());
+                    corpus_json.put("level",corpuses.get(i).getLevel());
+                    corpus_list.add(corpus_json);
+                    o.put("corpus_list",corpus_list);
+                    list.add(o);
+                }else{
+                    for(int j=0;j<list.size();j++){
+                        List<JSONObject> temp_corpus_list = (List<JSONObject>)list.get(j).get("corpus_list");
+                        if((int)list.get(j).get("type")==2&&temp_corpus_list.size()<2){
+                            JSONObject temp_json = new JSONObject();
+                            temp_json.put("id",corpuses.get(i).getId());
+                            temp_json.put("refText",corpuses.get(i).getRefText());
+                            temp_json.put("order",corpuses.get(i).getOrder());
+                            temp_json.put("pinyin",corpuses.get(i).getPinyin());
+                            temp_json.put("level",corpuses.get(i).getLevel());
+                            temp_corpus_list.add(temp_json);
+                        }
+                    }
+                }
+            } else if (corpuses.get(i).getType()==3) {
+                o.put("type",corpuses.get(i).getType());
+                List<JSONObject> corpus_list =new ArrayList<>();
+                JSONObject corpus_json = new JSONObject();
+                corpus_json.put("id",corpuses.get(i).getId());
+                corpus_json.put("refText",corpuses.get(i).getRefText());
+                corpus_json.put("order",corpuses.get(i).getOrder());
+                corpus_json.put("pinyin",corpuses.get(i).getPinyin());
+                corpus_json.put("level",corpuses.get(i).getLevel());
+                corpus_list.add(corpus_json);
+                o.put("corpus_list",corpus_list);
+                list.add(o);
+            } else if (corpuses.get(i).getType()==5) {
+                o.put("type",corpuses.get(i).getType());
+                List<JSONObject> corpus_list =new ArrayList<>();
+                JSONObject corpus_json = new JSONObject();
+                corpus_json.put("id",corpuses.get(i).getId());
+                corpus_json.put("refText",corpuses.get(i).getRefText());
+                corpus_json.put("order",corpuses.get(i).getOrder());
+                corpus_json.put("pinyin",corpuses.get(i).getPinyin());
+                corpus_json.put("level",corpuses.get(i).getLevel());
+                corpus_list.add(corpus_json);
+                o.put("corpus_list",corpus_list);
+                list.add(o);
+            }else {
+                o.put("type",corpuses.get(i).getType());
+                List<JSONObject> corpus_list =new ArrayList<>();
+                JSONObject corpus_json = new JSONObject();
+                corpus_json.put("id",corpuses.get(i).getId());
+                corpus_json.put("refText",corpuses.get(i).getRefText());
+                corpus_json.put("order",corpuses.get(i).getOrder());
+                corpus_json.put("pinyin",corpuses.get(i).getPinyin());
+                corpus_json.put("level",corpuses.get(i).getLevel());
+                corpus_list.add(corpus_json);
+                o.put("corpus_list",corpus_list);
+                list.add(o);
+            }
+        }
+        json.put("cpsrcdList",list);
+        return json;
     }
 }
