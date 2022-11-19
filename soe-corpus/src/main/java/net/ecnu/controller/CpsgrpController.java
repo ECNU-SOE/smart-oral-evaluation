@@ -1,14 +1,11 @@
 package net.ecnu.controller;
 
 
-import net.ecnu.controller.group.Create;
 import net.ecnu.controller.request.CpsgrpCreateReq;
 import net.ecnu.controller.request.CpsgrpFilterReq;
-import net.ecnu.controller.request.TranscriptReq;
 import net.ecnu.service.CpsgrpService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -30,7 +27,7 @@ public class CpsgrpController {
     }
 
     /**
-     * 获取语料组
+     * 查询语料组详情
      */
     @GetMapping("detail")
     public JsonData detail(@RequestParam String cpsgrpId) {
@@ -53,15 +50,6 @@ public class CpsgrpController {
     @GetMapping("del")
     public JsonData del(@RequestParam String cpsgrpId) {
         Object data = cpsgrpService.del(cpsgrpId);
-        return JsonData.buildSuccess(data);
-    }
-
-    /**
-     * 生成题目组答题报告
-     */
-    @PostMapping("transcript")
-    public JsonData transcript(@RequestBody @Validated TranscriptReq transcriptReq) {
-        Object data = cpsgrpService.genTranscript(transcriptReq);//生成报告
         return JsonData.buildSuccess(data);
     }
 

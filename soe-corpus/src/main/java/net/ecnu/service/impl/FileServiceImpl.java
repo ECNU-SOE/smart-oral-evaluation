@@ -164,20 +164,14 @@ public class FileServiceImpl implements FileService {
             JSONObject o = new JSONObject();
             //如果list为空则创建list的第一项
             if(corpuses.get(i).getType()==1) {
-                //否则遍历list，查看是否已经存在对应type的项
                 boolean exist = false;
-                //假设所有的corpus_list的项都已经满了
-                boolean full =true;
+                //否则遍历list，查看是否已经存在对应type的项
                 for(int j=0;j<list.size();j++){
-                    int temp_type = (int)list.get(j).get("type");
-                    if(temp_type==1)
+                    if((int)list.get(j).get("type")==1)
                         exist = true;
-                    List<JSONObject> temp_json= (List<JSONObject>)list.get(j).get("corpus_list");
-                    if(temp_json.size()<4&&temp_type==1)
-                        full=false;
                 }
-                //如果list为空,或者list中不存在对应type的项,或者存在但已满则新建json加入corpus_list
-                if(exist==false||full==true||list.isEmpty()) {
+                //如果list为空,或者list中不存在对应type的项则新建json加入corpus_list
+                if(exist==false||list.isEmpty()) {
                     o.put("type",corpuses.get(i).getType());
                     List<JSONObject> corpus_list =new ArrayList<>();
                     JSONObject corpus_json = new JSONObject();
@@ -193,7 +187,7 @@ public class FileServiceImpl implements FileService {
                     //找到list中对应的项并插入
                     for(int j=0;j<list.size();j++){
                         List<JSONObject> temp_corpus_list = (List<JSONObject>)list.get(j).get("corpus_list");
-                        if((int)list.get(j).get("type")==1&&temp_corpus_list.size()<4){
+                        if((int)list.get(j).get("type")==1){
                             JSONObject temp_json = new JSONObject();
                             temp_json.put("id",corpuses.get(i).getId());
                             temp_json.put("refText",corpuses.get(i).getRefText());
@@ -206,16 +200,11 @@ public class FileServiceImpl implements FileService {
                 }
             }else if(corpuses.get(i).getType()==2){
                 boolean exist = false;
-                boolean full =true;
                 for(int j=0;j<list.size();j++){
-                    int temp_type = (int)list.get(j).get("type");
-                    if(temp_type==2)
+                    if((int)list.get(j).get("type")==2)
                         exist = true;
-                    List<JSONObject> temp_json= (List<JSONObject>)list.get(j).get("corpus_list");
-                    if(temp_json.size()<2&&temp_type==2)
-                        full=false;
                 }
-                if(exist==false||full==true||list.isEmpty()) {
+                if(exist==false||list.isEmpty()) {
                     o.put("type",corpuses.get(i).getType());
                     List<JSONObject> corpus_list =new ArrayList<>();
                     JSONObject corpus_json = new JSONObject();
@@ -230,7 +219,7 @@ public class FileServiceImpl implements FileService {
                 }else{
                     for(int j=0;j<list.size();j++){
                         List<JSONObject> temp_corpus_list = (List<JSONObject>)list.get(j).get("corpus_list");
-                        if((int)list.get(j).get("type")==2&&temp_corpus_list.size()<2){
+                        if((int)list.get(j).get("type")==2){
                             JSONObject temp_json = new JSONObject();
                             temp_json.put("id",corpuses.get(i).getId());
                             temp_json.put("refText",corpuses.get(i).getRefText());
@@ -241,31 +230,7 @@ public class FileServiceImpl implements FileService {
                         }
                     }
                 }
-            } else if (corpuses.get(i).getType()==3) {
-                o.put("type",corpuses.get(i).getType());
-                List<JSONObject> corpus_list =new ArrayList<>();
-                JSONObject corpus_json = new JSONObject();
-                corpus_json.put("id",corpuses.get(i).getId());
-                corpus_json.put("refText",corpuses.get(i).getRefText());
-                corpus_json.put("order",corpuses.get(i).getOrder());
-                corpus_json.put("pinyin",corpuses.get(i).getPinyin());
-                corpus_json.put("level",corpuses.get(i).getLevel());
-                corpus_list.add(corpus_json);
-                o.put("corpus_list",corpus_list);
-                list.add(o);
-            } else if (corpuses.get(i).getType()==5) {
-                o.put("type",corpuses.get(i).getType());
-                List<JSONObject> corpus_list =new ArrayList<>();
-                JSONObject corpus_json = new JSONObject();
-                corpus_json.put("id",corpuses.get(i).getId());
-                corpus_json.put("refText",corpuses.get(i).getRefText());
-                corpus_json.put("order",corpuses.get(i).getOrder());
-                corpus_json.put("pinyin",corpuses.get(i).getPinyin());
-                corpus_json.put("level",corpuses.get(i).getLevel());
-                corpus_list.add(corpus_json);
-                o.put("corpus_list",corpus_list);
-                list.add(o);
-            }else {
+            } else {
                 o.put("type",corpuses.get(i).getType());
                 List<JSONObject> corpus_list =new ArrayList<>();
                 JSONObject corpus_json = new JSONObject();

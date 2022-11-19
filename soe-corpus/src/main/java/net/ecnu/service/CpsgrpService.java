@@ -2,7 +2,6 @@ package net.ecnu.service;
 
 import net.ecnu.controller.request.CpsgrpCreateReq;
 import net.ecnu.controller.request.CpsgrpFilterReq;
-import net.ecnu.controller.request.TranscriptReq;
 import net.ecnu.model.CpsgrpDO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -17,8 +16,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface CpsgrpService extends IService<CpsgrpDO> {
 
     /**
-     * 1、创建cpsgrp
-     * 2、创建cpsrcd，语料的快照
+     *  1、创建cpsgrp
+     *  2、创建cpsrcd，语料的快照
      */
     Object create(CpsgrpCreateReq cpsgrpCreateReq);
 
@@ -27,9 +26,4 @@ public interface CpsgrpService extends IService<CpsgrpDO> {
     Object detail(String cpsgrpId);
 
     Object pageByFilter(CpsgrpFilterReq cpsgrpFilter);
-
-    /**
-     * 生成题目组答题报告
-     */
-    Object genTranscript(TranscriptReq transcriptReq);
 }
