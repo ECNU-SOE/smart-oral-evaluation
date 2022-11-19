@@ -1,10 +1,7 @@
-package net.ecnu.model.VO;
+package net.ecnu.model.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.ecnu.model.CpsrcdDO;
 
 import java.io.Serializable;
 import java.util.Date;

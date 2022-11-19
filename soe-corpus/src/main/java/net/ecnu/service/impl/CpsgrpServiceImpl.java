@@ -2,6 +2,7 @@ package net.ecnu.service.impl;
 
 import net.ecnu.controller.request.CpsgrpCreateReq;
 import net.ecnu.controller.request.CpsgrpFilterReq;
+import net.ecnu.controller.request.TranscriptReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.interceptor.LoginInterceptor;
@@ -9,19 +10,20 @@ import net.ecnu.manager.CpsgrpManager;
 import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.mapper.CorpusMapper;
 import net.ecnu.mapper.CpsrcdMapper;
+import net.ecnu.mapper.TranscriptMapper;
 import net.ecnu.model.CorpusDO;
 import net.ecnu.model.CpsgrpDO;
 import net.ecnu.mapper.CpsgrpMapper;
 import net.ecnu.model.CpsrcdDO;
-import net.ecnu.model.VO.CpsgrpVO;
-import net.ecnu.model.VO.CpsrcdVO;
+import net.ecnu.model.TranscriptDO;
+import net.ecnu.model.vo.CpsgrpVO;
+import net.ecnu.model.vo.CpsrcdVO;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.service.CpsgrpService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.util.IDUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +56,9 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
 
     @Autowired
     private CpsrcdMapper cpsrcdMapper;
+
+    @Autowired
+    private TranscriptMapper transcriptMapper;
 
 
     @Override
@@ -116,6 +121,17 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     public Object pageByFilter(CpsgrpFilterReq cpsgrpFilter) {
         List<CpsgrpVO> cpsgrpVOS = cpsgrpManager.listByFilter(cpsgrpFilter);
         return cpsgrpVOS;
+    }
+
+    @Override
+    public Object genTranscript(TranscriptReq transcriptReq) {
+        //获取登录用户信息
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        TranscriptDO transcriptDO = new TranscriptDO();
+//        transcriptDO
+
+
+        return transcriptMapper.selectById("transcript_1593858644330549248");
     }
 
     /**

@@ -24,14 +24,16 @@ public class EvaluateController {
 
     @PostMapping("upload")
     @ResponseBody
-    public Result sentenceEvaluate(@RequestPart("audio") MultipartFile audio, @RequestParam("text") String text,
-                                   @RequestParam("pinyin")String pinyin,@RequestParam("mode") String mode) {
-        Result result = fileService.evaluate(audio, text, pinyin,mode);
+    public Result sentenceEvaluate(@RequestPart("audio") MultipartFile audio,
+                                   @RequestParam("text") String text,
+                                   @RequestParam("pinyin") String pinyin,
+                                   @RequestParam("mode") String mode) {
+        Result result = fileService.evaluate(audio, text, pinyin, mode);
         return result;
     }
 
     @GetMapping("details")
-    public JSONObject details(@RequestParam String cpsgrpId){
+    public JSONObject details(@RequestParam String cpsgrpId) {
         JSONObject result = fileService.getCorpusesByGroupId(cpsgrpId);
         return result;
     }
