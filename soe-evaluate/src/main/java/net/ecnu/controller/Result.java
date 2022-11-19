@@ -11,11 +11,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Result {
-    private String SuggestedScore;   //作为总分使用
-    private String PronAccuracy;     //准确度
-    private String PronFluency;      //流利度
-    private String PronCompletion;   //完整度
-    private List<JSONObject> WrongWords;
+    private double SuggestedScore;   //作为总分使用
+    private double PronAccuracy;     //准确度
+    private double PronFluency;      //流利度
+    private double PronCompletion;   //完整度
+    private List<JSONObject> WrongwWords;
     private int TotalWordsCount;
     private int WrongWordsCount;
 /*

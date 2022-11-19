@@ -12,7 +12,7 @@ import net.ecnu.mapper.CorpusMapper;
 import net.ecnu.mapper.CpsgrpMapper;
 import net.ecnu.model.CorpusDO;
 import net.ecnu.model.CpsgrpDO;
-import net.ecnu.model.vo.CpsgrpVO;
+import net.ecnu.model.VO.CpsgrpVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
