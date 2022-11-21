@@ -17,6 +17,7 @@ import net.ecnu.mapper.CpsgrpMapper;
 import net.ecnu.model.CpsrcdDO;
 import net.ecnu.model.TranscriptDO;
 import net.ecnu.model.common.LoginUser;
+import net.ecnu.model.dto.ScoreDTO;
 import net.ecnu.model.vo.CpsgrpVO;
 import net.ecnu.model.vo.CpsrcdVO;
 import net.ecnu.model.common.LoginUser;
@@ -25,11 +26,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.util.IDUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.commons.util.IdUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 /**
@@ -128,11 +132,67 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     public Object genTranscript(TranscriptReq transcriptReq) {
         //获取登录用户信息
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+        //处理生成TranscriptDO对象
         TranscriptDO transcriptDO = new TranscriptDO();
-//        transcriptDO
+        transcriptDO.setId("transcript_" + IDUtil.getSnowflakeId());
+        transcriptDO.setCpsgrpId(transcriptReq.getCpsgrpId());
+        transcriptDO.setRespondent(loginUser.getAccountNo());
+        //计算报告完整度得分
+        Double pronCompletion = computePronCompletion(transcriptReq.getScores());
+        transcriptDO.setPronCompletion(BigDecimal.valueOf(pronCompletion));
+        //计算报告准确度得分
+        Double pronAccuracy = computePronAccuracy(transcriptReq.getScores());
+        transcriptDO.setPronAccuracy(BigDecimal.valueOf(pronAccuracy));
+        //计算报告流畅性得分
+        Double pronFluency = computePronFluency(transcriptReq.getScores());
+        transcriptDO.setPronFluency(BigDecimal.valueOf(pronFluency));
+        //计算建议报告得分
+        Double suggestedScore = computeSuggestedScore(transcriptReq.getScores());
+        transcriptDO.setSuggestedScore(BigDecimal.valueOf(suggestedScore));
+        //插入数据库
+        transcriptMapper.insert(transcriptDO);
+        return transcriptMapper.selectById(transcriptDO.getId());
+    }
 
+    /**
+     * 计算报告建议得分
+     */
+    private Double computeSuggestedScore(List<ScoreDTO> scores) {
+        int totalWords = scores.stream().mapToInt(ScoreDTO::getTotalWords).sum();
+        int wrongWords = scores.stream().mapToInt(ScoreDTO::getWrongWords).sum();
+        Double suggestedScore = (1 - wrongWords * 1.0 / totalWords) * 100;
+        return suggestedScore;
+    }
 
-        return transcriptMapper.selectById("transcript_1593858644330549248");
+    /**
+     * 计算报告的pronCompletion评分
+     */
+    private Double computePronCompletion(List<ScoreDTO> scores) {
+        OptionalDouble averageOptional = scores.stream().mapToDouble(ScoreDTO::getPronCompletion).average();
+        Double average = averageOptional.isPresent() ? averageOptional.getAsDouble() : null;
+        if (average != null) average = average * 10;
+        return average;
+    }
+
+    /**
+     * 计算报告的pronAccuracy评分
+     */
+    private Double computePronAccuracy(List<ScoreDTO> scores) {
+        OptionalDouble averageOptional = scores.stream().mapToDouble(ScoreDTO::getPronAccuracy).average();
+        Double average = averageOptional.isPresent() ? averageOptional.getAsDouble() : null;
+        if (average != null) average = average / 10;
+        return average;
+    }
+
+    /**
+     * 计算报告的pronFluency评分
+     */
+    private Double computePronFluency(List<ScoreDTO> scores) {
+        OptionalDouble averageOptional = scores.stream().mapToDouble(ScoreDTO::getPronFluency).average();
+        Double average = averageOptional.isPresent() ? averageOptional.getAsDouble() : null;
+        if (average != null) average = average * 10;
+        return average;
     }
 
     /**
