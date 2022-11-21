@@ -176,7 +176,8 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     private Double computeSuggestedScore(List<ScoreDTO> scores) {
         int totalWords = scores.stream().mapToInt(ScoreDTO::getTotalWords).sum();
         int wrongWords = scores.stream().mapToInt(ScoreDTO::getWrongWords).sum();
-        Double suggestedScore = (1 - wrongWords * 1.0 / totalWords) * 100;
+        double suggestedScore = 0.0;
+        if (totalWords != 0) suggestedScore = (1 - wrongWords * 1.0 / totalWords) * 100;
         return suggestedScore;
     }
 
