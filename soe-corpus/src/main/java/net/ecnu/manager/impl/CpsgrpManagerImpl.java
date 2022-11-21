@@ -1,11 +1,13 @@
 package net.ecnu.manager.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.controller.request.CpsgrpFilterReq;
 import net.ecnu.manager.CpsgrpManager;
 import net.ecnu.mapper.CpsgrpMapper;
 import net.ecnu.model.CpsgrpDO;
-import net.ecnu.model.vo.CpsgrpVO;
+import net.ecnu.model.common.PageData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,15 +21,22 @@ public class CpsgrpManagerImpl implements CpsgrpManager {
     private CpsgrpMapper cpsgrpMapper;
 
 
-
     @Override
     public int insert(CpsgrpDO cpsgrpDO) {
         return cpsgrpMapper.insert(cpsgrpDO);
     }
 
     @Override
-    public List<CpsgrpVO> listByFilter(CpsgrpFilterReq cpsgrpFilter) {
-        return null;
+    public List<CpsgrpDO> listByFilter(CpsgrpFilterReq cpsgrpFilter, PageData pageData) {
+        Page<CpsgrpDO> cpsgrpDOPage = cpsgrpMapper.selectPage(
+                new Page<CpsgrpDO>(pageData.getCurrent(), pageData.getSize()), new QueryWrapper<>());
+        return cpsgrpDOPage.getRecords();
     }
+
+    @Override
+    public int countByFilter(CpsgrpFilterReq cpsgrpFilter) {
+        return cpsgrpMapper.selectCount(new QueryWrapper<CpsgrpDO>());
+    }
+
 
 }

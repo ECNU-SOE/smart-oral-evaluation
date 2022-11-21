@@ -17,16 +17,16 @@ import net.ecnu.mapper.CpsgrpMapper;
 import net.ecnu.model.CpsrcdDO;
 import net.ecnu.model.TranscriptDO;
 import net.ecnu.model.common.LoginUser;
+import net.ecnu.model.common.PageData;
 import net.ecnu.model.dto.ScoreDTO;
+import net.ecnu.model.vo.CpsgrpDetailVO;
 import net.ecnu.model.vo.CpsgrpVO;
 import net.ecnu.model.vo.CpsrcdVO;
-import net.ecnu.model.common.LoginUser;
 import net.ecnu.service.CpsgrpService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.util.IDUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.commons.util.IdUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -113,20 +113,15 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(cpsgrpId);
         if (cpsgrpDO == null) throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         //处理cpsgrpVO题目组对象
-        CpsgrpVO cpsgrpVO = new CpsgrpVO();
-        BeanUtils.copyProperties(cpsgrpDO, cpsgrpVO);
+        CpsgrpDetailVO cpsgrpDetailVO = new CpsgrpDetailVO();
+        BeanUtils.copyProperties(cpsgrpDO, cpsgrpDetailVO);
         //处理cpsrcdVOS题目列表
         List<CpsrcdDO> cpsrcdDOS = cpsrcdManager.listByCpsgrpId(cpsgrpId);
         List<CpsrcdVO> cpsrcdVOS = cpsrcdDOS.stream().map(this::beanProcess).collect(Collectors.toList());
-        cpsgrpVO.setCpsrcdList(cpsrcdVOS);
-        return cpsgrpVO;
+        cpsgrpDetailVO.setCpsrcdList(cpsrcdVOS);
+        return cpsgrpDetailVO;
     }
 
-    @Override
-    public Object pageByFilter(CpsgrpFilterReq cpsgrpFilter) {
-        List<CpsgrpVO> cpsgrpVOS = cpsgrpManager.listByFilter(cpsgrpFilter);
-        return cpsgrpVOS;
-    }
 
     @Override
     public Object genTranscript(TranscriptReq transcriptReq) {
@@ -153,6 +148,26 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         //插入数据库
         transcriptMapper.insert(transcriptDO);
         return transcriptMapper.selectById(transcriptDO.getId());
+    }
+
+    @Override
+    public Object pageByFilter(CpsgrpFilterReq cpsgrpFilter, PageData pageData) {
+        //获取分页后的cpsgrpDOS
+        List<CpsgrpDO> cpsgrpDOS = cpsgrpManager.listByFilter(cpsgrpFilter, pageData);
+        //统计过滤后的记录总数
+        int totalCount = cpsgrpManager.countByFilter(cpsgrpFilter);
+        pageData.setTotal(totalCount);
+        //生成处理cpsgrpVOS对象
+        List<CpsgrpVO> cpsgrpVOS = cpsgrpDOS.stream().map(cpsgrpDO -> {
+            CpsgrpVO cpsgrpVO = beanProcess(cpsgrpDO);
+            //统计题目数量
+            int cpsrcdNum = cpsrcdManager.countByCpsgrpId(cpsgrpVO.getId());
+            cpsgrpVO.setCpsrcdNum(cpsrcdNum);
+            return cpsgrpVO;
+        }).collect(Collectors.toList());
+        pageData.setRecords(cpsgrpVOS);
+        //返回分页对象
+        return pageData;
     }
 
     /**
@@ -211,5 +226,14 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         CpsrcdVO cpsrcdVO = new CpsrcdVO();
         BeanUtils.copyProperties(cpsgrpDO, cpsrcdVO);
         return cpsrcdVO;
+    }
+
+    /**
+     * CpsgrpDO->CpsgrpVO
+     */
+    private CpsgrpVO beanProcess(CpsgrpDO cpsgrpDO) {
+        CpsgrpVO cpsgrpVO = new CpsgrpVO();
+        BeanUtils.copyProperties(cpsgrpDO, cpsgrpVO);
+        return cpsgrpVO;
     }
 }

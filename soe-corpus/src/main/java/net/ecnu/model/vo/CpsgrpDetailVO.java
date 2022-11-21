@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * <p>
- * cpsgrp列表vo对象
+ * cpsgrp详情vo对象
  * </p>
  *
  * @author LYW
@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class CpsgrpVO implements Serializable {
+public class CpsgrpDetailVO implements Serializable {
 
     /**
      * 语料组id
@@ -38,11 +38,6 @@ public class CpsgrpVO implements Serializable {
      * 语料组描述
      */
     private String description;
-
-    /**
-     * 语料组题目数量
-     */
-    private Integer cpsrcdNum;
 
     /**
      * 开始时间
@@ -68,6 +63,11 @@ public class CpsgrpVO implements Serializable {
      * 更新时间
      */
     private Date gmtModified;
+
+    /**
+     * 题目列表
+     */
+    private List<CpsrcdVO> cpsrcdList;
 
 
 }

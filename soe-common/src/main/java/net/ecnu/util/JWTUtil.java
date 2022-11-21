@@ -27,9 +27,9 @@ public class JWTUtil {
     private static final String TOKEN_PREFIX = "soe-token-";
 
     /**
-     * token过期时间，7天
+     * token过期时间，14天
      */
-    private static final long EXPIRED = 1000 * 60 * 60 * 24 * 7;
+    private static final long EXPIRED = 1000 * 60 * 60 * 24 * 14;
 
     /**
      * 生成JWT
