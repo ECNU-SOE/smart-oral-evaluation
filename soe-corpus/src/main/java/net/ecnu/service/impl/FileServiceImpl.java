@@ -58,7 +58,7 @@ public class FileServiceImpl implements FileService {
 
             text.trim();
             req.setVoiceEncodeType(1L);  //语音数据类型1:pcm
-            req.setVoiceFileType(3L); //语音文件类型1: raw，2: wav，3: mp3，4: speex
+            req.setVoiceFileType(2L); //语音文件类型1: raw，2: wav，3: mp3，4: speex
             req.setSessionId(sessionId); //唯一标识
             if(pinyin.isEmpty()){//普通评测模式
                 req.setRefText(text);
@@ -131,7 +131,7 @@ public class FileServiceImpl implements FileService {
                 List<JSONObject> words = new ArrayList<>();
                 if ("Finished".equals(resp.getStatus())){
                     for(int k = 0; k< words1.length; k++){
-                        if(words1[k].getPronAccuracy()<90|| words1[k].getPronFluency()<0.90)
+                        if(Float.valueOf(words1[k].getPronAccuracy())<90|| Float.valueOf(words1[k].getPronFluency())<0.90)
                             if(!"*".equals(words1[k].getWord())){
                                 wrong_words++;//统计错字字数
                                 JSONObject temp_json = new JSONObject();
