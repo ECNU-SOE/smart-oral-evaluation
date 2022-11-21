@@ -2,6 +2,8 @@ package net.ecnu.model.dto;
 
 import lombok.Data;
 
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -10,7 +12,9 @@ public class ScoreDTO {
     @NotNull
     private Integer subTopic;
 
-    @NotNull
+    @DecimalMin(value = "0", message = "proportion range 0～1")
+    @DecimalMax(value = "1", message = "proportion range 0～1")
+    @NotNull(message = "proportion can't be null")
     private Double proportion;
 
     @NotNull
@@ -19,12 +23,18 @@ public class ScoreDTO {
     @NotNull
     private Integer wrongWords;
 
-    @NotNull
+    @DecimalMin(value = "0", message = "pronCompletion range 0～1")
+    @DecimalMax(value = "1", message = "pronCompletion range 0～1")
+    @NotNull(message = "pronCompletion can't be null")
     private Double pronCompletion;
 
-    @NotNull
+    @DecimalMin(value = "0", message = "pronAccuracy range 0～100")
+    @DecimalMax(value = "100", message = "pronAccuracy range 0～100")
+    @NotNull(message = "pronAccuracy can't be null")
     private Double pronAccuracy;
 
-    @NotNull
+    @DecimalMin(value = "0", message = "pronFluency range 0～1")
+    @DecimalMax(value = "1", message = "pronFluency range 0～1")
+    @NotNull(message = "pronFluency can't be null")
     private Double pronFluency;
 }
