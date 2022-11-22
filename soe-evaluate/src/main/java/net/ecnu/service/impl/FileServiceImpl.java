@@ -57,7 +57,7 @@ public class FileServiceImpl implements FileService {
 
             text.trim();
             req.setVoiceEncodeType(1L);  //语音数据类型1:pcm
-            req.setVoiceFileType(3L); //语音文件类型1: raw，2: wav，3: mp3，4: speex
+            req.setVoiceFileType(2L); //语音文件类型1: raw，2: wav，3: mp3，4: speex
             req.setSessionId(sessionId); //唯一标识
             if(pinyin.isEmpty()){//普通评测模式
                 req.setRefText(text);
@@ -70,9 +70,9 @@ public class FileServiceImpl implements FileService {
             req.setWorkMode(0L); //0,流式分片,1一次性评测
             if("0".equals(mode)){
                 req.setEvalMode(0L); //评估模式,0,单词.1,句子,2,段落,3自由说,4单词纠错
-            }else if("1".equals(mode)||"2".equals(mode)){
+            }else if("1".equals(mode)){
                 req.setEvalMode(1L);
-            }else if("3".equals(mode)||"5".equals(mode)){
+            }else if("3".equals(mode)||"5".equals(mode)||"2".equals(mode)){
                 req.setEvalMode(2L);
             }else{
                 return null;
@@ -119,19 +119,36 @@ public class FileServiceImpl implements FileService {
                     result.setWrongwWords(list);
                 }*/
 
+                if (resp==null){
+                    result.setWrongWordsCount(0);
+                    List<JSONObject> list = new ArrayList<>();
+                    JSONObject object = new JSONObject();
+                    object.put("words",0);
+                    list.add(object);
+                    if (list == null)
+                        System.out.println("这里为null");
+                    result.setWrongwWords(list);
+                    result.setPronAccuracy(0);
+                    result.setPronFluency(0);
+                    result.setPronCompletion(0);
+                    result.setTotalWordsCount(0);
+                    result.setSuggestedScore(0);
+                }
+
                 result.setSuggestedScore(Float.valueOf(resp.getSuggestedScore().toString()));
                 result.setPronAccuracy(Float.valueOf(resp.getPronAccuracy().toString()));
                 result.setPronFluency(Float.valueOf(resp.getPronFluency().toString()));
                 result.setPronCompletion(Float.valueOf(resp.getPronCompletion().toString()));
 
                 WordRsp[] words1 = resp.getWords();
-                int wrong_words =0;
+                int wrong_words =0,total_words=0;
                 //将所有得分不超过90分的汉字加入返回集合
                 List<JSONObject> words = new ArrayList<>();
                 if ("Finished".equals(resp.getStatus())){
                     for(int k = 0; k< words1.length; k++){
-                        if(words1[k].getPronAccuracy()<90|| words1[k].getPronFluency()<0.90)
-                            if(!"*".equals(words1[k].getWord())){
+                        if(!"*".equals(words1[k].getWord())){
+                            total_words++;
+                            if(Float.valueOf(words1[k].getPronAccuracy())<90|| Float.valueOf(words1[k].getPronFluency())<0.90){
                                 wrong_words++;//统计错字字数
                                 JSONObject temp_json = new JSONObject();
                                 temp_json.put("word", words1[k].getWord());
@@ -139,14 +156,12 @@ public class FileServiceImpl implements FileService {
                                 temp_json.put("PronFluency", Float.valueOf(words1[k].getPronFluency().toString()));
                                 words.add(temp_json);
                             }
+                        }
                     }
                 }
-
                 result.setWrongwWords(words);
-                result.setTotalWordsCount(words1.length-1);
+                result.setTotalWordsCount(total_words);
                 result.setWrongWordsCount(wrong_words);
-
-
                 // 输出json格式的字符串回包
                 System.out.println(TransmitOralProcessWithInitResponse.toJsonString(resp));
             }

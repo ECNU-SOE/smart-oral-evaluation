@@ -9,6 +9,4 @@ import java.util.List;
 public interface CpsrcdManager {
 
     List<CpsrcdDO> listByCpsgrpId(String cpsgrpId);
-
-    int countByCpsgrpId(String cpsgrpId);
 }

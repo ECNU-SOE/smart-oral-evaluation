@@ -120,6 +120,20 @@ public class FileServiceImpl implements FileService {
                     result.setWrongwWords(list);
                 }*/
 
+                if (resp==null){
+                    result.setWrongWordsCount(0);
+                    List<JSONObject> list = new ArrayList<>();
+                    JSONObject object = new JSONObject();
+                    object.put("words",0);
+                    list.add(object);
+                    result.setWrongwWords(list);
+                    result.setPronAccuracy(0);
+                    result.setPronFluency(0);
+                    result.setPronCompletion(0);
+                    result.setTotalWordsCount(0);
+                    result.setSuggestedScore(0);
+                }
+
                 result.setSuggestedScore(Float.valueOf(resp.getSuggestedScore().toString()));
                 result.setPronAccuracy(Float.valueOf(resp.getPronAccuracy().toString()));
                 result.setPronFluency(Float.valueOf(resp.getPronFluency().toString()));

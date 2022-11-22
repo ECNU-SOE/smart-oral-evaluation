@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * <p>
- * cpsgrp列表vo对象
+ * corpus快照
  * </p>
  *
  * @author LYW
@@ -40,11 +40,6 @@ public class CpsgrpVO implements Serializable {
     private String description;
 
     /**
-     * 语料组题目数量
-     */
-    private Integer cpsrcdNum;
-
-    /**
      * 开始时间
      */
     private Date startTime;
@@ -68,6 +63,11 @@ public class CpsgrpVO implements Serializable {
      * 更新时间
      */
     private Date gmtModified;
+
+    /**
+     * 题目列表
+     */
+    private List<CpsrcdVO> cpsrcdList;
 
 
 }

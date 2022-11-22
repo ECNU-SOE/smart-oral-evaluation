@@ -37,8 +37,4 @@ public class PageData {
      */
     private Object records;
 
-    public PageData(long cur, long size) {
-        this.current = cur;
-        this.size = size;
-    }
 }

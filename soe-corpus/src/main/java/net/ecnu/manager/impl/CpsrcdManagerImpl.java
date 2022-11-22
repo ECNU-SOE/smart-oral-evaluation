@@ -29,10 +29,4 @@ public class CpsrcdManagerImpl implements CpsrcdManager {
         );
     }
 
-    @Override
-    public int countByCpsgrpId(String cpsgrpId) {
-        return cpsrcdMapper.selectCount(new QueryWrapper<CpsrcdDO>()
-                .eq("cpsgrp_id", cpsgrpId));
-    }
-
 }
