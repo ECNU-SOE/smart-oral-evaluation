@@ -159,6 +159,9 @@ public class FileServiceImpl implements FileService {
         } catch (EncoderException e) {
             throw new RuntimeException(e);
         }
+        File outputfile = new File("output.mp3");
+        if (outputfile.exists())
+            outputfile.delete();
         return result;
     }
 
