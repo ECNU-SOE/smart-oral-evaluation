@@ -58,7 +58,7 @@ public class FileServiceImpl implements FileService {
 
             text.trim();
             req.setVoiceEncodeType(1L);  //语音数据类型1:pcm
-            req.setVoiceFileType(2L); //语音文件类型1: raw，2: wav，3: mp3，4: speex
+            req.setVoiceFileType(3L); //语音文件类型1: raw，2: wav，3: mp3，4: speex
             req.setSessionId(sessionId); //唯一标识
             if(pinyin.isEmpty()){//普通评测模式
                 req.setRefText(text);

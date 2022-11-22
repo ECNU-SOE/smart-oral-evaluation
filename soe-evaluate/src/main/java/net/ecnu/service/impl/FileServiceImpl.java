@@ -1,7 +1,6 @@
 package net.ecnu.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
@@ -14,8 +13,6 @@ import net.ecnu.domain.Cpsgrp;
 import net.ecnu.domain.Cpsrcd;
 import net.ecnu.mapper.CpsgrpDao;
 import net.ecnu.mapper.CpsrcdDao;
-import net.ecnu.model.CpsgrpDO;
-import net.ecnu.model.CpsrcdDO;
 import net.ecnu.service.FileService;
 import net.ecnu.util.SOEFileUtil;
 import net.ecnu.util.SOEWordUtil;
@@ -23,6 +20,8 @@ import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ws.schild.jave.EncoderException;
+import ws.schild.jave.InputFormatException;
 
 import java.io.File;
 import java.util.*;
@@ -40,7 +39,9 @@ public class FileServiceImpl implements FileService {
         Result result = new Result();
         try {
 
-            File file = SOEFileUtil.MultipartFile2File(audio);
+            File wav_file = SOEFileUtil.MultipartFile2File(audio);
+            File file =new File("output.mp3");
+            file = SOEFileUtil.Wav2mp3(wav_file,file);
 
             int PKG_SIZE = 2 * 1024; //分片大小
             String secretId = "AKIDZNBuVGvNrnbJoBYv9gr3EQWUJ8w1DPWS";
@@ -55,12 +56,11 @@ public class FileServiceImpl implements FileService {
 
             TransmitOralProcessWithInitRequest req = new TransmitOralProcessWithInitRequest();
 
-            text.trim();
             req.setVoiceEncodeType(1L);  //语音数据类型1:pcm
-            req.setVoiceFileType(2L); //语音文件类型1: raw，2: wav，3: mp3，4: speex
+            req.setVoiceFileType(3L); //语音文件类型1: raw，2: wav，3: mp3，4: speex
             req.setSessionId(sessionId); //唯一标识
             if(pinyin.isEmpty()){//普通评测模式
-                req.setRefText(text);
+                req.setRefText(text.trim());
                 req.setTextMode(0L); //文本格式.0普通文本 1,音素结构
             }else{//指定拼音评测模式
                 String s = SOEWordUtil.formatText(text,pinyin);
@@ -70,9 +70,9 @@ public class FileServiceImpl implements FileService {
             req.setWorkMode(0L); //0,流式分片,1一次性评测
             if("0".equals(mode)){
                 req.setEvalMode(0L); //评估模式,0,单词.1,句子,2,段落,3自由说,4单词纠错
-            }else if("1".equals(mode)){
+            }else if("1".equals(mode)||"2".equals(mode)){
                 req.setEvalMode(1L);
-            }else if("3".equals(mode)||"5".equals(mode)||"2".equals(mode)){
+            }else if("3".equals(mode)||"5".equals(mode)){
                 req.setEvalMode(2L);
             }else{
                 return null;
@@ -94,7 +94,7 @@ public class FileServiceImpl implements FileService {
                     lastIndex = data.length;
                 }
                 byte[] buf = Arrays.copyOfRange(data, (i - 1) * PKG_SIZE, lastIndex);
-//                String base64Str = new sun.misc.BASE64Encoder().encode(buf);
+                //String base64Str = new sun.misc.BASE64Encoder().encode(buf);
                 String base64Str = Base64.getEncoder().encodeToString(buf);
                 req.setUserVoiceData(base64Str);
                 req.setSeqId((long) i);
@@ -105,20 +105,6 @@ public class FileServiceImpl implements FileService {
                 }
 
                 resp = client.TransmitOralProcessWithInit(req);
-                /*if(resp==null){
-                    result.setTotalWordsCount(0);
-                    result.setSuggestedScore("0");
-                    result.setPronAccuracy("0");
-                    result.setPronCompletion("0");
-                    result.setPronFluency("0");
-                    List<JSONObject> list = new ArrayList<>();
-                    JSONObject object = new JSONObject();
-                    object.put("0","0");
-                    list.add(object);
-                    result.setWrongWordsCount(0);
-                    result.setWrongwWords(list);
-                }*/
-
                 if (resp==null){
                     result.setWrongWordsCount(0);
                     List<JSONObject> list = new ArrayList<>();
@@ -134,7 +120,6 @@ public class FileServiceImpl implements FileService {
                     result.setTotalWordsCount(0);
                     result.setSuggestedScore(0);
                 }
-
                 result.setSuggestedScore(Float.valueOf(resp.getSuggestedScore().toString()));
                 result.setPronAccuracy(Float.valueOf(resp.getPronAccuracy().toString()));
                 result.setPronFluency(Float.valueOf(resp.getPronFluency().toString()));
@@ -168,6 +153,10 @@ public class FileServiceImpl implements FileService {
         } catch (TencentCloudSDKException e) {
             e.printStackTrace();
         } catch (JSONException e) {
+            throw new RuntimeException(e);
+        } catch (InputFormatException e) {
+            throw new RuntimeException(e);
+        } catch (EncoderException e) {
             throw new RuntimeException(e);
         }
         return result;
