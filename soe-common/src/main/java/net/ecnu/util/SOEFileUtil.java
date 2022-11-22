@@ -1,6 +1,7 @@
 package net.ecnu.util;
 
 import org.springframework.web.multipart.MultipartFile;
+import ws.schild.jave.*;
 
 import java.io.*;
 
@@ -65,5 +66,21 @@ public class SOEFileUtil {
             e.printStackTrace();
         }
         return buffer;
+    }
+
+    public static File Wav2mp3(File source, File target) throws IllegalArgumentException, InputFormatException, EncoderException, EncoderException {
+        AudioAttributes audio = new AudioAttributes();
+        audio.setCodec("libmp3lame");
+        audio.setBitRate(new Integer(16000));
+        audio.setChannels(new Integer(2));
+        audio.setSamplingRate(new Integer(0));
+
+        EncodingAttributes attrs = new EncodingAttributes();
+        attrs.setFormat("mp3");
+        attrs.setAudioAttributes(audio);
+        Encoder encoder = new Encoder();
+        MultimediaObject sourceObj = new MultimediaObject(source);
+        encoder.encode(sourceObj, target, attrs);
+        return target;
     }
 }
