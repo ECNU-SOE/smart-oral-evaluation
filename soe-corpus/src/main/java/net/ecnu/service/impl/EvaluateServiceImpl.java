@@ -1,7 +1,6 @@
 package net.ecnu.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.soe.v20180724.SoeClient;
@@ -9,11 +8,11 @@ import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitReque
 import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitResponse;
 import com.tencentcloudapi.soe.v20180724.models.WordRsp;
 import net.ecnu.controller.Result;
-import net.ecnu.domain.Cpsgrp;
-import net.ecnu.domain.Cpsrcd;
-import net.ecnu.mapper.CpsgrpDao;
-import net.ecnu.mapper.CpsrcdDao;
-import net.ecnu.service.FileService;
+import net.ecnu.manager.CpsrcdManager;
+import net.ecnu.mapper.CpsgrpMapper;
+import net.ecnu.model.CpsgrpDO;
+import net.ecnu.model.CpsrcdDO;
+import net.ecnu.service.EvaluateService;
 import net.ecnu.util.SOEFileUtil;
 import net.ecnu.util.SOEWordUtil;
 import org.json.JSONException;
@@ -27,13 +26,16 @@ import java.io.File;
 import java.util.*;
 
 @Service
-public class FileServiceImpl implements FileService {
+public class EvaluateServiceImpl implements EvaluateService {
 
     @Autowired
-    private CpsrcdDao cpsrcdDao;
+    private CpsrcdManager cpsrcdManager;
 
     @Autowired
-    private CpsgrpDao cpsgrpDao;
+   private CpsgrpMapper cpsgrpMapper;
+
+
+
     @Override
     public Result evaluate(MultipartFile audio,String text,String pinyin,String mode) {
         Result result = new Result();
@@ -52,7 +54,6 @@ public class FileServiceImpl implements FileService {
             // 实例化要请求产品的client对象,clientProfile是可选的
             SoeClient client = new SoeClient(cred, "");
             String sessionId = UUID.randomUUID().toString();
-
 
             TransmitOralProcessWithInitRequest req = new TransmitOralProcessWithInitRequest();
 
@@ -107,12 +108,16 @@ public class FileServiceImpl implements FileService {
                 resp = client.TransmitOralProcessWithInit(req);
 
                 // 输出json格式的字符串回包
-                System.out.println(TransmitOralProcessWithInitResponse.toJsonString(resp));
+                //System.out.println(TransmitOralProcessWithInitResponse.toJsonString(resp));
             }
             if (resp==null){
                 result.setWrongWordsCount(0);
                 List<JSONObject> list = new ArrayList<>();
-                list.add((JSONObject) new JSONObject().put("words",0));
+                JSONObject object = new JSONObject();
+                object.put("words",0);
+                list.add(object);
+                if (list == null)
+                    System.out.println("这里为null");
                 result.setWrongwWords(list);
                 result.setPronAccuracy(0);
                 result.setPronFluency(0);
@@ -125,20 +130,20 @@ public class FileServiceImpl implements FileService {
             result.setPronFluency(Float.valueOf(resp.getPronFluency().toString()));
             result.setPronCompletion(Float.valueOf(resp.getPronCompletion().toString()));
 
-            WordRsp[] words1 = resp.getWords();
+            WordRsp[] resp_words = resp.getWords();
             int wrong_words =0,total_words=0;
             //将所有得分不超过90分的汉字加入返回集合
             List<JSONObject> words = new ArrayList<>();
             if ("Finished".equals(resp.getStatus())){
-                for(int k = 0; k< words1.length; k++){
-                    if(!"*".equals(words1[k].getWord())){
+                for(int k = 0; k< resp_words.length; k++){
+                    if(!"*".equals(resp_words[k].getWord())){
                         total_words++;
-                        if(Float.valueOf(words1[k].getPronAccuracy())<90|| Float.valueOf(words1[k].getPronFluency())<0.90){
+                        if(Float.valueOf(resp_words[k].getPronAccuracy())<90|| Float.valueOf(resp_words[k].getPronFluency())<0.90){
                             wrong_words++;//统计错字字数
                             JSONObject temp_json = new JSONObject();
-                            temp_json.put("word", words1[k].getWord());
-                            temp_json.put("PronAccuracy", Float.valueOf(words1[k].getPronAccuracy().toString()));
-                            temp_json.put("PronFluency", Float.valueOf(words1[k].getPronFluency().toString()));
+                            temp_json.put("word", resp_words[k].getWord());
+                            temp_json.put("PronAccuracy", Float.valueOf(resp_words[k].getPronAccuracy().toString()));
+                            temp_json.put("PronFluency", Float.valueOf(resp_words[k].getPronFluency().toString()));
                             words.add(temp_json);
                         }
                     }
@@ -164,8 +169,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public JSONObject getCorpusesByGroupId(String cpsgrpId) {
-        List<Cpsrcd> corpuses = cpsrcdDao.selectList(new QueryWrapper<Cpsrcd>().eq("cpsgrp_id", cpsgrpId));
-        Cpsgrp cpsgrp = cpsgrpDao.selectById(cpsgrpId);
+        List<CpsrcdDO> corpuses = cpsrcdManager.listByCpsgrpId(cpsgrpId);
+        CpsgrpDO cpsgrp = cpsgrpMapper.selectById(cpsgrpId);
         JSONObject json = new JSONObject();
         json.put("id",cpsgrp.getId());
         json.put("name",cpsgrp.getName());

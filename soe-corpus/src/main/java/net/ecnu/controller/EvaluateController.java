@@ -1,17 +1,17 @@
 package net.ecnu.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import net.ecnu.service.FileService;
+import net.ecnu.service.EvaluateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/test/v1")
+@RequestMapping("/api/evaluate/v1")
 public class EvaluateController {
 
     @Autowired
-    FileService fileService;
+    EvaluateService fileService;
 
     @PostMapping("upload")
     @ResponseBody

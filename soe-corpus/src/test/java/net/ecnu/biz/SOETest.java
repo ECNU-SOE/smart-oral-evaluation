@@ -9,14 +9,12 @@ import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitRespo
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.CorpusApplication;
 import net.ecnu.manager.CpsrcdManager;
-import net.ecnu.model.CpsrcdDO;
-import net.ecnu.service.FileService;
+import net.ecnu.service.EvaluateService;
 import net.ecnu.util.IDUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.commons.util.IdUtils;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
@@ -24,7 +22,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.List;
 import java.util.UUID;
 
 @RunWith(SpringRunner.class)
@@ -32,7 +29,7 @@ import java.util.UUID;
 @Slf4j
 public class SOETest {
     @Autowired
-    private FileService fileService;
+    private EvaluateService fileService;
 
     @Autowired
     private CpsrcdManager cpsrcdManager;
