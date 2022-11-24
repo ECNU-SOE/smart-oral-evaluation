@@ -2,7 +2,6 @@ package net.ecnu.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import net.ecnu.service.EvaluateService;
-import net.ecnu.service.FileService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -13,17 +12,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class EvaluateController {
 
     @Autowired
-    FileService fileService;
-
-    @Autowired
     private EvaluateService evaluateService;
 
+
     @PostMapping("upload")
-    @ResponseBody
     public Result sentenceEvaluate(@RequestPart("audio") MultipartFile audio, @RequestParam("text") String text,
                                    @RequestParam("pinyin") String pinyin, @RequestParam("mode") String mode) {
-        Result result = fileService.evaluate(audio, text, pinyin, mode);
-        return result;
+//        Result result = evaluateService.evaluate(audio, text, pinyin, mode);
+        return null;
     }
 
     /**
@@ -40,7 +36,7 @@ public class EvaluateController {
 
     @GetMapping("details")
     public JSONObject details(@RequestParam String cpsgrpId) {
-        JSONObject result = fileService.getCorpusesByGroupId(cpsgrpId);
+        JSONObject result = evaluateService.getCorpusesByGroupId(cpsgrpId);
         return result;
     }
 

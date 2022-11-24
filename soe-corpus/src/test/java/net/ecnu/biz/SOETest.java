@@ -1,7 +1,6 @@
 package net.ecnu.biz;
 
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.nacos.api.config.annotation.NacosValue;
+
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.soe.v20180724.SoeClient;
@@ -10,15 +9,11 @@ import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitRespo
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.CorpusApplication;
 import net.ecnu.manager.CpsrcdManager;
-import net.ecnu.model.CpsrcdDO;
-import net.ecnu.service.FileService;
-import net.ecnu.util.IDUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.commons.util.IdUtils;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
@@ -30,8 +25,6 @@ import java.util.*;
 @SpringBootTest(classes = CorpusApplication.class)
 @Slf4j
 public class SOETest {
-    @Autowired
-    private FileService fileService;
 
     @Autowired
     private CpsrcdManager cpsrcdManager;
@@ -39,12 +32,6 @@ public class SOETest {
     @Value(value = "${aliyun.oss.endpoint}")
     private String ossEndpoint;
 
-    @Test
-    public void testTGX() {
-        String s = "cpsgrp_1588871928125460480";
-        JSONObject json = fileService.getCorpusesByGroupId(s);
-        System.out.println("json = " + json);
-    }
 
     @Test
     public void evaluateTest() {
