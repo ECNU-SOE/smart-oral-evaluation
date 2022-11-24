@@ -5,7 +5,6 @@ import net.ecnu.controller.request.CpsgrpFilterReq;
 import net.ecnu.controller.request.TranscriptReq;
 import net.ecnu.model.CpsgrpDO;
 import com.baomidou.mybatisplus.extension.service.IService;
-import net.ecnu.model.common.PageData;
 
 /**
  * <p>
@@ -18,8 +17,8 @@ import net.ecnu.model.common.PageData;
 public interface CpsgrpService extends IService<CpsgrpDO> {
 
     /**
-     * 1、创建cpsgrp
-     * 2、创建cpsrcd，语料的快照
+     *  1、创建cpsgrp
+     *  2、创建cpsrcd，语料的快照
      */
     Object create(CpsgrpCreateReq cpsgrpCreateReq);
 
@@ -27,7 +26,7 @@ public interface CpsgrpService extends IService<CpsgrpDO> {
 
     Object detail(String cpsgrpId);
 
-    Object genTranscript(TranscriptReq transcriptReq);
+    Object pageByFilter(CpsgrpFilterReq cpsgrpFilter);
 
-    Object pageByFilter(CpsgrpFilterReq cpsgrpFilter, PageData pageData);
+    Object genTranscript(TranscriptReq transcriptReq);
 }

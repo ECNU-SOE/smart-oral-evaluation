@@ -1,11 +1,9 @@
 package net.ecnu.controller;
 
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import net.ecnu.controller.request.CpsgrpCreateReq;
 import net.ecnu.controller.request.CpsgrpFilterReq;
 import net.ecnu.controller.request.TranscriptReq;
-import net.ecnu.model.common.PageData;
 import net.ecnu.service.CpsgrpService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +22,9 @@ public class CpsgrpController {
      */
     @PostMapping("list")
     public JsonData list(@RequestParam(value = "cur", defaultValue = "1") int cur,
-                         @RequestParam(value = "size", defaultValue = "10") int size,
+                         @RequestParam(value = "size", defaultValue = "50") int size,
                          @RequestBody CpsgrpFilterReq cpsgrpFilter) {
-        Object data = cpsgrpService.pageByFilter(cpsgrpFilter, new PageData(cur, size));
+        Object data = cpsgrpService.pageByFilter(cpsgrpFilter);
         return JsonData.buildSuccess(data);
     }
 
