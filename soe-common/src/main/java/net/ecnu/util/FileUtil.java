@@ -3,9 +3,10 @@ package net.ecnu.util;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.util.Objects;
 
-public class SOEFileUtil {
-    public static File MultipartFile2File(MultipartFile multipartFile){
+public class FileUtil {
+    public static File MultipartFile2File(MultipartFile multipartFile) {
         File file = null;
         //判断是否为null
         if (multipartFile.equals("") || multipartFile.getSize() <= 0) {
@@ -16,7 +17,7 @@ public class SOEFileUtil {
         OutputStream os = null;
         try {
             ins = multipartFile.getInputStream();
-            file = new File(multipartFile.getOriginalFilename());
+            file = new File(Objects.requireNonNull(multipartFile.getOriginalFilename()));
             os = new FileOutputStream(file);
             int bytesRead = 0;
             byte[] buffer = new byte[8192];
@@ -25,15 +26,15 @@ public class SOEFileUtil {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
-            if(os != null){
+        } finally {
+            if (os != null) {
                 try {
                     os.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            if(ins != null){
+            if (ins != null) {
                 try {
                     ins.close();
                 } catch (IOException e) {
@@ -44,26 +45,35 @@ public class SOEFileUtil {
         return file;
     }
 
-    public static byte[] File2byte(File tradeFile){
+    public static byte[] File2byte(File tradeFile) {
         byte[] buffer = null;
-        try
-        {
-            FileInputStream fis = new FileInputStream(tradeFile);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try (FileInputStream fis = new FileInputStream(tradeFile);
+             ByteArrayOutputStream bos = new ByteArrayOutputStream();) {
             byte[] b = new byte[1024];
             int n;
-            while ((n = fis.read(b)) != -1)
-            {
+            while ((n = fis.read(b)) != -1) {
                 bos.write(b, 0, n);
             }
-            fis.close();
-            bos.close();
             buffer = bos.toByteArray();
-        }catch (FileNotFoundException e){
-            e.printStackTrace();
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return buffer;
+    }
+
+
+    public static File transferToFile(MultipartFile multipartFile) {
+        File file = null;
+        try {
+            String originalFilename = multipartFile.getOriginalFilename();
+            originalFilename = originalFilename != null ? originalFilename : "tmpFile";
+            String[] filename = originalFilename.split("\\.");
+            file = File.createTempFile(filename[0], "." + filename[1]);
+            multipartFile.transferTo(file);
+            file.deleteOnExit();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return file;
     }
 }

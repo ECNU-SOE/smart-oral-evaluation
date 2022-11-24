@@ -17,6 +17,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+
 /**
  * <p>
  * 语料原型 服务实现类
@@ -52,4 +54,5 @@ public class CorpusServiceImpl extends ServiceImpl<CorpusMapper, CorpusDO> imple
         int rows = corpusManager.add(corpusDO);
         return rows;
     }
+
 }

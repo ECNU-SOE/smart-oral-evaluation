@@ -15,4 +15,14 @@ public class SOEConst {
      */
     public static final String MAIL_PATTERN = "^([a-z0-9A-Z]+[-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$";
 
+    /**
+     * 语音分片大小
+     */
+    public static final int PKG_SIZE = 100 * 1024;
+
+    /**
+     * 默认错字得分线
+     */
+    public static final Double ERR_SCORE_LINE = 90.0;
+
 }

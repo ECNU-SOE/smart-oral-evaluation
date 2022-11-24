@@ -12,7 +12,6 @@
         <module>soe-common</module>
         <module>soe-user</module>
         <module>soe-corpus</module>
-        <module>soe-evaluate</module>
         <module>soe-gateway</module>
         <module>soe-shop</module>
     </modules>

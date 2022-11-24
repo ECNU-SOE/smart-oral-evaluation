@@ -1,6 +1,7 @@
 package net.ecnu.biz;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.nacos.api.config.annotation.NacosValue;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.soe.v20180724.SoeClient;
@@ -15,6 +16,7 @@ import net.ecnu.util.IDUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.commons.util.IdUtils;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -22,10 +24,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CorpusApplication.class)
@@ -37,15 +36,18 @@ public class SOETest {
     @Autowired
     private CpsrcdManager cpsrcdManager;
 
+    @Value(value = "${aliyun.oss.endpoint}")
+    private String ossEndpoint;
+
     @Test
-    public void testTGX(){
+    public void testTGX() {
         String s = "cpsgrp_1588871928125460480";
         JSONObject json = fileService.getCorpusesByGroupId(s);
         System.out.println("json = " + json);
     }
 
     @Test
-    public void evaluateTest(){
+    public void evaluateTest() {
         try {
             String file = "C:\\Users\\Lenovo\\Desktop\\smart-oral-evaluation-main\\soe-corpus\\src\\main\\resources\\read_sentence_cn.mp3"; //本地音频文件
             int PKG_SIZE = 2 * 1024; //分片大小
@@ -108,9 +110,9 @@ public class SOETest {
     }
 
     @Test
-    public void IDTest(){
-        System.out.println(IDUtil.getSnowflakeId());
-        //1584108301652725760
-        //1584108469131284480
+    public void IDTest() {
+        System.out.println(ossEndpoint);
     }
+
+
 }
