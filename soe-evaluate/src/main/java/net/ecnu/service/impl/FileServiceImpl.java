@@ -105,51 +105,48 @@ public class FileServiceImpl implements FileService {
                 }
 
                 resp = client.TransmitOralProcessWithInit(req);
-                if (resp==null){
-                    result.setWrongWordsCount(0);
-                    List<JSONObject> list = new ArrayList<>();
-                    JSONObject object = new JSONObject();
-                    object.put("words",0);
-                    list.add(object);
-                    if (list == null)
-                        System.out.println("这里为null");
-                    result.setWrongwWords(list);
-                    result.setPronAccuracy(0);
-                    result.setPronFluency(0);
-                    result.setPronCompletion(0);
-                    result.setTotalWordsCount(0);
-                    result.setSuggestedScore(0);
-                }
-                result.setSuggestedScore(Float.valueOf(resp.getSuggestedScore().toString()));
-                result.setPronAccuracy(Float.valueOf(resp.getPronAccuracy().toString()));
-                result.setPronFluency(Float.valueOf(resp.getPronFluency().toString()));
-                result.setPronCompletion(Float.valueOf(resp.getPronCompletion().toString()));
 
-                WordRsp[] words1 = resp.getWords();
-                int wrong_words =0,total_words=0;
-                //将所有得分不超过90分的汉字加入返回集合
-                List<JSONObject> words = new ArrayList<>();
-                if ("Finished".equals(resp.getStatus())){
-                    for(int k = 0; k< words1.length; k++){
-                        if(!"*".equals(words1[k].getWord())){
-                            total_words++;
-                            if(Float.valueOf(words1[k].getPronAccuracy())<90|| Float.valueOf(words1[k].getPronFluency())<0.90){
-                                wrong_words++;//统计错字字数
-                                JSONObject temp_json = new JSONObject();
-                                temp_json.put("word", words1[k].getWord());
-                                temp_json.put("PronAccuracy", Float.valueOf(words1[k].getPronAccuracy().toString()));
-                                temp_json.put("PronFluency", Float.valueOf(words1[k].getPronFluency().toString()));
-                                words.add(temp_json);
-                            }
-                        }
-                    }
-                }
-                result.setWrongwWords(words);
-                result.setTotalWordsCount(total_words);
-                result.setWrongWordsCount(wrong_words);
                 // 输出json格式的字符串回包
                 System.out.println(TransmitOralProcessWithInitResponse.toJsonString(resp));
             }
+            if (resp==null){
+                result.setWrongWordsCount(0);
+                List<JSONObject> list = new ArrayList<>();
+                list.add((JSONObject) new JSONObject().put("words",0));
+                result.setWrongwWords(list);
+                result.setPronAccuracy(0);
+                result.setPronFluency(0);
+                result.setPronCompletion(0);
+                result.setTotalWordsCount(0);
+                result.setSuggestedScore(0);
+            }
+            result.setSuggestedScore(Float.valueOf(resp.getSuggestedScore().toString()));
+            result.setPronAccuracy(Float.valueOf(resp.getPronAccuracy().toString()));
+            result.setPronFluency(Float.valueOf(resp.getPronFluency().toString()));
+            result.setPronCompletion(Float.valueOf(resp.getPronCompletion().toString()));
+
+            WordRsp[] words1 = resp.getWords();
+            int wrong_words =0,total_words=0;
+            //将所有得分不超过90分的汉字加入返回集合
+            List<JSONObject> words = new ArrayList<>();
+            if ("Finished".equals(resp.getStatus())){
+                for(int k = 0; k< words1.length; k++){
+                    if(!"*".equals(words1[k].getWord())){
+                        total_words++;
+                        if(Float.valueOf(words1[k].getPronAccuracy())<90|| Float.valueOf(words1[k].getPronFluency())<0.90){
+                            wrong_words++;//统计错字字数
+                            JSONObject temp_json = new JSONObject();
+                            temp_json.put("word", words1[k].getWord());
+                            temp_json.put("PronAccuracy", Float.valueOf(words1[k].getPronAccuracy().toString()));
+                            temp_json.put("PronFluency", Float.valueOf(words1[k].getPronFluency().toString()));
+                            words.add(temp_json);
+                        }
+                    }
+                }
+            }
+            result.setWrongwWords(words);
+            result.setTotalWordsCount(total_words);
+            result.setWrongWordsCount(wrong_words);
         } catch (TencentCloudSDKException e) {
             e.printStackTrace();
         } catch (JSONException e) {
