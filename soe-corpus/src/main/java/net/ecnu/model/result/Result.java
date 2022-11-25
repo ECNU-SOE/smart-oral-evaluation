@@ -1,4 +1,4 @@
-package net.ecnu.controller;
+package net.ecnu.model.result;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.AllArgsConstructor;
