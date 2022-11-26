@@ -31,6 +31,14 @@
             <artifactId>tencentcloud-sdk-java-soe</artifactId>
             <version>3.1.561</version>
         </dependency>
+
+        <!--音频格式转换-->
+        <dependency>
+            <groupId>ws.schild</groupId>
+            <artifactId>jave-all-deps</artifactId>
+            <version>3.3.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>

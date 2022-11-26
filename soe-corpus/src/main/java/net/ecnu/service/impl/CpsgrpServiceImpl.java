@@ -207,9 +207,9 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     /**
      * CpsrcdDO->CpsrcdVO
      */
-    private CpsrcdVO beanProcess(CpsrcdDO cpsgrpDO) {
+    private CpsrcdVO beanProcess(CpsrcdDO cpsrcdDO) {
         CpsrcdVO cpsrcdVO = new CpsrcdVO();
-        BeanUtils.copyProperties(cpsgrpDO, cpsrcdVO);
+        BeanUtils.copyProperties(cpsrcdDO, cpsrcdVO);
         return cpsrcdVO;
     }
 }

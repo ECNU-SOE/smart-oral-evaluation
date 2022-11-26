@@ -9,6 +9,7 @@ import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitRespo
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.CorpusApplication;
 import net.ecnu.manager.CpsrcdManager;
+import net.ecnu.service.EvaluateService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -28,6 +30,9 @@ public class SOETest {
 
     @Autowired
     private CpsrcdManager cpsrcdManager;
+
+    @Autowired
+    private EvaluateService evaluateService;
 
     @Value(value = "${aliyun.oss.endpoint}")
     private String ossEndpoint;
@@ -100,6 +105,12 @@ public class SOETest {
     public void IDTest() {
         System.out.println(ossEndpoint);
     }
+
+//    @Test
+//    public void convertTest() {
+//        File
+//evaluateService.convert()
+//    }
 
 
 }
