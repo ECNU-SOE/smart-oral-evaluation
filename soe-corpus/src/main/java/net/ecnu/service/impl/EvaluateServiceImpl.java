@@ -14,6 +14,7 @@ import net.ecnu.model.CpsrcdDO;
 import net.ecnu.model.vo.EvalResultVO;
 import net.ecnu.service.EvaluateService;
 import net.ecnu.util.FileUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -215,7 +216,7 @@ public class EvaluateServiceImpl implements EvaluateService {
 //            req.setIsQuery(0L); //轮询
 //            TransmitOralProcessWithInitResponse resp = null;
 //            //将文件装换成base64
-//            //byte[] data = Files.refadAllBytes(Paths.get(file));
+//            //byte[] data = Files.readAllBytes(Paths.get(file));
 //            byte[] data = SOEFileUtil.File2byte(file);
 //            int pkgNum = (int) Math.ceil((double) data.length / PKG_SIZE);
 //            for (int i = 1; i <= pkgNum; i++) {
@@ -294,105 +295,79 @@ public class EvaluateServiceImpl implements EvaluateService {
 //    }
 
     @Override
-    public JSONObject getCorpusesByGroupId(String cpsgrpId) {
-        List<CpsrcdDO> corpuses = cpsrcdManager.listByCpsgrpId(cpsgrpId);
+    public Object getCorpusesByGroupId(String cpsgrpId) {
+        List<CpsrcdDO> cpsrcdDOS= cpsrcdManager.listByCpsgrpId(cpsgrpId);
         CpsgrpDO cpsgrp = cpsgrpMapper.selectById(cpsgrpId);
-        JSONObject json = new JSONObject();
-        json.put("id", cpsgrp.getId());
-        json.put("name", cpsgrp.getName());
-        json.put("type", cpsgrp.getType());
-        json.put("description", cpsgrp.getDescription());
-        json.put("endTime", cpsgrp.getEndTime());
-        json.put("creator", cpsgrp.getCreator());
-        json.put("gmtCreate", cpsgrp.getGmtCreate());
-        json.put("gmtModified", cpsgrp.getGmtModified());
+        CpsgrpVO2 cpsgrpVO = new CpsgrpVO2();
+        BeanUtils.copyProperties(cpsgrp,cpsgrpVO);
         List<JSONObject> list = new ArrayList<>();
-        for (int i = 0; i < corpuses.size(); i++) {
+        for (CpsrcdDO cpsrcd : cpsrcdDOS) {
             JSONObject o = new JSONObject();
             //如果list为空则创建list的第一项
-            if (corpuses.get(i).getType() == 1) {
+            if (cpsrcd.getType() == 1) {
                 boolean exist = false;
                 //否则遍历list，查看是否已经存在对应type的项
-                for (int j = 0; j < list.size(); j++) {
-                    if ((int) list.get(j).get("type") == 1)
+                for (JSONObject jsonObject : list) {
+                    if ((int) jsonObject.get("type") == 1)
                         exist = true;
                 }
-                //如果list为空,或者list中不存在对应type的项则新建json加入corpus_list
-                if (exist == false || list.isEmpty()) {
-                    o.put("type", corpuses.get(i).getType());
-                    List<JSONObject> corpus_list = new ArrayList<>();
-                    JSONObject corpus_json = new JSONObject();
-                    corpus_json.put("id", corpuses.get(i).getId());
-                    corpus_json.put("refText", corpuses.get(i).getRefText());
-                    corpus_json.put("order", corpuses.get(i).getOrder());
-                    corpus_json.put("pinyin", corpuses.get(i).getPinyin());
-                    corpus_json.put("level", corpuses.get(i).getLevel());
-                    corpus_list.add(corpus_json);
-                    o.put("corpus_list", corpus_list);
+                //如果list为空,或者list中不存在对应type的项则新建cpsrcdVO加入corpus_list
+                if (!exist||list.isEmpty()) {
+                    o.put("type", cpsrcd.getType());
+                    List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
+                    CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
+                    BeanUtils.copyProperties(cpsrcd,cpsrcdVO2);
+                    cpsrcdVO2s.add(cpsrcdVO2);
+                    o.put("corpus_list", cpsrcdVO2s);
                     list.add(o);
                 } else {
                     //找到list中对应的项并插入
-                    for (int j = 0; j < list.size(); j++) {
-                        List<JSONObject> temp_corpus_list = (List<JSONObject>) list.get(j).get("corpus_list");
-                        if ((int) list.get(j).get("type") == 1) {
-                            JSONObject temp_json = new JSONObject();
-                            temp_json.put("id", corpuses.get(i).getId());
-                            temp_json.put("refText", corpuses.get(i).getRefText());
-                            temp_json.put("order", corpuses.get(i).getOrder());
-                            temp_json.put("pinyin", corpuses.get(i).getPinyin());
-                            temp_json.put("level", corpuses.get(i).getLevel());
-                            temp_corpus_list.add(temp_json);
+                    for (JSONObject jsonObject : list) {
+                        List<CpsrcdVO2> temp_list = (List<CpsrcdVO2>) jsonObject.get("corpus_list");
+                        if ((int) jsonObject.get("type") == 1) {
+                            CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
+                            BeanUtils.copyProperties(cpsrcd,cpsrcdVO2);
+                            temp_list.add(cpsrcdVO2);
                         }
                     }
                 }
-            } else if (corpuses.get(i).getType() == 2) {
+            } else if (cpsrcd.getType() == 2) {
                 boolean exist = false;
-                for (int j = 0; j < list.size(); j++) {
-                    if ((int) list.get(j).get("type") == 2)
+                for (JSONObject jsonObject : list) {
+                    if ((int) jsonObject.get("type") == 2)
                         exist = true;
                 }
-                if (exist == false || list.isEmpty()) {
-                    o.put("type", corpuses.get(i).getType());
-                    List<JSONObject> corpus_list = new ArrayList<>();
-                    JSONObject corpus_json = new JSONObject();
-                    corpus_json.put("id", corpuses.get(i).getId());
-                    corpus_json.put("refText", corpuses.get(i).getRefText());
-                    corpus_json.put("order", corpuses.get(i).getOrder());
-                    corpus_json.put("pinyin", corpuses.get(i).getPinyin());
-                    corpus_json.put("level", corpuses.get(i).getLevel());
-                    corpus_list.add(corpus_json);
-                    o.put("corpus_list", corpus_list);
+                if (!exist||list.isEmpty()) {
+                    o.put("type", cpsrcd.getType());
+                    List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
+                    CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
+                    BeanUtils.copyProperties(cpsrcd,cpsrcdVO2);
+                    cpsrcdVO2s.add(cpsrcdVO2);
+                    o.put("corpus_list", cpsrcdVO2s);
                     list.add(o);
                 } else {
-                    for (int j = 0; j < list.size(); j++) {
-                        List<JSONObject> temp_corpus_list = (List<JSONObject>) list.get(j).get("corpus_list");
-                        if ((int) list.get(j).get("type") == 2) {
-                            JSONObject temp_json = new JSONObject();
-                            temp_json.put("id", corpuses.get(i).getId());
-                            temp_json.put("refText", corpuses.get(i).getRefText());
-                            temp_json.put("order", corpuses.get(i).getOrder());
-                            temp_json.put("pinyin", corpuses.get(i).getPinyin());
-                            temp_json.put("level", corpuses.get(i).getLevel());
-                            temp_corpus_list.add(temp_json);
+                    //找到list中对应的项并插入
+                    for (JSONObject jsonObject : list) {
+                        List<CpsrcdVO2> temp_list = (List<CpsrcdVO2>) jsonObject.get("corpus_list");
+                        if ((int) jsonObject.get("type") == 2) {
+                            CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
+                            BeanUtils.copyProperties(cpsrcd,cpsrcdVO2);
+                            temp_list.add(cpsrcdVO2);
                         }
                     }
                 }
             } else {
-                o.put("type", corpuses.get(i).getType());
-                List<JSONObject> corpus_list = new ArrayList<>();
-                JSONObject corpus_json = new JSONObject();
-                corpus_json.put("id", corpuses.get(i).getId());
-                corpus_json.put("refText", corpuses.get(i).getRefText());
-                corpus_json.put("order", corpuses.get(i).getOrder());
-                corpus_json.put("pinyin", corpuses.get(i).getPinyin());
-                corpus_json.put("level", corpuses.get(i).getLevel());
-                corpus_list.add(corpus_json);
-                o.put("corpus_list", corpus_list);
+                o.put("type", cpsrcd.getType());
+                List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
+                CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
+                BeanUtils.copyProperties(cpsrcd,cpsrcdVO2);
+                cpsrcdVO2s.add(cpsrcdVO2);
+                o.put("corpus_list", cpsrcdVO2s);
                 list.add(o);
             }
-        }
-        json.put("cpsrcdList", list);
-        return json;
-    }
 
+        }
+        cpsgrpVO.setCpsrcdList(list);
+        return cpsgrpVO;
+    }
 }

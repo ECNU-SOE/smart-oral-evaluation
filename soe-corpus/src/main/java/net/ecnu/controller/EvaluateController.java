@@ -1,6 +1,6 @@
 package net.ecnu.controller;
 
-import com.alibaba.fastjson.JSONObject;
+import net.ecnu.model.result.Result;
 import net.ecnu.service.EvaluateService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,9 +62,8 @@ public class EvaluateController {
 
 
     @GetMapping("details")
-    public JSONObject details(@RequestParam String cpsgrpId) {
-        JSONObject result = evaluateService.getCorpusesByGroupId(cpsgrpId);
-        return result;
+    public JsonData details(@RequestParam String cpsgrpId) {
+        Object data = evaluateService.getCorpusesByGroupId(cpsgrpId);
+        return JsonData.buildSuccess(data);
     }
-
 }

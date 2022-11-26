@@ -1,6 +1,8 @@
 package net.ecnu.biz;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.soe.v20180724.SoeClient;
@@ -9,7 +11,10 @@ import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitRespo
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.CorpusApplication;
 import net.ecnu.manager.CpsrcdManager;
+import net.ecnu.model.vo.CpsgrpVO2;
 import net.ecnu.service.EvaluateService;
+import net.ecnu.service.impl.EvaluateServiceImpl;
+import net.ecnu.util.JsonData;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -29,14 +33,18 @@ import java.util.*;
 public class SOETest {
 
     @Autowired
-    private CpsrcdManager cpsrcdManager;
-
-    @Autowired
     private EvaluateService evaluateService;
 
     @Value(value = "${aliyun.oss.endpoint}")
     private String ossEndpoint;
 
+    @Test
+    public void evaluateTest_t(){
+        Object jsonObject = evaluateService.getCorpusesByGroupId("cpsgrp_1588871928125460480");
+        CpsgrpVO2 vo2 = (CpsgrpVO2) jsonObject;
+        List<JSONObject> cpsrcdList = (List<JSONObject>)vo2.getCpsrcdList();
+        System.out.println("cpsrcdList = " + cpsrcdList);
+    }
 
     @Test
     public void evaluateTest() {
@@ -105,12 +113,6 @@ public class SOETest {
     public void IDTest() {
         System.out.println(ossEndpoint);
     }
-
-//    @Test
-//    public void convertTest() {
-//        File
-//evaluateService.convert()
-//    }
 
 
 }
