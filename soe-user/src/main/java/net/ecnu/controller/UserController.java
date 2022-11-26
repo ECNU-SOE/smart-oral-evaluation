@@ -34,4 +34,10 @@ public class UserController {
         Object data = userService.login(userReq);
         return JsonData.buildSuccess(data);
     }
+
+    @PostMapping("info")
+    public JsonData info(@RequestBody UserReq userReq){
+        Object data = userService.info(userReq);
+        return JsonData.buildSuccess(data);
+    }
 }

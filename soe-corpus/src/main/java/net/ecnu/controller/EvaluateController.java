@@ -24,13 +24,13 @@ public class EvaluateController {
     private EvaluateService evaluateService;
 
 
-    @PostMapping("upload")
+    /*@PostMapping("upload")
     @Deprecated
     public Result sentenceEvaluate(@RequestPart("audio") MultipartFile audio, @RequestParam("text") String text,
                                    @RequestParam("pinyin") String pinyin, @RequestParam("mode") String mode) {
-//        Result result = evaluateService.evaluate(audio, text, pinyin, mode);
-        return null;
-    }
+        Result result = evaluateService.evaluate(audio, text, pinyin, mode);
+        return result;
+    }*/
 
     /**
      * 语音评测

@@ -7,4 +7,6 @@ public interface UserService {
     Object register(UserReq userReq);
 
     Object login(UserReq userReq);
+
+    Object info(UserReq userReq);
 }

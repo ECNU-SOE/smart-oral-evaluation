@@ -8,6 +8,7 @@ import net.ecnu.manager.UserManager;
 import net.ecnu.mapper.UserMapper;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.UserDO;
+import net.ecnu.model.vo.UserVO;
 import net.ecnu.service.UserService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.JWTUtil;
@@ -57,6 +58,17 @@ public class UserServiceImpl implements UserService {
         LoginUser loginUser = new LoginUser();
         BeanUtils.copyProperties(userDO, loginUser);
         return JWTUtil.geneJsonWebToken(loginUser);
+    }
+
+    @Override
+    public Object info(UserReq userReq) {
+        UserDO userDO = userManager.selectOneByPhone(userReq.getPhone());
+        if (userDO==null){
+            throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
+        }
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(userDO,userVO);
+        return userVO;
     }
 }
 
