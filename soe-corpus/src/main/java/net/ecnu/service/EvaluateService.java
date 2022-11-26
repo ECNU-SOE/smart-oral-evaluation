@@ -11,7 +11,7 @@ public interface EvaluateService {
 
 //    Result evaluate(MultipartFile file, String text, String pinyin, String mode);
 
-    JSONObject getCorpusesByGroupId(String cpsgrpId);
+    Object getCorpusesByGroupId(String cpsgrpId);
 
     File convert(MultipartFile audio);
 }

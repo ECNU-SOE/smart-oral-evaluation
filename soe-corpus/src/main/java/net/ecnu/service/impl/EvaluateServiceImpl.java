@@ -11,6 +11,8 @@ import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.mapper.CpsgrpMapper;
 import net.ecnu.model.CpsgrpDO;
 import net.ecnu.model.CpsrcdDO;
+import net.ecnu.model.vo.CpsgrpVO2;
+import net.ecnu.model.vo.CpsrcdVO2;
 import net.ecnu.model.vo.EvalResultVO;
 import net.ecnu.service.EvaluateService;
 import net.ecnu.util.FileUtil;
