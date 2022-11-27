@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 @RestController
 @RequestMapping("/api/user/v1")
@@ -36,8 +38,9 @@ public class UserController {
     }
 
     @PostMapping("info")
-    public JsonData info(@RequestBody UserReq userReq){
-        Object data = userService.info(userReq);
+    public JsonData info(HttpServletRequest req){
+        Object data = userService.info(req);
         return JsonData.buildSuccess(data);
     }
+
 }

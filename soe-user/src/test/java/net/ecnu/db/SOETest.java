@@ -23,12 +23,6 @@ public class SOETest {
 
     @Test
     public void userTest(){
-        UserReq userReq = new UserReq();
-        userReq.setPhone("18786978272");
-        userReq.setCode("123456");
-        userReq.setPwd("123456");
-        Object info = userService.info(userReq);
-        String s = JsonUtil.obj2Json(info);
-        System.out.println("s = " + s);
+
     }
 }

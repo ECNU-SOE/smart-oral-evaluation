@@ -12,9 +12,12 @@ import net.ecnu.model.vo.UserVO;
 import net.ecnu.service.UserService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.JWTUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 @Service
@@ -61,8 +64,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Object info(UserReq userReq) {
-        UserDO userDO = userManager.selectOneByPhone(userReq.getPhone());
+    public Object info(HttpServletRequest req) {
+        String token = req.getHeader("token");
+        if (StringUtils.isBlank(token)){
+            token = req.getParameter("token");
+        }
+        if (StringUtils.isBlank(token)){
+            throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+        }
+        LoginUser loginUser = JWTUtil.checkJWT(token);
+        UserDO userDO = userManager.selectOneByPhone(loginUser.getPhone());
         if (userDO==null){
             throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
         }
