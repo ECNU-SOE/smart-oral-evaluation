@@ -1,6 +1,8 @@
 package net.ecnu.service;
 
 import net.ecnu.controller.request.UserReq;
+import net.ecnu.model.UserDO;
+import net.ecnu.model.common.LoginUser;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -11,4 +13,6 @@ public interface UserService {
     Object login(UserReq userReq);
 
     Object info(HttpServletRequest req);
+
+    int update(UserDO user);
 }

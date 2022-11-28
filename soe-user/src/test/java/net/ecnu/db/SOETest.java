@@ -23,6 +23,7 @@ public class SOETest {
 
     @Test
     public void userTest(){
-
+        int a = 3;
+        boolean flag;
     }
 }

@@ -9,6 +9,7 @@ import net.ecnu.mapper.UserMapper;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.UserDO;
 import net.ecnu.model.vo.UserVO;
+import net.ecnu.model.vo.dto.UserDTO;
 import net.ecnu.service.UserService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.JWTUtil;
@@ -80,6 +81,22 @@ public class UserServiceImpl implements UserService {
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(userDO,userVO);
         return userVO;
+    }
+
+    @Override
+    public int update(UserDO user) {
+        if (user.getDel()!=null&&user.getDel()){
+            return 0;
+        }
+        if (StringUtils.isBlank(user.getAccountNo())){
+            return 0;
+        }
+        UserDTO userDTO = new UserDTO();
+        BeanUtils.copyProperties(user,userDTO);
+        UserDO userDO = new UserDO();
+        BeanUtils.copyProperties(userDTO,userDO);
+        userDO.setAccountNo(user.getAccountNo());
+        return userMapper.updateById(userDO);
     }
 }
 
