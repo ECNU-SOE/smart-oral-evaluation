@@ -7,7 +7,7 @@ import java.io.File;
 
 public interface EvaluateService {
 
-    Object evaluate(MultipartFile audio, String refText, String pinyin, long evalMode);
+    Object evaluate(File audio, String refText, String pinyin, long evalMode);
 
 //    Result evaluate(MultipartFile file, String text, String pinyin, String mode);
 

@@ -54,8 +54,8 @@ public class EvaluateServiceImpl implements EvaluateService {
     private CpsgrpMapper cpsgrpMapper;
 
     @Override
-    public Object evaluate(MultipartFile audio, String refText, String pinyin, long evalMode) {
-        File file = FileUtil.transferToFile(audio);
+    public Object evaluate(File file, String refText, String pinyin, long evalMode) {
+//        File file = FileUtil.transferToFile(audio);
         byte[] bytes = null;
         try {
             bytes = Files.readAllBytes(file.toPath());

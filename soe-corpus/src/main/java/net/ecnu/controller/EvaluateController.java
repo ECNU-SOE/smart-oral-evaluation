@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -40,7 +41,8 @@ public class EvaluateController {
                              @RequestParam(value = "refText", required = true) String refText,
                              @RequestParam(value = "pinyin", required = false) String pinyin,
                              @RequestParam(value = "evalMode", required = true) long evalMode) {
-        Object data = evaluateService.evaluate(audio, refText, pinyin, evalMode);
+        File convert = evaluateService.convert(audio);
+        Object data = evaluateService.evaluate(convert, refText, pinyin, evalMode);
         return JsonData.buildSuccess(data);
     }
 
