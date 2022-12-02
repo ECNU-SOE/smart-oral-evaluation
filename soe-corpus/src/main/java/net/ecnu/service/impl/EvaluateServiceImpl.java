@@ -77,15 +77,31 @@ public class EvaluateServiceImpl implements EvaluateService {
         evalResultVO.setPronFluency(Double.valueOf(resp.getPronFluency()));
         evalResultVO.setPronAccuracy(Double.valueOf(resp.getPronAccuracy()));
         evalResultVO.setPronCompletion(Double.valueOf(resp.getPronCompletion()));
-        //统计总字数与错字数
+        // 统计总字数与错字数
         int wrongWordCount = 0;
         for (WordRsp word : resp.getWords()) {
             if (word.getPronAccuracy() < SOEConst.ERR_SCORE_LINE) wrongWordCount++;
         }
-        evalResultVO.setTotalWordCount(refText.length());
+        // 错字包括未读字
+        int totalWordCount = countTotalWord(refText);
+        wrongWordCount += totalWordCount - resp.getWords().length;
+        evalResultVO.setTotalWordCount(totalWordCount);
         evalResultVO.setWrongWordCount(wrongWordCount);
         //返回结果
         return evalResultVO;
+    }
+
+    /**
+     * 统计文本中的汉子个数
+     */
+    private int countTotalWord(String refText) {
+        int totalWordCount = 0;
+        char[] chars = refText.toCharArray();
+        for (char ch : chars) {
+            boolean matches = String.valueOf(ch).matches("[\u4e00-\u9fa5]");
+            if (matches) totalWordCount++;
+        }
+        return totalWordCount;
     }
 
 
@@ -296,10 +312,10 @@ public class EvaluateServiceImpl implements EvaluateService {
 
     @Override
     public Object getCorpusesByGroupId(String cpsgrpId) {
-        List<CpsrcdDO> cpsrcdDOS= cpsrcdManager.listByCpsgrpId(cpsgrpId);
+        List<CpsrcdDO> cpsrcdDOS = cpsrcdManager.listByCpsgrpId(cpsgrpId);
         CpsgrpDO cpsgrp = cpsgrpMapper.selectById(cpsgrpId);
         CpsgrpVO2 cpsgrpVO = new CpsgrpVO2();
-        BeanUtils.copyProperties(cpsgrp,cpsgrpVO);
+        BeanUtils.copyProperties(cpsgrp, cpsgrpVO);
         List<JSONObject> list = new ArrayList<>();
         for (CpsrcdDO cpsrcd : cpsrcdDOS) {
             JSONObject o = new JSONObject();
@@ -312,11 +328,11 @@ public class EvaluateServiceImpl implements EvaluateService {
                         exist = true;
                 }
                 //如果list为空,或者list中不存在对应type的项则新建cpsrcdVO加入corpus_list
-                if (!exist||list.isEmpty()) {
+                if (!exist || list.isEmpty()) {
                     o.put("type", cpsrcd.getType());
                     List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
                     CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
-                    BeanUtils.copyProperties(cpsrcd,cpsrcdVO2);
+                    BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
                     cpsrcdVO2s.add(cpsrcdVO2);
                     o.put("corpus_list", cpsrcdVO2s);
                     list.add(o);
@@ -326,7 +342,7 @@ public class EvaluateServiceImpl implements EvaluateService {
                         List<CpsrcdVO2> temp_list = (List<CpsrcdVO2>) jsonObject.get("corpus_list");
                         if ((int) jsonObject.get("type") == 1) {
                             CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
-                            BeanUtils.copyProperties(cpsrcd,cpsrcdVO2);
+                            BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
                             temp_list.add(cpsrcdVO2);
                         }
                     }
@@ -337,11 +353,11 @@ public class EvaluateServiceImpl implements EvaluateService {
                     if ((int) jsonObject.get("type") == 2)
                         exist = true;
                 }
-                if (!exist||list.isEmpty()) {
+                if (!exist || list.isEmpty()) {
                     o.put("type", cpsrcd.getType());
                     List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
                     CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
-                    BeanUtils.copyProperties(cpsrcd,cpsrcdVO2);
+                    BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
                     cpsrcdVO2s.add(cpsrcdVO2);
                     o.put("corpus_list", cpsrcdVO2s);
                     list.add(o);
@@ -351,7 +367,7 @@ public class EvaluateServiceImpl implements EvaluateService {
                         List<CpsrcdVO2> temp_list = (List<CpsrcdVO2>) jsonObject.get("corpus_list");
                         if ((int) jsonObject.get("type") == 2) {
                             CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
-                            BeanUtils.copyProperties(cpsrcd,cpsrcdVO2);
+                            BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
                             temp_list.add(cpsrcdVO2);
                         }
                     }
@@ -360,7 +376,7 @@ public class EvaluateServiceImpl implements EvaluateService {
                 o.put("type", cpsrcd.getType());
                 List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
                 CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
-                BeanUtils.copyProperties(cpsrcd,cpsrcdVO2);
+                BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
                 cpsrcdVO2s.add(cpsrcdVO2);
                 o.put("corpus_list", cpsrcdVO2s);
                 list.add(o);

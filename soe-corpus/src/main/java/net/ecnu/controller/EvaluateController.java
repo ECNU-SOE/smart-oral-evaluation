@@ -1,6 +1,5 @@
 package net.ecnu.controller;
 
-import net.ecnu.model.result.Result;
 import net.ecnu.service.EvaluateService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/api/evaluate/v1")
@@ -41,7 +38,9 @@ public class EvaluateController {
                              @RequestParam(value = "refText", required = true) String refText,
                              @RequestParam(value = "pinyin", required = false) String pinyin,
                              @RequestParam(value = "evalMode", required = true) long evalMode) {
+        long startTime = System.currentTimeMillis();
         File convert = evaluateService.convert(audio);
+        System.out.println("语音格式转换耗时：" + (System.currentTimeMillis() - startTime) + "ms");
         Object data = evaluateService.evaluate(convert, refText, pinyin, evalMode);
         return JsonData.buildSuccess(data);
     }
