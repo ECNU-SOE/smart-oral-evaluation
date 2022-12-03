@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -18,6 +19,7 @@ public class ScoreDTO {
     private Double proportion;
 
     @NotNull
+    @Min(value = 1, message = "totalWords must greater than 1")
     private Integer totalWords;
 
     @NotNull
@@ -33,8 +35,8 @@ public class ScoreDTO {
     @NotNull(message = "pronAccuracy can't be null")
     private Double pronAccuracy;
 
-    @DecimalMin(value = "0", message = "pronFluency range 0～1")
-    @DecimalMax(value = "1", message = "pronFluency range 0～1")
+    @DecimalMin(value = "-1", message = "pronFluency range -1～1")
+    @DecimalMax(value = "1", message = "pronFluency range -1～1")
     @NotNull(message = "pronFluency can't be null")
     private Double pronFluency;
 }
