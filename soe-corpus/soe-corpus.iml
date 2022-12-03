@@ -29,7 +29,6 @@
     <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.16" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-web:2.5.5" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter:2.5.5" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot:2.5.5" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-logging:2.5.5" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.2.6" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.2.6" level="project" />
@@ -45,16 +44,9 @@
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-tomcat:2.5.5" level="project" />
     <orderEntry type="library" name="Maven: org.apache.tomcat.embed:tomcat-embed-core:9.0.53" level="project" />
     <orderEntry type="library" name="Maven: org.apache.tomcat.embed:tomcat-embed-websocket:9.0.53" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-web:5.3.10" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-beans:5.3.10" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:5.3.10" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-aop:5.3.10" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-context:5.3.10" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-expression:5.3.10" level="project" />
     <orderEntry type="library" name="Maven: mysql:mysql-connector-java:8.0.26" level="project" />
     <orderEntry type="library" name="Maven: com.baomidou:mybatis-plus-boot-starter:3.4.0" level="project" />
     <orderEntry type="library" name="Maven: com.baomidou:mybatis-plus:3.4.0" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-autoconfigure:2.5.5" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-jdbc:2.5.5" level="project" />
     <orderEntry type="library" name="Maven: com.zaxxer:HikariCP:4.0.3" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-jdbc:5.3.10" level="project" />
@@ -130,7 +122,6 @@
     <orderEntry type="library" name="Maven: io.prometheus:simpleclient:0.10.0" level="project" />
     <orderEntry type="library" name="Maven: com.alibaba.spring:spring-context-support:1.0.10" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.cloud:spring-cloud-commons:3.0.4" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-crypto:5.5.2" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.cloud:spring-cloud-context:3.0.4" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.cloud:spring-cloud-starter-loadbalancer:3.0.4" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.cloud:spring-cloud-starter:3.0.4" level="project" />
@@ -218,5 +209,18 @@
     <orderEntry type="library" name="Maven: ws.schild:jave-nativebin-osxm1:3.3.1" level="project" />
     <orderEntry type="library" name="Maven: ws.schild:jave-nativebin-linux-arm32:3.3.1" level="project" />
     <orderEntry type="library" name="Maven: ws.schild:jave-nativebin-linux-arm64:3.3.1" level="project" />
+    <orderEntry type="module" module-name="soe-security" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-web:5.3.10" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-beans:5.3.10" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-context:5.3.10" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-aop:5.3.10" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-expression:5.3.10" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:5.5.2" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-crypto:5.5.2" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-web:5.5.2" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-config:5.5.2" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-autoconfigure:2.5.5" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot:2.5.5" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:5.3.10" level="project" />
   </component>
 </module>

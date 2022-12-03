@@ -29,6 +29,12 @@
             <groupId>com.aliyun.oss</groupId>
             <artifactId>aliyun-sdk-oss</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>net.ecnu</groupId>
+            <artifactId>soe-security</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

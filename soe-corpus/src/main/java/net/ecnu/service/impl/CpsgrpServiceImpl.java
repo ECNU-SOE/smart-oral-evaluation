@@ -5,7 +5,7 @@ import net.ecnu.controller.request.CpsgrpFilterReq;
 import net.ecnu.controller.request.TranscriptReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
-import net.ecnu.interceptor.LoginInterceptor;
+//import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.manager.CpsgrpManager;
 import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.mapper.CorpusMapper;
@@ -24,6 +24,8 @@ import net.ecnu.model.common.LoginUser;
 import net.ecnu.service.CpsgrpService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.util.IDUtil;
+import net.ecnu.utils.RequestParamUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.commons.util.IdUtils;
@@ -70,12 +72,14 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Object create(CpsgrpCreateReq cpsgrpCreateReq) {
         //获取登录用户信息
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         //处理生成 cpsgrpDO 对象，并插入数据库
         CpsgrpDO cpsgrpDO = new CpsgrpDO();
         BeanUtils.copyProperties(cpsgrpCreateReq, cpsgrpDO);
         cpsgrpDO.setId("cpsgrp_" + IDUtil.getSnowflakeId());
-        cpsgrpDO.setCreator(loginUser.getAccountNo());
+        //cpsgrpDO.setCreator(loginUser.getAccountNo());
+        cpsgrpDO.setCreator(currentAccountNo);
         int rows = cpsgrpMapper.insert(cpsgrpDO);
         //处理生成 cpsrcdDO 对象, 并插入数据库
         List<CorpusDO> corpusDOS = corpusMapper.selectBatchIds(cpsgrpCreateReq.getCorpusIds());
@@ -94,9 +98,10 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Object del(String cpsgrpId) {
         //获取登录用户信息,判断操作是否越权
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(cpsgrpId);
-        if (cpsgrpDO == null || !loginUser.getAccountNo().equals(cpsgrpDO.getCreator())) {
+        if (cpsgrpDO == null || !currentAccountNo.equals(cpsgrpDO.getCreator())) {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
         //获取cpsrcdIds
@@ -131,13 +136,15 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     @Override
     public Object genTranscript(TranscriptReq transcriptReq) {
         //获取登录用户信息
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
         //处理生成TranscriptDO对象
         TranscriptDO transcriptDO = new TranscriptDO();
         transcriptDO.setId("transcript_" + IDUtil.getSnowflakeId());
         transcriptDO.setCpsgrpId(transcriptReq.getCpsgrpId());
-        transcriptDO.setRespondent(loginUser.getAccountNo());
+        //transcriptDO.setRespondent(loginUser.getAccountNo());
+        transcriptDO.setRespondent(currentAccountNo);
         //计算报告完整度得分
         Double pronCompletion = computePronCompletion(transcriptReq.getScores());
         transcriptDO.setPronCompletion(BigDecimal.valueOf(pronCompletion));
