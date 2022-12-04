@@ -40,6 +40,11 @@ public class CpsgrpVO implements Serializable {
     private String description;
 
     /**
+     * 语料组题目数量
+     */
+    private Integer cpsrcdNum;
+
+    /**
      * 开始时间
      */
     private Date startTime;

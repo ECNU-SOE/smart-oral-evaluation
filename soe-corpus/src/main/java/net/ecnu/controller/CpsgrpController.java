@@ -4,6 +4,7 @@ package net.ecnu.controller;
 import net.ecnu.controller.request.CpsgrpCreateReq;
 import net.ecnu.controller.request.CpsgrpFilterReq;
 import net.ecnu.controller.request.TranscriptReq;
+import net.ecnu.model.common.PageData;
 import net.ecnu.service.CpsgrpService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class CpsgrpController {
     public JsonData list(@RequestParam(value = "cur", defaultValue = "1") int cur,
                          @RequestParam(value = "size", defaultValue = "50") int size,
                          @RequestBody CpsgrpFilterReq cpsgrpFilter) {
-        Object data = cpsgrpService.pageByFilter(cpsgrpFilter);
+        Object data = cpsgrpService.pageByFilter(cpsgrpFilter, new PageData(cur, size));
         return JsonData.buildSuccess(data);
     }
 
