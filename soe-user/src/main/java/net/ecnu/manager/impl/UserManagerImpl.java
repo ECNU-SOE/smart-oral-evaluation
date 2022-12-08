@@ -33,4 +33,11 @@ public class UserManagerImpl implements UserManager {
                 .eq("del", 0));
         return userDOS;
     }
+
+    @Override
+    public UserDO selectOneByAccountNo(String accountNo) {
+        return userMapper.selectOne(new QueryWrapper<UserDO>()
+                .eq("account_no", accountNo)
+                .eq("del", 0));
+    }
 }

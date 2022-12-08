@@ -13,16 +13,16 @@ import lombok.extern.slf4j.Slf4j;
 import net.ecnu.controller.request.UserReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
+import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.manager.UserManager;
 import net.ecnu.mapper.UserMapper;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.UserDO;
 import net.ecnu.model.vo.UserVO;
-import net.ecnu.model.vo.dto.UserDTO;
+import net.ecnu.model.dto.UserDTO;
 import net.ecnu.service.UserService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.JWTUtil;
-import net.ecnu.util.JsonData;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @Service
@@ -80,35 +79,47 @@ public class UserServiceImpl implements UserService {
     @Override
     public Object info(HttpServletRequest req) {
         String token = req.getHeader("token");
-        if (StringUtils.isBlank(token)){
+        if (StringUtils.isBlank(token)) {
             token = req.getParameter("token");
         }
-        if (StringUtils.isBlank(token)){
+        if (StringUtils.isBlank(token)) {
             throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
         }
         LoginUser loginUser = JWTUtil.checkJWT(token);
 //        UserDO userDO = userManager.selectOneByPhone(loginUser.getPhone());
         UserDO userDO = userMapper.selectById(loginUser.getAccountNo());
-        if (userDO==null){
+        if (userDO == null) {
             throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
         }
         UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(userDO,userVO);
+        BeanUtils.copyProperties(userDO, userVO);
+
+        return userVO;
+    }
+
+    @Override
+    public Object getUserInfo() {
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
+        //如果token有效，数据库查询用户个人信息
+        UserDO userDO = userManager.selectOneByAccountNo(loginUser.getAccountNo());
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(userDO, userVO);
         return userVO;
     }
 
     @Override
     public int update(UserDO user) {
-        if (user.getDel()!=null&&user.getDel()){
+        if (user.getDel() != null && user.getDel()) {
             return 0;
         }
-        if (StringUtils.isBlank(user.getAccountNo())){
+        if (StringUtils.isBlank(user.getAccountNo())) {
             return 0;
         }
         UserDTO userDTO = new UserDTO();
-        BeanUtils.copyProperties(user,userDTO);
+        BeanUtils.copyProperties(user, userDTO);
         UserDO userDO = new UserDO();
-        BeanUtils.copyProperties(userDTO,userDO);
+        BeanUtils.copyProperties(userDTO, userDO);
         userDO.setAccountNo(user.getAccountNo());
         return userMapper.updateById(userDO);
     }
@@ -118,7 +129,7 @@ public class UserServiceImpl implements UserService {
         List<UserDO> userDOS = userManager.selectAllByPhone(phoneNum);
         if (userDOS.isEmpty())
             return false;
-        if (userDOS.size()>1)
+        if (userDOS.size() > 1)
             return false;
 
         final String templateCode = "SMS_262610596"; //阿里云短信模板,需要向阿里云申请
@@ -136,11 +147,11 @@ public class UserServiceImpl implements UserService {
         //自定义请求参数
         request.putQueryParameter("RegionId", "cn-hangzhou");
         request.putQueryParameter("PhoneNumbers", phoneNum);
-        request.putQueryParameter("SignName",signName);    //短信签名
+        request.putQueryParameter("SignName", signName);    //短信签名
         request.putQueryParameter("TemplateCode", templateCode);//短信模板code
         String code = RandomUtil.randomNumbers(6);
-        HashMap<String,Object> map = new HashMap<>();
-        map.put("code",code);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("code", code);
         request.putQueryParameter("TemplateParam", JSONObject.toJSONString(code));
         try {
             CommonResponse resp = client.getCommonResponse(request);// 发送短信
@@ -150,6 +161,8 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException(e);
         }
     }
+
+
 }
 
 

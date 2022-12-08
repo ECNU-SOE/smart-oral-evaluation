@@ -49,25 +49,37 @@ public class UserController {
         return JsonData.buildSuccess(data);
     }
 
+    /**
+     * 查询用户详情
+     */
     @PostMapping("info")
-    public JsonData info(HttpServletRequest req){
+    public JsonData info(HttpServletRequest req) {
         Object data = userService.info(req);
-        if (data==null)
+        if (data == null)
             return JsonData.buildError("查询用户信息错误");
         return JsonData.buildSuccess(data);
     }
 
+    /**
+     * 查询登陆用户详情（需要携带token）
+     */
+    @GetMapping("info2")
+    public JsonData info2() {
+        Object data = userService.getUserInfo();
+        return JsonData.buildSuccess(data);
+    }
+
     @PostMapping("update")
-    public JsonData update(@RequestBody UserDO user){
+    public JsonData update(@RequestBody UserDO user) {
         int num = userService.update(user);
-        if (num>=1){
+        if (num >= 1) {
             return JsonData.buildSuccess();
         }
         return JsonData.buildError("用户信息更新失败");
     }
 
     @GetMapping("/send/{phone}")
-    public JsonData send(@PathVariable("phone") String phone){
+    public JsonData send(@PathVariable("phone") String phone) {
         boolean isSend = userService.send(phone);
         if (isSend)
             return JsonData.buildSuccess();

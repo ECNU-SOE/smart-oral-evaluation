@@ -34,7 +34,6 @@ public class UserVO implements Serializable {
     /**
      * 用户角色
      */
-    @JsonIgnore
     private Integer roleId;
 
     /**
@@ -76,36 +75,6 @@ public class UserVO implements Serializable {
      * 邮箱
      */
     private String mail;
-
-    /**
-     * 密码
-     */
-    @JsonIgnore
-    private String pwd;
-
-    /**
-     * 加密盐
-     */
-    @JsonIgnore
-    private String secret;
-
-    /**
-     * 删除标识位
-     */
-    @JsonIgnore
-    private Boolean del;
-
-    /**
-     * 创建时间
-     */
-    @JsonIgnore
-    private Date gmtCreate;
-
-    /**
-     * 更新时间
-     */
-    @JsonIgnore
-    private Date gmtModified;
 
 
 }
