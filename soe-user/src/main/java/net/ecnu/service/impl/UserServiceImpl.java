@@ -129,44 +129,45 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean send(String phoneNum) {
-        UserDO userDO = userManager.selectOneByPhone(phoneNum);
-        if (userDO==null)
-            return false;
-        if (userDOS.size() > 1)
-            return false;
-
-        final String templateCode = "SMS_262610596"; //阿里云短信模板,需要向阿里云申请
-        final String signName = "唐国兴的博客"; //短信签名，需要向阿里云申请
-
-        //连接阿里云
-        DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", "LTAI5tKC7ayyoZA81SE62bpH", "0v3aCE7DZyXXueE4Ui2BC8fwIVEOMj");
-        IAcsClient client = new DefaultAcsClient(profile);
-        //构建请求
-        CommonRequest request = new CommonRequest();
-        request.setSysMethod(MethodType.POST);
-        request.setSysDomain("dysmsapi.aliyuncs.com");//不要动
-        request.setSysVersion("2017-05-25");
-        request.setSysAction("SendSms");
-        //自定义请求参数
-        request.putQueryParameter("RegionId", "cn-hangzhou");
-        request.putQueryParameter("PhoneNumbers", phoneNum);
-        request.putQueryParameter("SignName", signName);    //短信签名
-        request.putQueryParameter("TemplateCode", templateCode);//短信模板code
-        String code = RandomUtil.randomNumbers(6);
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("code", code);
-        request.putQueryParameter("TemplateParam", JSONObject.toJSONString(code));
-        HashMap<String,Object> map = new HashMap<>();
-        map.put("code",code);
-        request.putQueryParameter("TemplateParam", JSONObject.toJSONString(map));
-        try {
-            CommonResponse resp = client.getCommonResponse(request);// 发送短信
-            String s = new String(resp.getData().getBytes(), StandardCharsets.UTF_8);
-            System.out.println(s);
-            return resp.getHttpResponse().isSuccess();
-        } catch (ClientException e) {
-            throw new RuntimeException(e);
-        }
+//        UserDO userDO = userManager.selectOneByPhone(phoneNum);
+//        if (userDO==null)
+//            return false;
+//        if (userDOS.size() > 1)
+//            return false;
+//
+//        final String templateCode = "SMS_262610596"; //阿里云短信模板,需要向阿里云申请
+//        final String signName = "唐国兴的博客"; //短信签名，需要向阿里云申请
+//
+//        //连接阿里云
+//        DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", "LTAI5tKC7ayyoZA81SE62bpH", "0v3aCE7DZyXXueE4Ui2BC8fwIVEOMj");
+//        IAcsClient client = new DefaultAcsClient(profile);
+//        //构建请求
+//        CommonRequest request = new CommonRequest();
+//        request.setSysMethod(MethodType.POST);
+//        request.setSysDomain("dysmsapi.aliyuncs.com");//不要动
+//        request.setSysVersion("2017-05-25");
+//        request.setSysAction("SendSms");
+//        //自定义请求参数
+//        request.putQueryParameter("RegionId", "cn-hangzhou");
+//        request.putQueryParameter("PhoneNumbers", phoneNum);
+//        request.putQueryParameter("SignName", signName);    //短信签名
+//        request.putQueryParameter("TemplateCode", templateCode);//短信模板code
+//        String code = RandomUtil.randomNumbers(6);
+//        HashMap<String, Object> map = new HashMap<>();
+//        map.put("code", code);
+//        request.putQueryParameter("TemplateParam", JSONObject.toJSONString(code));
+//        HashMap<String,Object> map = new HashMap<>();
+//        map.put("code",code);
+//        request.putQueryParameter("TemplateParam", JSONObject.toJSONString(map));
+//        try {
+//            CommonResponse resp = client.getCommonResponse(request);// 发送短信
+//            String s = new String(resp.getData().getBytes(), StandardCharsets.UTF_8);
+//            System.out.println(s);
+//            return resp.getHttpResponse().isSuccess();
+//        } catch (ClientException e) {
+//            throw new RuntimeException(e);
+//        }
+        return true;
     }
 
 
