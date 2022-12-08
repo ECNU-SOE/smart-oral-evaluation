@@ -17,6 +17,7 @@ import net.ecnu.mapper.CpsgrpMapper;
 import net.ecnu.model.CpsrcdDO;
 import net.ecnu.model.TranscriptDO;
 import net.ecnu.model.common.LoginUser;
+import net.ecnu.model.common.PageData;
 import net.ecnu.model.dto.ScoreDTO;
 import net.ecnu.model.vo.CpsgrpVO;
 import net.ecnu.model.vo.CpsrcdVO;
@@ -128,9 +129,23 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     }
 
     @Override
-    public Object pageByFilter(CpsgrpFilterReq cpsgrpFilter) {
-        List<CpsgrpVO> cpsgrpVOS = cpsgrpManager.listByFilter(cpsgrpFilter);
-        return cpsgrpVOS;
+    public Object pageByFilter(CpsgrpFilterReq cpsgrpFilter, PageData pageData) {
+        //获取分页后的cpsgrpDOS
+        List<CpsgrpDO> cpsgrpDOS = cpsgrpManager.listByFilter(cpsgrpFilter, pageData);
+        //统计过滤后的记录总数
+        int totalCount = cpsgrpManager.countByFilter(cpsgrpFilter);
+        pageData.setTotal(totalCount);
+        //生成处理cpsgrpVOS对象
+        List<CpsgrpVO> cpsgrpVOS = cpsgrpDOS.stream().map(cpsgrpDO -> {
+            CpsgrpVO cpsgrpVO = beanProcess(cpsgrpDO);
+            //统计题目数量
+            int cpsrcdNum = cpsrcdManager.countByCpsgrpId(cpsgrpVO.getId());
+            cpsgrpVO.setCpsrcdNum(cpsrcdNum);
+            return cpsgrpVO;
+        }).collect(Collectors.toList());
+        pageData.setRecords(cpsgrpVOS);
+        //返回分页对象
+        return pageData;
     }
 
     @Override
@@ -221,5 +236,14 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         CpsrcdVO cpsrcdVO = new CpsrcdVO();
         BeanUtils.copyProperties(cpsrcdDO, cpsrcdVO);
         return cpsrcdVO;
+    }
+
+    /**
+     * CpsgrpDO->CpsgrpVO
+     */
+    private CpsgrpVO beanProcess(CpsgrpDO cpsgrpDO) {
+        CpsgrpVO cpsgrpVO = new CpsgrpVO();
+        BeanUtils.copyProperties(cpsgrpDO, cpsgrpVO);
+        return cpsgrpVO;
     }
 }

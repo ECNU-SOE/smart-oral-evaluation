@@ -5,6 +5,7 @@ import net.ecnu.controller.request.CpsgrpFilterReq;
 import net.ecnu.controller.request.TranscriptReq;
 import net.ecnu.model.CpsgrpDO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import net.ecnu.model.common.PageData;
 
 /**
  * <p>
@@ -26,7 +27,8 @@ public interface CpsgrpService extends IService<CpsgrpDO> {
 
     Object detail(String cpsgrpId);
 
-    Object pageByFilter(CpsgrpFilterReq cpsgrpFilter);
 
     Object genTranscript(TranscriptReq transcriptReq);
+
+    Object pageByFilter(CpsgrpFilterReq cpsgrpFilter, PageData pageData);
 }
