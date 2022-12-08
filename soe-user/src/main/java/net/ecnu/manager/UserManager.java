@@ -8,6 +8,4 @@ import java.util.List;
 public interface UserManager {
 
     UserDO selectOneByPhone(String phone);
-
-    List<UserDO> selectAllByPhone(String phone);
 }

@@ -25,12 +25,4 @@ public class UserManagerImpl implements UserManager {
                 .eq("del", 0));
         return userDO;
     }
-
-    @Override
-    public List<UserDO> selectAllByPhone(String phone) {
-        List<UserDO> userDOS = userMapper.selectList(new QueryWrapper<UserDO>()
-                .eq("phone", phone)
-                .eq("del", 0));
-        return userDOS;
-    }
 }

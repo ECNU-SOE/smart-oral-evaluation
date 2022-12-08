@@ -1,5 +1,6 @@
 package net.ecnu.service.impl;
 
+import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.CommonRequest;
@@ -29,6 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,11 +90,7 @@ public class UserServiceImpl implements UserService {
             throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
         }
         LoginUser loginUser = JWTUtil.checkJWT(token);
-//        UserDO userDO = userManager.selectOneByPhone(loginUser.getPhone());
         UserDO userDO = userMapper.selectById(loginUser.getAccountNo());
-        if (userDO==null){
-            throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
-        }
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(userDO,userVO);
         return userVO;
@@ -115,12 +114,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean send(String phoneNum) {
-        List<UserDO> userDOS = userManager.selectAllByPhone(phoneNum);
-        if (userDOS.isEmpty())
+        UserDO userDO = userManager.selectOneByPhone(phoneNum);
+        if (userDO==null)
             return false;
-        if (userDOS.size()>1)
-            return false;
-
         final String templateCode = "SMS_262610596"; //阿里云短信模板,需要向阿里云申请
         final String signName = "唐国兴的博客"; //短信签名，需要向阿里云申请
 
@@ -141,10 +137,11 @@ public class UserServiceImpl implements UserService {
         String code = RandomUtil.randomNumbers(6);
         HashMap<String,Object> map = new HashMap<>();
         map.put("code",code);
-        request.putQueryParameter("TemplateParam", JSONObject.toJSONString(code));
+        request.putQueryParameter("TemplateParam", JSONObject.toJSONString(map));
         try {
             CommonResponse resp = client.getCommonResponse(request);// 发送短信
-            System.out.println(resp.getData());
+            String s = new String(resp.getData().getBytes(), StandardCharsets.UTF_8);
+            System.out.println(s);
             return resp.getHttpResponse().isSuccess();
         } catch (ClientException e) {
             throw new RuntimeException(e);
