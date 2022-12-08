@@ -9,6 +9,8 @@ import net.ecnu.model.UserDO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @Slf4j
 public class UserManagerImpl implements UserManager {
@@ -22,5 +24,13 @@ public class UserManagerImpl implements UserManager {
                 .eq("phone", phone)
                 .eq("del", 0));
         return userDO;
+    }
+
+    @Override
+    public List<UserDO> selectAllByPhone(String phone) {
+        List<UserDO> userDOS = userMapper.selectList(new QueryWrapper<UserDO>()
+                .eq("phone", phone)
+                .eq("del", 0));
+        return userDOS;
     }
 }

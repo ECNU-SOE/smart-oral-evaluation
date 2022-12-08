@@ -1,6 +1,7 @@
 package net.ecnu.db;
 
 
+import cn.hutool.core.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.UserApplication;
 import net.ecnu.controller.request.UserReq;
@@ -23,7 +24,7 @@ public class SOETest {
 
     @Test
     public void userTest(){
-        int a = 3;
-        boolean flag;
+        String s = RandomUtil.randomNumbers(6);
+        System.out.println(s);
     }
 }

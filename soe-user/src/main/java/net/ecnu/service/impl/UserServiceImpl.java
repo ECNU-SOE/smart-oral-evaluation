@@ -1,5 +1,6 @@
 package net.ecnu.service.impl;
 
+import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.CommonRequest;
 import com.aliyuncs.CommonResponse;
@@ -21,12 +22,15 @@ import net.ecnu.model.vo.dto.UserDTO;
 import net.ecnu.service.UserService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.JWTUtil;
+import net.ecnu.util.JsonData;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -83,7 +87,8 @@ public class UserServiceImpl implements UserService {
             throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
         }
         LoginUser loginUser = JWTUtil.checkJWT(token);
-        UserDO userDO = userManager.selectOneByPhone(loginUser.getPhone());
+//        UserDO userDO = userManager.selectOneByPhone(loginUser.getPhone());
+        UserDO userDO = userMapper.selectById(loginUser.getAccountNo());
         if (userDO==null){
             throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
         }
@@ -109,7 +114,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean send(String phoneNum, String templateCode, Map<String, Object> code) {
+    public boolean send(String phoneNum) {
+        List<UserDO> userDOS = userManager.selectAllByPhone(phoneNum);
+        if (userDOS.isEmpty())
+            return false;
+        if (userDOS.size()>1)
+            return false;
+
+        final String templateCode = "SMS_262610596"; //阿里云短信模板,需要向阿里云申请
+        final String signName = "唐国兴的博客"; //短信签名，需要向阿里云申请
+
         //连接阿里云
         DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", "LTAI5tKC7ayyoZA81SE62bpH", "0v3aCE7DZyXXueE4Ui2BC8fwIVEOMj");
         IAcsClient client = new DefaultAcsClient(profile);
@@ -122,9 +136,11 @@ public class UserServiceImpl implements UserService {
         //自定义请求参数
         request.putQueryParameter("RegionId", "cn-hangzhou");
         request.putQueryParameter("PhoneNumbers", phoneNum);
-        final String signName = "唐国兴的博客"; //短信签名，需要向阿里云申请
         request.putQueryParameter("SignName",signName);    //短信签名
         request.putQueryParameter("TemplateCode", templateCode);//短信模板code
+        String code = RandomUtil.randomNumbers(6);
+        HashMap<String,Object> map = new HashMap<>();
+        map.put("code",code);
         request.putQueryParameter("TemplateParam", JSONObject.toJSONString(code));
         try {
             CommonResponse resp = client.getCommonResponse(request);// 发送短信

@@ -1,13 +1,16 @@
 package net.ecnu.controller;
 
+import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Find;
 import net.ecnu.controller.request.UserReq;
+import net.ecnu.manager.UserManager;
 import net.ecnu.model.UserDO;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.service.UserService;
 import net.ecnu.util.JsonData;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -25,6 +29,7 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
 
     /**
      * 用户注册
@@ -47,6 +52,8 @@ public class UserController {
     @PostMapping("info")
     public JsonData info(HttpServletRequest req){
         Object data = userService.info(req);
+        if (data==null)
+            return JsonData.buildError("查询用户信息错误");
         return JsonData.buildSuccess(data);
     }
 
@@ -61,10 +68,7 @@ public class UserController {
 
     @GetMapping("/send/{phone}")
     public JsonData send(@PathVariable("phone") String phone){
-        HashMap<String,Object> map = new HashMap<>();
-        map.put("code",1234);
-        final String templateCode = "SMS_262610596"; //阿里云短信模板,需要向阿里云申请
-        boolean isSend = userService.send(phone,templateCode, map);
+        boolean isSend = userService.send(phone);
         if (isSend)
             return JsonData.buildSuccess();
         else
