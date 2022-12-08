@@ -5,6 +5,7 @@ import net.ecnu.model.UserDO;
 import net.ecnu.model.common.LoginUser;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 public interface UserService {
 
@@ -15,4 +16,6 @@ public interface UserService {
     Object info(HttpServletRequest req);
 
     int update(UserDO user);
+
+    boolean send(String phoneNum, String templateCode, Map<String,Object> code);
 }

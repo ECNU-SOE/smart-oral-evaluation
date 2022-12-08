@@ -1,5 +1,6 @@
 package net.ecnu.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Find;
 import net.ecnu.controller.request.UserReq;
@@ -13,10 +14,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.UUID;
 
 
 @RestController
 @RequestMapping("/api/user/v1")
+@CrossOrigin //sendSms跨域支持
 public class UserController {
 
     @Autowired
@@ -53,6 +57,18 @@ public class UserController {
             return JsonData.buildSuccess();
         }
         return JsonData.buildError("用户信息更新失败");
+    }
+
+    @GetMapping("/send/{phone}")
+    public JsonData send(@PathVariable("phone") String phone){
+        HashMap<String,Object> map = new HashMap<>();
+        map.put("code",1234);
+        final String templateCode = "SMS_262610596"; //阿里云短信模板,需要向阿里云申请
+        boolean isSend = userService.send(phone,templateCode, map);
+        if (isSend)
+            return JsonData.buildSuccess();
+        else
+            return JsonData.buildError("短信发送错误");
     }
 
 }
