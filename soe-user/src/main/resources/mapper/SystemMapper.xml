@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.ecnu.mapper.SystemMapper">
+
+    <select id="selectOrgTree"
+            resultType="net.ecnu.model.authentication.SysOrg">
+        SELECT id,org_pid,org_pids,is_leaf,org_name,address,phone,email,org_sort,level,status
+        FROM sys_org o
+        <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR">
+            AND (org_pids like CONCAT('%[',#{rootOrgId},']%') OR id = #{rootOrgId})
+            <if test="orgNameLike !=null and orgNameLike != '' " >
+                AND org_name like CONCAT('%',#{orgNameLike},'%')
+            </if>
+            <if test="orgStatus !=null  " >
+                AND status = #{orgStatus}
+            </if>
+        </trim>
+        ORDER BY level,org_sort
+    </select>
+
+    <select id="selectMenuTree"
+            resultType="net.ecnu.model.authentication.SysMenu">
+        SELECT id,menu_pid,menu_pids,is_leaf,menu_name,url,icon,menu_sort,level,status,hidden,view_import
+        FROM sys_menu o
+        <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR">
+            AND (menu_pids like CONCAT('%[',#{rootMenuId},']%') OR id = #{rootMenuId})
+            <if test="menuNameLike !=null and menuNameLike != '' " >
+                AND menu_name like CONCAT('%',#{menuNameLike},'%')
+            </if>
+            <if test="menuStatus !=null  " >
+                AND status = #{menuStatus}
+            </if>
+        </trim>
+        ORDER BY level,menu_sort
+    </select>
+
+    <select id="selectUser"
+            resultType="net.ecnu.model.authentication.SysUserOrg">
+        SELECT u.account_no,u.org_id,o.org_name,u.enabled,u.real_name,u.phone,u.mail,u.gmtCreate
+        FROM user u
+        LEFT JOIN sys_org o ON u.org_id = o.id
+        <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR">
+            <if test="realName !=null and realName != '' " >
+                AND u.real_name like CONCAT('%',#{realName},'%')
+            </if>
+            <if test="phone !=null and phone != '' " >
+                AND u.phone like CONCAT('%',#{phone},'%')
+            </if>
+            <if test="email !=null and email != '' " >
+                AND u.mail like CONCAT('%',#{email},'%')
+            </if>
+            <if test="enabled != null  " >
+                AND u.enabled = #{enabled}
+            </if>
+            <if test="createStartTime != null  and createEndTime != null " >
+                AND u.gmtCreate between #{createStartTime} and #{createEndTime}
+            </if>
+            <if test="orgId !=null and orgId != '' " >
+                AND (
+                o.org_pids like CONCAT('%',#{orgId},'%')
+                OR
+                o.id = #{orgId}
+                )
+            </if>
+        </trim>
+    </select>
+
+    <select id="selectApiTree"
+            resultType="net.ecnu.model.authentication.SysApi">
+        SELECT id,api_pid,api_pids,is_leaf,api_name,url,api_sort,level,status
+        FROM sys_api o
+        <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR">
+            AND (api_pids like CONCAT('%[',#{rootApiId},']%') OR id = #{rootApiId})
+            <if test="apiNameLike !=null and apiNameLike != '' " >
+                AND api_name like CONCAT('%',#{apiNameLike},'%')
+            </if>
+            <if test="apiStatus != null  " >
+                AND status = #{apiStatus}
+            </if>
+        </trim>
+        ORDER BY level,api_sort
+    </select>
+
+    <select id="selectApiExpandedKeys" resultType="java.lang.String">
+        SELECT distinct id
+        FROM sys_api a
+        WHERE a.level = 2
+    </select>
+
+    <select id="selectApiCheckedKeys" resultType="java.lang.String">
+        SELECT distinct api_id
+        FROM sys_role_api ra
+        WHERE role_id = #{roleId}
+    </select>
+
+    <insert id="insertRoleApiIds" >
+        insert into sys_role_api ( role_id,api_id )
+        values
+        <foreach collection="checkedIds" item="item"  separator=",">
+            (#{roleId},#{item})
+        </foreach>
+    </insert>
+
+    <select id="getCheckedRoleIds" resultType="java.lang.String">
+        SELECT distinct role_id
+        FROM sys_user_role ra
+        WHERE ra.user_id = #{userId};
+    </select>
+
+    <insert id="insertUserRoleIds" >
+        insert into sys_user_role ( user_id,role_id )
+        values
+        <foreach collection="checkedIds" item="item"  separator=",">
+            (#{userId},#{item})
+        </foreach>
+    </insert>
+
+    <select id="selectMenuCheckedKeys" resultType="java.lang.String">
+        SELECT distinct menu_id
+        FROM sys_role_menu ra
+        WHERE ra.role_id = #{roleId}
+    </select>
+
+    <select id="selectMenuExpandedKeys" resultType="java.lang.String">
+        SELECT distinct id
+        FROM sys_menu a
+        WHERE a.level = 2
+    </select>
+
+    <insert id="insertRoleMenuIds" >
+        insert into sys_role_menu ( role_id,menu_id )
+        values
+        <foreach collection="checkedIds" item="item"  separator=",">
+            (#{roleId},#{item})
+        </foreach>
+    </insert>
+
+    <select id="selectMenuByUsername"
+            resultType="net.ecnu.model.authentication.SysMenu">
+        SELECT distinct m.id,menu_pid,menu_pids,is_leaf,menu_name,url,icon,menu_sort,level,status,hidden,view_import
+        FROM sys_menu m
+        LEFT JOIN sys_role_menu rm ON m.id = rm.menu_id
+        LEFT JOIN sys_user_role ur ON ur.role_id = rm.role_id
+        LEFT JOIN user u ON u.id = ur.user_id
+        WHERE u.phone = #{phone}
+        AND m.status = 0
+        ORDER BY level,menu_sort
+    </select>
+</mapper>

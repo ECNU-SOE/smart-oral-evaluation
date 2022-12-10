@@ -16,4 +16,8 @@ public class UserDTO {
     private String phone;
     private String mail;
     private Date gmtModified;
+    private String pwd;
+    private Integer orgId;
+    private Boolean enabled;
 }
+

@@ -25,4 +25,9 @@ public class SOEConst {
      */
     public static final Double ERR_SCORE_LINE = 90.0;
 
+    /**
+     * 用户初始密码
+     */
+    public static final String USER_INIT_PASSWORD = "abcd1234";
+
 }
