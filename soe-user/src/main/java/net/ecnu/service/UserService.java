@@ -17,5 +17,8 @@ public interface UserService {
 
     int update(UserDO user);
 
-    boolean send(String phoneNum, String templateCode, Map<String,Object> code);
+    boolean send(String phoneNum);
+
+    Object getUserInfo();
+
 }
