@@ -12,12 +12,14 @@ import net.ecnu.model.authentication.SysApiNode;
 import net.ecnu.model.authentication.SysRoleApi;
 import net.ecnu.model.authentication.tree.DataTreeUtil;
 import net.ecnu.service.authentication.SysApiService;
+import net.ecnu.utils.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -75,6 +77,13 @@ public class SysApiServiceImpl implements SysApiService {
         sysApiMapper.updateById(parent);
 
         sysapi.setStatus(false);//设置是否禁用，新增节点默认可用
+        //添加操作记录
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if(StringUtils.isBlank(currentAccountNo)){
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION.getCode(),"添加接口操作必须携带有效token");
+        }
+        sysapi.setCreateBy(currentAccountNo);
+        sysapi.setCreateTime(LocalDateTime.now());
         sysApiMapper.insert(sysapi);
     }
 
@@ -98,6 +107,12 @@ public class SysApiServiceImpl implements SysApiService {
             throw new BizException(BizCodeEnum.USER_INPUT_ERROR.getCode(),
                     "修改操作必须带主键");
         }else{
+            String currentAccountNo = RequestParamUtil.currentAccountNo();
+            if(StringUtils.isBlank(currentAccountNo)){
+                throw new BizException(BizCodeEnum.TOKEN_EXCEPTION.getCode(),"修改接口信息必须携带有效token");
+            }
+            sysapi.setUpdateTime(LocalDateTime.now());
+            sysapi.setUpdateBy(currentAccountNo);
             sysApiMapper.updateById(sysapi);
         }
     }
@@ -149,7 +164,7 @@ public class SysApiServiceImpl implements SysApiService {
     @Override
     public void updateStatus(Long id, Boolean status) {
         if(Objects.isNull(id)){
-            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"修改操作必须带主键");
+            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"修改接口信息操作必须带主键");
         }
         SysApi sysApi = new SysApi();
         sysApi.setId(id);

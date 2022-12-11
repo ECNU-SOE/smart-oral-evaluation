@@ -4,7 +4,6 @@ import lombok.Data;
 
 /**
  * sys_role_api
- * @author
  */
 @Data
 public class SysRoleApi {

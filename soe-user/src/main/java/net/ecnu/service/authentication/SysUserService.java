@@ -28,11 +28,11 @@ public interface SysUserService {
 
     void deleteUser(String accountNo);
 
-    void pwdreset(String phone);
+    void pwdreset(String accountNo);
 
-    void updateEnabled(String phone, Boolean enabled);
+    void updateEnabled(String accountNo, Boolean enabled);
 
-    void changePwd(String phone, String oldPass, String newPass);
+    void changePwd(String accountNo, String oldPass, String newPass);
 
     Boolean isdefault(String accountNo);
 }

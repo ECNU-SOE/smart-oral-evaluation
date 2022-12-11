@@ -40,8 +40,6 @@ public class JwtWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapte
     private String[] PERMIT_API_LIST = {
             //用户登录
             JWTConstants.LOGIN,
-            //刷新token
-            JWTConstants.REFRESH_TOKEN,
             //注册
             JWTConstants.REGISTER,
             //角色

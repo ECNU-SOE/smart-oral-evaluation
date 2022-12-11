@@ -61,7 +61,7 @@ public interface MyUserDetailsServiceMapper extends BaseMapper<UserDO> {
     Integer checkUserByPhone(@Param("phone")String phone);
 
     //给新增用户赋角色
-    @Insert("insert into user_role values (#{roleId},#{accountNo})")
+    @Insert("insert into user_role(account_no,role_id) values (#{accountNo},#{roleId})")
     Integer insertUserRole(@Param("roleId") Integer roleId,@Param("accountNo") String accountNo);
 
 

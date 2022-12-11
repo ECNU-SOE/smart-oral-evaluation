@@ -73,12 +73,12 @@ public class SysUserServiceImpl implements SysUserService {
     //用户管理：修改
     @Override
     public void updateUser(UserDTO sysuser) {
-        if(Objects.isNull(sysuser)|| StringUtils.isBlank(sysuser.getPhone())){
+        if(Objects.isNull(sysuser)||StringUtils.isBlank(sysuser.getAccountNo())){
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(), BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getMessage());
         }
         //根据用户名修改用户信息
         LambdaQueryWrapper<UserDO> lambdaQ = Wrappers.lambdaQuery();
-        lambdaQ.eq(UserDO::getPhone, sysuser.getPhone());
+        lambdaQ.eq(UserDO::getAccountNo, sysuser.getAccountNo());
         UserDO userDO = new UserDO();
         BeanUtils.copyProperties(sysuser,userDO);
         userMapper.update(userDO,lambdaQ);
@@ -110,8 +110,8 @@ public class SysUserServiceImpl implements SysUserService {
 
     //用户管理：重置密码
     @Override
-    public void pwdreset(String phone) {
-        if(StringUtils.isBlank(phone)){
+    public void pwdreset(String accountNo) {
+        if(StringUtils.isBlank(accountNo)){
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"重置密码操作必须带手机号");
         }
         UserDO sysUser = new UserDO();
@@ -121,28 +121,30 @@ public class SysUserServiceImpl implements SysUserService {
 
         //根据用户名修改用户信息
         LambdaQueryWrapper<UserDO> lambdaQ = Wrappers.lambdaQuery();
-        lambdaQ.eq(UserDO::getPwd, phone);
+        lambdaQ.eq(UserDO::getAccountNo, accountNo);
         userMapper.update(sysUser,lambdaQ);
     }
 
     @Override
-    public void updateEnabled(String phone, Boolean enabled) {
-        if(StringUtils.isBlank(phone)){
-            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"修改操作必须带账号");
+    public void updateEnabled(String accountNo, Boolean enabled) {
+        if(StringUtils.isBlank(accountNo)){
+            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"修改用户信息操作必须携带有效token");
         }
         UserDO sysUser = new UserDO();
         sysUser.setEnabled(enabled);
-
         //根据用户名修改用户信息
         LambdaQueryWrapper<UserDO> lambdaQ = Wrappers.lambdaQuery();
-        lambdaQ.eq(UserDO::getPhone, phone);
+        lambdaQ.eq(UserDO::getAccountNo, accountNo);
         userMapper.update(sysUser,lambdaQ);
     }
 
     @Override
-    public void changePwd(String phone, String oldPass, String newPass) {
+    public void changePwd(String accountNo, String oldPass, String newPass) {
+        if(StringUtils.isBlank(accountNo)){
+            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"修改密码必须携带有效token");
+        }
         UserDO sysUser = userMapper.selectOne(
-                new QueryWrapper<UserDO>().eq("phone",phone));
+                new QueryWrapper<UserDO>().eq("account_no",accountNo));
         //判断旧密码是否正确
         boolean isMatch = passwordEncoder.matches(oldPass,sysUser.getPwd());
         if(isMatch){

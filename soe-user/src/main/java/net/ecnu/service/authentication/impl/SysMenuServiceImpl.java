@@ -12,11 +12,13 @@ import net.ecnu.model.authentication.SysMenuNode;
 import net.ecnu.model.authentication.SysRoleMenu;
 import net.ecnu.model.authentication.tree.DataTreeUtil;
 import net.ecnu.service.authentication.SysMenuService;
+import net.ecnu.utils.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -71,6 +73,12 @@ public class SysMenuServiceImpl implements SysMenuService {
             throw new BizException(BizCodeEnum.USER_INPUT_ERROR.getCode(),
                     "修改操作必须带主键");
         }else{
+            String currentAccountNo = RequestParamUtil.currentAccountNo();
+            if(StringUtils.isBlank(currentAccountNo)){
+                throw new BizException(BizCodeEnum.TOKEN_EXCEPTION.getCode(),"更新菜单信息必须携带有效token");
+            }
+            sysmenu.setUpdateBy(currentAccountNo);
+            sysmenu.setUpdateTime(LocalDateTime.now());
             sysMenuMapper.updateById(sysmenu);
         }
     }
@@ -86,6 +94,12 @@ public class SysMenuServiceImpl implements SysMenuService {
         sysMenuMapper.updateById(parent);
 
         sysmenu.setStatus(false);//设置是否禁用，新增节点默认可用
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if(StringUtils.isBlank(currentAccountNo)){
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION.getCode(),"添加菜单必须携带有效token");
+        }
+        sysmenu.setCreateBy(currentAccountNo);
+        sysmenu.setCreateTime(LocalDateTime.now());
         sysMenuMapper.insert(sysmenu);
     }
 
@@ -168,7 +182,7 @@ public class SysMenuServiceImpl implements SysMenuService {
     @Override
     public void updateStatus(Integer id, Boolean status) {
         if(Objects.isNull(id)){
-            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"修改操作必须带主键");
+            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"更改菜单状态信息操作必须带主键");
         }
         SysMenu sysMenu = new SysMenu();
         sysMenu.setId(id);
@@ -179,7 +193,7 @@ public class SysMenuServiceImpl implements SysMenuService {
     @Override
     public void updateHidden(Integer id, Boolean hidden) {
         if(Objects.isNull(id)){
-            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"修改操作必须带主键");
+            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"修改菜单的隐藏状态操作必须带主键");
         }
         SysMenu sysMenu = new SysMenu();
         sysMenu.setId(id);

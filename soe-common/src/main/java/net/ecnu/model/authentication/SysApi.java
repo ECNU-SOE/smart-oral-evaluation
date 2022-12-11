@@ -3,10 +3,6 @@ package net.ecnu.model.authentication;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * sys_api
- * @author 字母哥
- */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SysApi extends BaseColumns {

@@ -96,11 +96,11 @@ public class SysUserController {
 
     //用户管理：重置密码
     @PostMapping(value = "/pwd/reset")
-    public JsonData pwdreset(@RequestParam String phone) {
-        if(StringUtils.isBlank(phone)){
+    public JsonData pwdreset(@RequestParam String accountNo) {
+        if(StringUtils.isBlank(accountNo)){
             return JsonData.buildCodeAndMsg(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(), BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getMessage());
         }
-        sysuserService.pwdreset(phone);
+        sysuserService.pwdreset(accountNo);
         return JsonData.buildSuccess("重置密码成功!");
     }
 
@@ -113,18 +113,18 @@ public class SysUserController {
 
     //修改密码
     @PostMapping(value = "/pwd/change")
-    public JsonData pwdchange(@RequestParam String phone,
-                              @RequestParam String oldPass,
+    public JsonData pwdchange(@RequestParam String oldPass,
                               @RequestParam String newPass) {
-        sysuserService.changePwd(phone,oldPass,newPass);
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        sysuserService.changePwd(currentAccountNo,oldPass,newPass);
         return JsonData.buildSuccess("修改密码成功!");
     }
 
     //用户管理：更新用户激活状态
     @PostMapping(value = "/enabled/change")
-    public JsonData update(@RequestParam String phone,
-                           @RequestParam Boolean enabled) {
-        sysuserService.updateEnabled(phone, enabled);
+    public JsonData update(@RequestParam Boolean enabled) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        sysuserService.updateEnabled(currentAccountNo, enabled);
         return JsonData.buildSuccess("用户状态更新成功！");
     }
 }

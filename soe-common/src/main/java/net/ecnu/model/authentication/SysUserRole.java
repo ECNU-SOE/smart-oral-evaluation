@@ -4,7 +4,6 @@ import lombok.Data;
 
 /**
  * sys_user_role
- * @author
  */
 @Data
 public class SysUserRole {

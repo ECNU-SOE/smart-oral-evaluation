@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 
 /**
  * sys_config
- * @author 字母哥
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
