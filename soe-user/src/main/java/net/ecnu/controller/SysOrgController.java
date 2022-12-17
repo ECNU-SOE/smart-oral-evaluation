@@ -1,11 +1,13 @@
 package net.ecnu.controller;
 
+import io.swagger.annotations.Api;
 import net.ecnu.model.UserDO;
 import net.ecnu.model.authentication.SysOrg;
 import net.ecnu.model.authentication.SysOrgNode;
 import net.ecnu.service.authentication.SysOrgService;
 import net.ecnu.service.authentication.SysUserService;
 import net.ecnu.util.JsonData;
+import org.apiguardian.api.API;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -13,8 +15,8 @@ import java.util.List;
 
 /**
  * 培训管理系统-组织管理模块
- * TODO
  */
+@Api(value = "组织管理模块")
 @RestController
 @RequestMapping("/system/sysorg")
 public class SysOrgController {

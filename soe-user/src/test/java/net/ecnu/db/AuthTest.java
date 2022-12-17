@@ -10,6 +10,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @description:
@@ -28,5 +31,15 @@ public class AuthTest {
     public void passwordTest(){
         String password = "abcd1234";
         log.info("初始密码加密：{}", JSON.toJSON(passwordEncoder.encode(password)));
+    }
+
+    @Test
+    public void apiIdGenerate(){
+        List<Integer> list = new ArrayList<>();
+        for(int i=18;i<=79;i++){
+            list.add(i);
+        }
+        String collect = list.stream().map(e -> String.valueOf(e)).collect(Collectors.joining(","));
+        System.out.println("collect = " + collect);
     }
 }

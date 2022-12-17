@@ -1,5 +1,7 @@
 package net.ecnu.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import net.ecnu.model.authentication.SysRole;
 import net.ecnu.model.vo.dto.UserRoleCheckedIds;
 import net.ecnu.service.authentication.SysRoleService;
@@ -13,6 +15,7 @@ import java.util.Map;
 /**
  * 权限管理系统-角色管理模块
  */
+@Api(value = "角色管理模块")
 @RestController
 @RequestMapping("/system/sysrole")
 public class SysRoleController {
@@ -21,12 +24,14 @@ public class SysRoleController {
     private SysRoleService sysroleService;
 
     //角色管理:查询
+    @ApiOperation("角色管理:查询")
     @PostMapping(value = "/query")
     public List<SysRole> query(@RequestParam("roleLike") String roleLike) {
         return sysroleService.queryRoles(roleLike);
     }
 
     //角色管理：修改
+    @ApiOperation("角色管理：修改")
     @PostMapping(value = "/update")
     public JsonData update(@RequestBody SysRole sysRole) {
         sysroleService.updateRole(sysRole);
@@ -34,6 +39,7 @@ public class SysRoleController {
     }
 
     //角色管理：新增
+    @ApiOperation("角色管理：新增")
     @PostMapping(value = "/add")
     public JsonData add(@RequestBody SysRole sysRole) {
         sysroleService.addRole(sysRole);
@@ -41,6 +47,7 @@ public class SysRoleController {
     }
 
     //角色管理：删除
+    @ApiOperation("角色管理：删除")
     @PostMapping(value = "/delete")
     public JsonData delete(@RequestParam Integer roleId) {
         sysroleService.deleteRole(roleId);
@@ -48,12 +55,14 @@ public class SysRoleController {
     }
 
     //用户管理：为用户分配角色，展示角色列表及勾选角色列表
+    @ApiOperation("为用户分配角色，展示角色列表及勾选角色列表")
     @PostMapping(value = "/checkedroles")
     public Map<String,Object> checkedroles(@RequestParam Integer userId) {
         return sysroleService.getRolesAndChecked(userId);
     }
 
     //用户管理：保存用户角色
+    @ApiOperation("保存用户角色")
     @PostMapping(value = "/savekeys")
     public JsonData savekeys(@RequestBody UserRoleCheckedIds userRoleCheckedIds) {
         sysroleService.saveCheckedKeys(
@@ -66,6 +75,7 @@ public class SysRoleController {
 
 
     //角色管理：更新角色禁用状态
+    @ApiOperation("更新角色禁用状态")
     @PostMapping(value = "/status/change")
     public JsonData update(@RequestParam Integer roleId,
                            @RequestParam Boolean status) {

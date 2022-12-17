@@ -1,6 +1,8 @@
 package net.ecnu.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.mapper.UserMapper;
 import net.ecnu.model.UserDO;
@@ -21,6 +23,7 @@ import java.util.Date;
 /**
  * 权限管理系统-用户管理模块
  */
+@Api(value = "用户管理模块")
 @RestController
 @RequestMapping("/system/sysuser")
 public class SysUserController {
@@ -44,6 +47,7 @@ public class SysUserController {
     }*/
 
     //根据登录用户名查询用户信息
+    @ApiOperation("根据登录用户名查询用户信息")
     @GetMapping(value = "/info")
     public UserVO info() {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
@@ -54,6 +58,7 @@ public class SysUserController {
     }
 
     //用户管理：查询，username替换成user表中realName，页面展示时隐藏掉用户的accountNo
+    @ApiOperation("用户管理：查询")
     @PostMapping("/query")
     public IPage<SysUserOrg> query(@RequestParam("orgId") Integer orgId ,
                                    @RequestParam("realName") String realName ,
@@ -71,6 +76,7 @@ public class SysUserController {
     }
 
     //用户管理：更新
+    @ApiOperation("用户管理：更新")
     @PostMapping(value = "/update")
     public JsonData update(@RequestBody UserDTO sysUser) {
         sysuserService.updateUser(sysUser);
@@ -78,6 +84,7 @@ public class SysUserController {
     }
 
     //用户管理：新增
+    @ApiOperation("用户管理：新增")
     @PostMapping(value = "/add")
     public JsonData add(@RequestBody UserDTO sysUser) {
         sysuserService.addUser(sysUser);
@@ -85,6 +92,7 @@ public class SysUserController {
     }
 
     //用户管理：删除，删除指定用户时，将对应用户的accountNo发送过来
+    @ApiOperation("用户管理：删除")
     @PostMapping(value = "/delete")
     public JsonData delete(@RequestParam String accountNo) {
         if(StringUtils.isBlank(accountNo)){
@@ -95,6 +103,7 @@ public class SysUserController {
     }
 
     //用户管理：重置密码
+    @ApiOperation("用户管理：重置密码")
     @PostMapping(value = "/pwd/reset")
     public JsonData pwdreset(@RequestParam String accountNo) {
         if(StringUtils.isBlank(accountNo)){
@@ -105,6 +114,7 @@ public class SysUserController {
     }
 
     //判断登录用户密码是否是默认密码
+    @ApiOperation("判断登录用户密码是否是默认密码")
     @PostMapping(value = "/pwd/isdefault")
     public Boolean isdefault() {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
@@ -112,6 +122,7 @@ public class SysUserController {
     }
 
     //修改密码
+    @ApiOperation("修改密码")
     @PostMapping(value = "/pwd/change")
     public JsonData pwdchange(@RequestParam String oldPass,
                               @RequestParam String newPass) {
@@ -121,6 +132,7 @@ public class SysUserController {
     }
 
     //用户管理：更新用户激活状态
+    @ApiOperation("用户管理：更新用户激活状态")
     @PostMapping(value = "/enabled/change")
     public JsonData update(@RequestParam Boolean enabled) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();

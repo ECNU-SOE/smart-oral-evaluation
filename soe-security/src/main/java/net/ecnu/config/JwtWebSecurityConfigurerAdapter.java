@@ -46,6 +46,17 @@ public class JwtWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapte
             JWTConstants.ROLES
     };
 
+    private String[] PERMIT_RES_LIST = {
+            "/swagger-ui.html",
+            "/v2/api-docs", // swagger api json
+            "/swagger-resources/configuration/ui", // 用来获取支持的动作
+            "/swagger-resources", // 用来获取api-docs的URI
+            "/swagger-resources/configuration/security", // 安全选项
+            "/swagger-resources/**",
+            //补充路径，近期在搭建swagger接口文档时，通过浏览器控制台发现该/webjars路径下的文件被拦截，故加上此过滤条件即可。
+            "/webjars/**"
+    };
+
     @Override
     public void configure(HttpSecurity http) throws Exception {
         if(jwtProperties.getCsrfDisabled()){
@@ -66,6 +77,12 @@ public class JwtWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapte
         http.authorizeRequests().anyRequest()
                 .access("@rbacService.hasPermission(request,authentication)");
                 //.access("");
+    }
+
+    @Override
+    public void configure(WebSecurity web) {
+        //将项目中静态资源路径开放出来
+        web.ignoring().antMatchers(PERMIT_RES_LIST);
     }
 
     @Bean

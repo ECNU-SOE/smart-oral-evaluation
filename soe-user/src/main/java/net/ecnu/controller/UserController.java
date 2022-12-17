@@ -1,6 +1,8 @@
 package net.ecnu.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Find;
 import net.ecnu.controller.request.UserReq;
@@ -17,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.UUID;
 
-
+@Api(value = "端上用户管理")
 @RestController
 @RequestMapping("/api/user/v1")
 @CrossOrigin //sendSms跨域支持
@@ -29,6 +31,7 @@ public class UserController {
     /**
      * 用户注册
      */
+    @ApiOperation("用户注册")
     @PostMapping("register")
     public JsonData register(@RequestBody @Validated(Create.class) UserReq userReq) {
         Object data = userService.register(userReq);
@@ -38,18 +41,21 @@ public class UserController {
     /**
      * 用户登录
      */
+    @ApiOperation("用户登录")
     @PostMapping("login")
     public JsonData login(@RequestBody @Validated(Find.class) UserReq userReq) {
         Object data = userService.login(userReq);
         return JsonData.buildSuccess(data);
     }
 
+    @ApiOperation("获取用户信息")
     @PostMapping("info")
     public JsonData info(HttpServletRequest req){
         Object data = userService.info(req);
         return JsonData.buildSuccess(data);
     }
 
+    @ApiOperation("更新用户信息")
     @PostMapping("update")
     public JsonData update(@RequestBody UserDO user){
         int num = userService.update(user);
@@ -59,6 +65,7 @@ public class UserController {
         return JsonData.buildError("用户信息更新失败");
     }
 
+    @ApiOperation("发送短信验证码")
     @GetMapping("/send/{phone}")
     public JsonData send(@PathVariable("phone") String phone){
         HashMap<String,Object> map = new HashMap<>();
