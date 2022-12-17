@@ -52,12 +52,12 @@ public class SysUserController {
     //根据登录用户名查询用户信息
     @ApiOperation("根据登录用户名查询用户信息")
     @GetMapping(value = "/info")
-    public UserVO info() {
+    public JsonData info() {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         UserDO userByUserName = sysuserService.getUserByUserName(currentAccountNo);
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(userByUserName,userVO);
-        return userVO;
+        return JsonData.buildSuccess(userVO);
     }
 
     //用户管理：查询，username替换成user表中realName，页面展示时隐藏掉用户的accountNo
