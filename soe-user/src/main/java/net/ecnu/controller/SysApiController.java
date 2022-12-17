@@ -1,6 +1,8 @@
 package net.ecnu.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import net.ecnu.model.authentication.RoleCheckedIds;
 import net.ecnu.model.authentication.SysApi;
@@ -27,11 +29,15 @@ public class SysApiController {
 
     //接口管理:查询
     @ApiOperation("接口管理:查询")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(name = "apiStatus",value = "用户是否禁用，true：禁用，false：激活",required = true),
+            @ApiImplicitParam(name = "apiNameLike",value = "接口名称模糊字段",required = false)
+    })
     @PostMapping(value = "/tree")
-    public List<SysApiNode> tree(@RequestParam("apiNameLike") String apiNameLike,
+    public JsonData tree(@RequestParam("apiNameLike") String apiNameLike,
                                  @RequestParam("apiStatus") Boolean apiStatus) {
-
-        return sysapiService.getApiTree(apiNameLike, apiStatus);
+        List<SysApiNode> apiTree = sysapiService.getApiTree(apiNameLike, apiStatus);
+        return JsonData.buildSuccess(apiTree);
     }
 
     //接口管理:修改
@@ -61,12 +67,12 @@ public class SysApiController {
     //角色管理：API树展示（勾选项、展开项）
     @ApiOperation("角色管理：API树展示（勾选项、展开项）")
     @PostMapping(value = "/checkedtree")
-    public Map<String,Object> checkedtree(@RequestParam Integer roleId) {
+    public JsonData checkedtree(@RequestParam Integer roleId) {
         Map<String,Object> ret = new HashMap<>();
         ret.put("tree",sysapiService.getApiTree("",null));
         ret.put("expandedKeys",sysapiService.getExpandedKeys());
         ret.put("checkedKeys",sysapiService.getCheckedKeys(roleId));
-        return ret;
+        return JsonData.buildSuccess(ret);
     }
 
     //角色管理：保存API权限勾选结果

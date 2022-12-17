@@ -2,6 +2,8 @@ package net.ecnu.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.mapper.UserMapper;
@@ -10,6 +12,7 @@ import net.ecnu.model.authentication.SysUserOrg;
 import net.ecnu.model.vo.UserVO;
 import net.ecnu.model.vo.dto.UserDTO;
 import net.ecnu.service.authentication.SysUserService;
+import net.ecnu.util.IDUtil;
 import net.ecnu.util.JsonData;
 import net.ecnu.utils.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -60,19 +63,20 @@ public class SysUserController {
     //用户管理：查询，username替换成user表中realName，页面展示时隐藏掉用户的accountNo
     @ApiOperation("用户管理：查询")
     @PostMapping("/query")
-    public IPage<SysUserOrg> query(@RequestParam("orgId") Integer orgId ,
-                                   @RequestParam("realName") String realName ,
-                                   @RequestParam("phone") String phone,
-                                   @RequestParam("email") String email,
-                                   @RequestParam("enabled") Boolean enabled,
-                                   @RequestParam("createStartTime") Date createStartTime,
-                                   @RequestParam("createEndTime") Date createEndTime,
-                                   @RequestParam("pageNum") Integer pageNum,
-                                   @RequestParam("pageSize") Integer pageSize) {
+    public JsonData query(@RequestParam(value = "orgId",required = false) Integer orgId ,
+                                   @RequestParam(value = "realName",required = false) String realName ,
+                                   @RequestParam(value = "phone",required = false) String phone,
+                                   @RequestParam(value = "email",required = false) String email,
+                                   @RequestParam(value = "enabled",required = false) Boolean enabled,
+                                   @RequestParam(value = "createStartTime",required = false) Date createStartTime,
+                                   @RequestParam(value = "createEndTime",required = false) Date createEndTime,
+                                   @RequestParam(value = "pageNum",required = true) Integer pageNum,
+                                   @RequestParam(value = "pageSize",required = true) Integer pageSize) {
 
-        return sysuserService.queryUser(orgId,realName,phone,email,enabled,
+        IPage<SysUserOrg> sysUserOrgIPage = sysuserService.queryUser(orgId, realName, phone, email, enabled,
                 createStartTime, createEndTime,
-                pageNum,pageSize);
+                pageNum, pageSize);
+        return JsonData.buildSuccess(sysUserOrgIPage);
     }
 
     //用户管理：更新
@@ -87,6 +91,8 @@ public class SysUserController {
     @ApiOperation("用户管理：新增")
     @PostMapping(value = "/add")
     public JsonData add(@RequestBody UserDTO sysUser) {
+        //雪花算法生成accountNo
+        sysUser.setAccountNo("user_" + IDUtil.getSnowflakeId());
         sysuserService.addUser(sysUser);
         return JsonData.buildSuccess("新增用户成功！");
     }
@@ -116,7 +122,7 @@ public class SysUserController {
     //判断登录用户密码是否是默认密码
     @ApiOperation("判断登录用户密码是否是默认密码")
     @PostMapping(value = "/pwd/isdefault")
-    public Boolean isdefault() {
+    public JsonData isdefault() {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         return sysuserService.isdefault(currentAccountNo);
     }

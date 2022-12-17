@@ -1,6 +1,7 @@
 package net.ecnu.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import net.ecnu.model.authentication.SysRole;
 import net.ecnu.model.vo.dto.UserRoleCheckedIds;
@@ -24,10 +25,12 @@ public class SysRoleController {
     private SysRoleService sysroleService;
 
     //角色管理:查询
+    @ApiImplicitParam(name = "roleLike",value = "角色模糊字段",required = false)
     @ApiOperation("角色管理:查询")
     @PostMapping(value = "/query")
-    public List<SysRole> query(@RequestParam("roleLike") String roleLike) {
-        return sysroleService.queryRoles(roleLike);
+    public JsonData query(@RequestParam("roleLike") String roleLike) {
+        List<SysRole> sysRoles = sysroleService.queryRoles(roleLike);
+        return JsonData.buildSuccess(sysRoles);
     }
 
     //角色管理：修改
@@ -57,8 +60,9 @@ public class SysRoleController {
     //用户管理：为用户分配角色，展示角色列表及勾选角色列表
     @ApiOperation("为用户分配角色，展示角色列表及勾选角色列表")
     @PostMapping(value = "/checkedroles")
-    public Map<String,Object> checkedroles(@RequestParam Integer userId) {
-        return sysroleService.getRolesAndChecked(userId);
+    public JsonData checkedroles(@RequestParam Integer userId) {
+        Map<String, Object> rolesAndChecked = sysroleService.getRolesAndChecked(userId);
+        return JsonData.buildSuccess(rolesAndChecked);
     }
 
     //用户管理：保存用户角色

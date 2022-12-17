@@ -14,6 +14,7 @@ import net.ecnu.model.UserDO;
 import net.ecnu.model.authentication.SysUserOrg;
 import net.ecnu.model.vo.dto.UserDTO;
 import net.ecnu.service.authentication.SysUserService;
+import net.ecnu.util.JsonData;
 import net.ecnu.utils.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -43,7 +44,7 @@ public class SysUserServiceImpl implements SysUserService {
         Page<SysUserOrg> page = new Page<>(pageNum,pageSize);   //查询第pageNum页，每页pageSize条数据
         if(orgId == null){ //获取当前登录用户的orgId
             String accountNo = RequestParamUtil.currentAccountNo();
-            if(StringUtils.isBlank(accountNo)){
+            if(!StringUtils.isBlank(accountNo)){
                 UserDO sysUser = userMapper.selectOne(
                         new QueryWrapper<UserDO>()
                                 .eq("account_no",accountNo)
@@ -147,7 +148,7 @@ public class SysUserServiceImpl implements SysUserService {
                 new QueryWrapper<UserDO>().eq("account_no",accountNo));
         //判断旧密码是否正确
         boolean isMatch = passwordEncoder.matches(oldPass,sysUser.getPwd());
-        if(isMatch){
+        if(!isMatch){
             throw new BizException(BizCodeEnum.USER_INPUT_ERROR.getCode(),"原密码输入错误，请确认后重新输入！");
         }
         UserDO sysUserNew = new UserDO();
@@ -157,14 +158,15 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public Boolean isdefault(String accountNo) {
+    public JsonData isdefault(String accountNo) {
         if(StringUtils.isBlank(accountNo)){
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"判断是否为默认密码必须携带有效token");
         }
         UserDO sysUser = userMapper.selectOne(
                 new QueryWrapper<UserDO>().eq("account_no",accountNo));
         //判断数据库密码是否是默认密码
-        return passwordEncoder.matches(SOEConst.USER_INIT_PASSWORD , sysUser.getPwd());
+        boolean matches = passwordEncoder.matches(SOEConst.USER_INIT_PASSWORD, sysUser.getPwd());
+        return JsonData.buildSuccess(matches);
     }
 
 

@@ -38,8 +38,9 @@ public class SysConfigController {
     }
 
     @PostMapping(value = "/query")
-    public List<SysConfig> query(@RequestParam("configLike") String configLike) {
-        return sysconfigService.queryConfigs(configLike);
+    public JsonData query(@RequestParam("configLike") String configLike) {
+        List<SysConfig> sysConfigs = sysconfigService.queryConfigs(configLike);
+        return JsonData.buildSuccess(sysConfigs);
     }
 
     @PostMapping(value = "/update")

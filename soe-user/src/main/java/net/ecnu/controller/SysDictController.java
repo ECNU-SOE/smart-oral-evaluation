@@ -29,8 +29,9 @@ public class SysDictController {
      */
     @ApiOperation("查询所有数据字典项")
     @PostMapping(value = "/all")
-    public List<SysDict> all() {
-        return sysDictService.all();
+    public JsonData all() {
+        List<SysDict> all = sysDictService.all();
+        return JsonData.buildSuccess(all);
     }
 
     /**
@@ -41,8 +42,9 @@ public class SysDictController {
      */
     @ApiOperation("根据查询参数参训数据字典")
     @PostMapping(value = "/query")
-    public List<SysDict> query(@RequestParam("groupName") String groupName, @RequestParam("groupCode") String groupCode  ) {
-        return sysDictService.query(groupName, groupCode );
+    public JsonData query(@RequestParam("groupName") String groupName, @RequestParam("groupCode") String groupCode  ) {
+        List<SysDict> query = sysDictService.query(groupName, groupCode);
+        return JsonData.buildSuccess(query);
     }
 
     /**

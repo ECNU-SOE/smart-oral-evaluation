@@ -36,7 +36,7 @@
 
     <select id="selectUser"
             resultType="net.ecnu.model.authentication.SysUserOrg">
-        SELECT u.account_no,u.org_id,o.org_name,u.enabled,u.real_name,u.phone,u.mail,u.gmtCreate
+        SELECT u.account_no,u.org_id,o.org_name,u.enabled,u.real_name,u.phone,u.mail,u.gmt_create
         FROM user u
         LEFT JOIN sys_org o ON u.org_id = o.id
         <trim prefix="WHERE" prefixOverrides="AND|OR" suffixOverrides="AND|OR">
@@ -53,7 +53,7 @@
                 AND u.enabled = #{enabled}
             </if>
             <if test="createStartTime != null  and createEndTime != null " >
-                AND u.gmtCreate between #{createStartTime} and #{createEndTime}
+                AND u.gmt_create between #{createStartTime} and #{createEndTime}
             </if>
             <if test="orgId !=null and orgId != '' " >
                 AND (

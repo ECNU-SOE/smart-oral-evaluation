@@ -1,6 +1,8 @@
 package net.ecnu.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import net.ecnu.model.authentication.RoleCheckedIds;
 import net.ecnu.model.authentication.SysMenu;
@@ -29,10 +31,10 @@ public class SysMenuController {
     //菜单管理：查询
     @ApiOperation("菜单管理：查询")
     @PostMapping(value = "/tree")
-    public List<SysMenuNode> tree(@RequestParam("menuNameLike") String menuNameLike,
-                                  @RequestParam("menuStatus") Boolean menuStatus) {
-
-        return sysmenuService.getMenuTree(menuNameLike, menuStatus);
+    public JsonData tree(@RequestParam(value = "menuNameLike",required = false) String menuNameLike,
+                                  @RequestParam(value = "menuStatus",required = false) Boolean menuStatus) {
+        List<SysMenuNode> menuTree = sysmenuService.getMenuTree(menuNameLike, menuStatus);
+        return JsonData.buildSuccess(menuTree);
     }
 
     //菜单管理：修改
@@ -62,12 +64,12 @@ public class SysMenuController {
     //角色管理:菜单树展示（勾选项、展开项）
     @ApiOperation("角色管理:菜单树展示（勾选项、展开项）")
     @PostMapping(value = "/checkedtree")
-    public Map<String,Object> checkedtree(@RequestParam Integer roleId) {
+    public JsonData checkedtree(@RequestParam Integer roleId) {
         Map<String,Object> ret = new HashMap<>();
         ret.put("tree",sysmenuService.getMenuTree("",null));
         ret.put("expandedKeys",sysmenuService.getExpandedKeys());
         ret.put("checkedKeys",sysmenuService.getCheckedKeys(roleId));
-        return ret;
+        return JsonData.buildSuccess(ret);
     }
 
     //角色管理：保存菜单勾选结果
@@ -81,8 +83,9 @@ public class SysMenuController {
     //系统左侧菜单栏加载，根据登录用户名加载它可以访问的菜单项
     @ApiOperation("根据登录用户名加载它可以访问的菜单项")
     @PostMapping(value = "/tree/user")
-    public List<SysMenuNode> usertree(@RequestParam("username") String username) {
-        return sysmenuService.getMenuTreeByUsername(username);
+    public JsonData usertree(@RequestParam("username") String username) {
+        List<SysMenuNode> menuTreeByUsername = sysmenuService.getMenuTreeByUsername(username);
+        return JsonData.buildSuccess(menuTreeByUsername);
     }
 
 
