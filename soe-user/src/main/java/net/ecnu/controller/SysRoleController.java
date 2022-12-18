@@ -78,7 +78,7 @@ public class SysRoleController {
     }
 
 
-    //角色管理：更新角色禁用状态
+    //角色管理：更新角色禁用状态*
     @ApiOperation("更新角色禁用状态")
     @PostMapping(value = "/status/change")
     public JsonData update(@RequestParam Integer roleId,

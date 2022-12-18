@@ -2,6 +2,7 @@ package net.ecnu.service.authentication;
 
 import net.ecnu.model.authentication.SysApi;
 import net.ecnu.model.authentication.SysApiNode;
+import net.ecnu.util.JsonData;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ public interface SysApiService {
 
     void addApi(SysApi sysapi);
 
-    void updateApi(SysApi sysapi);
+    JsonData updateApi(SysApi sysapi);
 
     void deleteApi(SysApi sysApi);
 

@@ -29,13 +29,9 @@ public class SysApiController {
 
     //接口管理:查询
     @ApiOperation("接口管理:查询")
-    @ApiImplicitParams(value = {
-            @ApiImplicitParam(name = "apiStatus",value = "用户是否禁用，true：禁用，false：激活",required = true),
-            @ApiImplicitParam(name = "apiNameLike",value = "接口名称模糊字段",required = false)
-    })
     @PostMapping(value = "/tree")
-    public JsonData tree(@RequestParam("apiNameLike") String apiNameLike,
-                                 @RequestParam("apiStatus") Boolean apiStatus) {
+    public JsonData tree(@RequestParam(value = "apiNameLike",required = false) String apiNameLike,
+                                 @RequestParam(value = "apiStatus",required = true) Boolean apiStatus) {
         List<SysApiNode> apiTree = sysapiService.getApiTree(apiNameLike, apiStatus);
         return JsonData.buildSuccess(apiTree);
     }

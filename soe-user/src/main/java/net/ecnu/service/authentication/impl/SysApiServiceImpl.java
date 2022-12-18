@@ -12,11 +12,14 @@ import net.ecnu.model.authentication.SysApiNode;
 import net.ecnu.model.authentication.SysRoleApi;
 import net.ecnu.model.authentication.tree.DataTreeUtil;
 import net.ecnu.service.authentication.SysApiService;
+import net.ecnu.util.JsonData;
 import net.ecnu.utils.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -68,20 +71,22 @@ public class SysApiServiceImpl implements SysApiService {
     @Override
     @Transactional
     public void addApi(SysApi sysapi) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if(StringUtils.isBlank(currentAccountNo)){
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION.getCode(),"添加接口操作必须携带有效token");
+        }
         setApiIdsAndLevel(sysapi);
 
         sysapi.setIsLeaf(true); //新增的菜单节点都是子节点，没有下级
         SysApi parent = new SysApi();
         parent.setId(sysapi.getApiPid());
         parent.setIsLeaf(false);//更新父节点为非子节点。
+        parent.setUpdateBy(currentAccountNo);
+        parent.setUpdateTime(LocalDateTime.now());
         sysApiMapper.updateById(parent);
 
         sysapi.setStatus(false);//设置是否禁用，新增节点默认可用
         //添加操作记录
-        String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if(StringUtils.isBlank(currentAccountNo)){
-            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION.getCode(),"添加接口操作必须携带有效token");
-        }
         sysapi.setCreateBy(currentAccountNo);
         sysapi.setCreateTime(LocalDateTime.now());
         sysApiMapper.insert(sysapi);
@@ -102,7 +107,8 @@ public class SysApiServiceImpl implements SysApiService {
     }
 
     @Override
-    public void updateApi(SysApi sysapi) {
+    @Transactional
+    public JsonData updateApi(SysApi sysapi) {
         if(sysapi.getId() == null){
             throw new BizException(BizCodeEnum.USER_INPUT_ERROR.getCode(),
                     "修改操作必须带主键");
@@ -113,7 +119,12 @@ public class SysApiServiceImpl implements SysApiService {
             }
             sysapi.setUpdateTime(LocalDateTime.now());
             sysapi.setUpdateBy(currentAccountNo);
-            sysApiMapper.updateById(sysapi);
+            int updateStatus = sysApiMapper.updateById(sysapi);
+            if(updateStatus> 0){
+                return JsonData.buildSuccess("更新接口配置成功！");
+            }else {
+                return JsonData.buildError("更新接口失败");
+            }
         }
     }
 
@@ -155,6 +166,7 @@ public class SysApiServiceImpl implements SysApiService {
     }
 
     @Override
+    @Transactional
     public void saveCheckedKeys(String roleCode, Integer roleId, List<Integer> checkedIds) {
         //保存之前先删除
         sysRoleApiMapper.delete(new UpdateWrapper<SysRoleApi>().eq("role_id",roleId));
@@ -162,6 +174,7 @@ public class SysApiServiceImpl implements SysApiService {
     }
 
     @Override
+    @Transactional
     public void updateStatus(Long id, Boolean status) {
         if(Objects.isNull(id)){
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"修改接口信息操作必须带主键");

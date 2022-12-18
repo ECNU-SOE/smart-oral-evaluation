@@ -86,20 +86,23 @@ public class SysMenuServiceImpl implements SysMenuService {
     @Override
     public void addMenu(SysMenu sysmenu) {
         setMenuIdsAndLevel(sysmenu);
-
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         sysmenu.setIsLeaf(true); //新增的菜单节点都是子节点，没有下级
         SysMenu parent = new SysMenu();
         parent.setId(sysmenu.getMenuPid());
         parent.setIsLeaf(false);//更新父节点为非子节点。
+        parent.setUpdateBy(currentAccountNo);
+        parent.setUpdateTime(LocalDateTime.now());
         sysMenuMapper.updateById(parent);
 
         sysmenu.setStatus(false);//设置是否禁用，新增节点默认可用
-        String currentAccountNo = RequestParamUtil.currentAccountNo();
         if(StringUtils.isBlank(currentAccountNo)){
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION.getCode(),"添加菜单必须携带有效token");
         }
         sysmenu.setCreateBy(currentAccountNo);
         sysmenu.setCreateTime(LocalDateTime.now());
+        sysmenu.setUpdateBy(currentAccountNo);
+        sysmenu.setUpdateTime(LocalDateTime.now());
         sysMenuMapper.insert(sysmenu);
     }
 
@@ -162,8 +165,8 @@ public class SysMenuServiceImpl implements SysMenuService {
     }
 
     @Override
-    public List<SysMenuNode> getMenuTreeByUsername(String phone) {
-        List<SysMenu> sysMenus = systemMapper.selectMenuByUsername(phone);
+    public List<SysMenuNode> getMenuTreeByUsername(String accountNo) {
+        List<SysMenu> sysMenus = systemMapper.selectMenuByUsername(accountNo);
 
         if (sysMenus.size() > 0) {
             Integer rootMenuId = sysMenus.get(0).getId();
@@ -184,9 +187,12 @@ public class SysMenuServiceImpl implements SysMenuService {
         if(Objects.isNull(id)){
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"更改菜单状态信息操作必须带主键");
         }
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         SysMenu sysMenu = new SysMenu();
         sysMenu.setId(id);
         sysMenu.setStatus(status);
+        sysMenu.setUpdateBy(currentAccountNo);
+        sysMenu.setUpdateTime(LocalDateTime.now());
         sysMenuMapper.updateById(sysMenu);
     }
 
@@ -195,9 +201,12 @@ public class SysMenuServiceImpl implements SysMenuService {
         if(Objects.isNull(id)){
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"修改菜单的隐藏状态操作必须带主键");
         }
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         SysMenu sysMenu = new SysMenu();
         sysMenu.setId(id);
         sysMenu.setHidden(hidden);
+        sysMenu.setUpdateBy(currentAccountNo);
+        sysMenu.setUpdateTime(LocalDateTime.now());
         sysMenuMapper.updateById(sysMenu);
     }
 }

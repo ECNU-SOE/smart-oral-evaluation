@@ -27,7 +27,7 @@ public interface SysMenuService {
 
     void saveCheckedKeys(Integer roleId, List<Integer> checkedIds);
 
-    List<SysMenuNode> getMenuTreeByUsername(String phone);
+    List<SysMenuNode> getMenuTreeByUsername(String accountNo);
 
     void updateStatus(Integer id, Boolean status);
 

@@ -54,5 +54,5 @@ public interface SystemMapper {
     Integer insertRoleMenuIds(@Param("roleId") Integer roleId,
                               @Param("checkedIds") List<Integer> checkedIds);
 
-    List<SysMenu> selectMenuByUsername(@Param("phone") String phone);
+    List<SysMenu> selectMenuByUsername(@Param("accountNo") String accountNo);
 }

@@ -9,6 +9,7 @@ import net.ecnu.model.authentication.SysMenu;
 import net.ecnu.model.authentication.SysMenuNode;
 import net.ecnu.service.authentication.SysMenuService;
 import net.ecnu.util.JsonData;
+import net.ecnu.utils.RequestParamUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -83,8 +84,9 @@ public class SysMenuController {
     //系统左侧菜单栏加载，根据登录用户名加载它可以访问的菜单项
     @ApiOperation("根据登录用户名加载它可以访问的菜单项")
     @PostMapping(value = "/tree/user")
-    public JsonData usertree(@RequestParam("username") String username) {
-        List<SysMenuNode> menuTreeByUsername = sysmenuService.getMenuTreeByUsername(username);
+    public JsonData usertree() {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        List<SysMenuNode> menuTreeByUsername = sysmenuService.getMenuTreeByUsername(currentAccountNo);
         return JsonData.buildSuccess(menuTreeByUsername);
     }
 

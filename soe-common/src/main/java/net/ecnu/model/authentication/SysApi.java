@@ -1,11 +1,14 @@
 package net.ecnu.model.authentication;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SysApi extends BaseColumns {
+
+    @TableId
     private Long id;
 
     /**
