@@ -1,5 +1,7 @@
 package net.ecnu.service.impl;
 
+import cn.hutool.core.util.CharsetUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.CommonRequest;
 import com.aliyuncs.CommonResponse;
@@ -12,12 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 import net.ecnu.controller.request.UserReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
+import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.manager.UserManager;
 import net.ecnu.mapper.UserMapper;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.UserDO;
 import net.ecnu.model.vo.UserVO;
-import net.ecnu.model.vo.dto.UserDTO;
+import net.ecnu.model.dto.UserDTO;
 import net.ecnu.service.UserService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.JWTUtil;
@@ -27,7 +30,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.List;
 
 
 @Service
@@ -76,40 +82,59 @@ public class UserServiceImpl implements UserService {
     @Override
     public Object info(HttpServletRequest req) {
         String token = req.getHeader("token");
-        if (StringUtils.isBlank(token)){
+        if (StringUtils.isBlank(token)) {
             token = req.getParameter("token");
         }
-        if (StringUtils.isBlank(token)){
+        if (StringUtils.isBlank(token)) {
             throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
         }
         LoginUser loginUser = JWTUtil.checkJWT(token);
-        UserDO userDO = userManager.selectOneByPhone(loginUser.getPhone());
-        if (userDO==null){
+//        UserDO userDO = userManager.selectOneByPhone(loginUser.getPhone());
+        UserDO userDO = userMapper.selectById(loginUser.getAccountNo());
+        if (userDO == null) {
             throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
         }
         UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(userDO,userVO);
+        BeanUtils.copyProperties(userDO, userVO);
+
+        return userVO;
+    }
+
+    @Override
+    public Object getUserInfo() {
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
+        //如果token有效，数据库查询用户个人信息
+        UserDO userDO = userManager.selectOneByAccountNo(loginUser.getAccountNo());
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(userDO, userVO);
         return userVO;
     }
 
     @Override
     public int update(UserDO user) {
-        if (user.getDel()!=null&&user.getDel()){
+        if (user.getDel() != null && user.getDel()) {
             return 0;
         }
-        if (StringUtils.isBlank(user.getAccountNo())){
+        if (StringUtils.isBlank(user.getAccountNo())) {
             return 0;
         }
         UserDTO userDTO = new UserDTO();
-        BeanUtils.copyProperties(user,userDTO);
+        BeanUtils.copyProperties(user, userDTO);
         UserDO userDO = new UserDO();
-        BeanUtils.copyProperties(userDTO,userDO);
+        BeanUtils.copyProperties(userDTO, userDO);
         userDO.setAccountNo(user.getAccountNo());
         return userMapper.updateById(userDO);
     }
 
     @Override
-    public boolean send(String phoneNum, String templateCode, Map<String, Object> code) {
+    public boolean send(String phoneNum) {
+        UserDO userDO = userManager.selectOneByPhone(phoneNum);
+        if (userDO == null)
+            return false;
+        final String templateCode = "SMS_262610596"; //阿里云短信模板,需要向阿里云申请
+        final String signName = "唐国兴的博客"; //短信签名，需要向阿里云申请
+
         //连接阿里云
         DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", "LTAI5tKC7ayyoZA81SE62bpH", "0v3aCE7DZyXXueE4Ui2BC8fwIVEOMj");
         IAcsClient client = new DefaultAcsClient(profile);
@@ -122,18 +147,23 @@ public class UserServiceImpl implements UserService {
         //自定义请求参数
         request.putQueryParameter("RegionId", "cn-hangzhou");
         request.putQueryParameter("PhoneNumbers", phoneNum);
-        final String signName = "唐国兴的博客"; //短信签名，需要向阿里云申请
-        request.putQueryParameter("SignName",signName);    //短信签名
+        request.putQueryParameter("SignName", signName);    //短信签名
         request.putQueryParameter("TemplateCode", templateCode);//短信模板code
-        request.putQueryParameter("TemplateParam", JSONObject.toJSONString(code));
+        String code = RandomUtil.randomNumbers(6);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("code", code);
+        request.putQueryParameter("TemplateParam", JSONObject.toJSONString(map));
         try {
             CommonResponse resp = client.getCommonResponse(request);// 发送短信
-            System.out.println(resp.getData());
+            String s = new String(resp.getData().getBytes(), StandardCharsets.UTF_8);
+            System.out.println(s);
             return resp.getHttpResponse().isSuccess();
         } catch (ClientException e) {
             throw new RuntimeException(e);
         }
     }
+
+
 }
 
 

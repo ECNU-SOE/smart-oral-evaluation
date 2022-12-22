@@ -1,4 +1,4 @@
-package net.ecnu.model.vo.dto;
+package net.ecnu.model.dto;
 
 import lombok.Data;
 

@@ -16,8 +16,9 @@ public enum BizCodeEnum {
     USER_PHONE_FORMAT_ERROR(250007,"仅支持中国大陆手机号，改手机号格式有误"),
     USER_INPUT_ERROR(250008,"您输入的数据格式错误或您没有权限访问资源"),
     /**
-     * 语料相关
+     * 语料组相关
      */
+    CPSGRP_ERROR(260001, "语料组异常"),
 
     /**
      * 参数异常

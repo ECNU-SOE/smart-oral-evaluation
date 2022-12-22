@@ -18,9 +18,6 @@ public class CommonUtil {
 
     /**
      * 获取ip
-     *
-     * @param request
-     * @return
      */
     public static String getIpAddr(HttpServletRequest request) {
         String ipAddress = null;
@@ -59,12 +56,8 @@ public class CommonUtil {
         return ipAddress;
     }
 
-
     /**
      * 获取全部请求头
-     *
-     * @param request
-     * @return
      */
     public static Map<String, String> getAllRequestHeader(HttpServletRequest request) {
         Enumeration<String> headerNames = request.getHeaderNames();
@@ -79,12 +72,8 @@ public class CommonUtil {
         return map;
     }
 
-
     /**
      * MD5加密
-     *
-     * @param data
-     * @return
      */
     public static String MD5(String data) {
         try {
@@ -102,12 +91,8 @@ public class CommonUtil {
 
     }
 
-
     /**
      * 获取验证码随机数
-     *
-     * @param length
-     * @return
      */
     public static String getRandomCode(int length) {
         String sources = "0123456789";
@@ -119,21 +104,15 @@ public class CommonUtil {
         return sb.toString();
     }
 
-
     /**
      * 获取当前时间戳
-     *
-     * @return
      */
     public static long getCurrentTimestamp() {
         return System.currentTimeMillis();
     }
 
-
     /**
      * 生成uuid
-     *
-     * @return
      */
     public static String generateUUID() {
         return UUID.randomUUID().toString().replaceAll("-", "").substring(0, 32);
@@ -143,17 +122,6 @@ public class CommonUtil {
      * 获取随机长度的串
      */
     private static final String ALL_CHAR_NUM = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
-    public static String getStringNumRandom(int length) {
-        //生成随机数字和字母,
-        Random random = new Random();
-        StringBuilder saltString = new StringBuilder(length);
-        for (int i = 1; i <= length; ++i) {
-            saltString.append(ALL_CHAR_NUM.charAt(random.nextInt(ALL_CHAR_NUM.length())));
-        }
-        return saltString.toString();
-    }
-
 
     /**
      * 响应json数据给前端
@@ -183,41 +151,16 @@ public class CommonUtil {
 
 
     /**
-     * murmurhash算法
+     * 统计文本中的汉子个数
      */
-    public static long murmurHash32(String param) {
-        return Hashing.murmur3_32().hashUnencodedChars(param).padToLong();
+    public static int countWord(String refText) {
+        int totalWordCount = 0;
+        char[] chars = refText.toCharArray();
+        for (char ch : chars) {
+            boolean matches = String.valueOf(ch).matches("[\u4e00-\u9fa5]");
+            if (matches) totalWordCount++;
+        }
+        return totalWordCount;
     }
-
-//    /**
-//     * URL增加前缀
-//     */
-//    public static String addUrlPrefix(String url) {
-//        return IDUtil.geneSnowFlakeID() + "&" + url;
-//    }
-
-    /**
-     * 移除URL前缀
-     */
-    public static String removeUrlPrefix(String url) {
-        return url.substring(url.indexOf("&") + 1);
-    }
-
-    /**
-     * 如果短链码重复，则调用这个方法
-     * url前缀的编号递增1
-     * 如果还是用雪花算法，则容易C端和B端不一致，所以采用编号递增1的方式
-     * 123132432212&https://xdclass.net/download.html
-     */
-    public static String addUrlPrefixVersion(String url) {
-        //随机id
-        String version = url.substring(0, url.indexOf("&"));
-        //原始地址
-        String originalUrl = url.substring(url.indexOf("&") + 1);
-        //新id
-        Long newVersion = Long.parseLong(version) + 1;
-        return newVersion + "&" + originalUrl;
-    }
-
 
 }

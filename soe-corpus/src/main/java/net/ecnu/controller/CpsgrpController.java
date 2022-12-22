@@ -57,7 +57,7 @@ public class CpsgrpController {
     }
 
     /**
-     * 生成题目组答题报告
+     * 生成语料组 答题报告transcript
      */
     @PostMapping("transcript")
     public JsonData transcript(@RequestBody @Validated TranscriptReq transcriptReq) {
