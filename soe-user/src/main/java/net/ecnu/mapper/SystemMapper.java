@@ -42,9 +42,9 @@ public interface SystemMapper {
     Integer insertRoleApiIds(@Param("roleId") Integer roleId,
                              @Param("checkedIds") List<Integer> checkedIds);
 
-    List<String> getCheckedRoleIds(Integer userId);
+    List<String> getCheckedRoleIds(@Param("accountNo") String accountNo);
 
-    Integer insertUserRoleIds(@Param("userId") Integer userId,
+    Integer insertUserRoleIds(@Param("accountNo") String accountNo,
                               @Param("checkedIds") List<Integer> checkedIds);
 
     List<String> selectMenuCheckedKeys(Integer roleId);

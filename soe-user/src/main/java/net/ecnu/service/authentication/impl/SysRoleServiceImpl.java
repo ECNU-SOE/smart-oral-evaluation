@@ -10,10 +10,12 @@ import net.ecnu.mapper.SystemMapper;
 import net.ecnu.model.authentication.SysRole;
 import net.ecnu.model.authentication.SysUserRole;
 import net.ecnu.service.authentication.SysRoleService;
+import net.ecnu.utils.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,13 +34,13 @@ public class SysRoleServiceImpl implements SysRoleService {
     private SysUserRoleMapper sysUserRoleMapper;
 
     @Override
-    public List<SysRole> queryRoles(String roleLik) {
+    public List<SysRole> queryRoles(String roleLike) {
         QueryWrapper<SysRole> query = new QueryWrapper<>();
-        query.like(StringUtils.isNotEmpty(roleLik),"role_code",roleLik)
+        query.like(StringUtils.isNotEmpty(roleLike),"role_code",roleLike)
                 .or()
-                .like(StringUtils.isNotEmpty(roleLik),"role_desc",roleLik)
+                .like(StringUtils.isNotEmpty(roleLike),"role_desc",roleLike)
                 .or()
-                .like(StringUtils.isNotEmpty(roleLik),"role_name",roleLik);
+                .like(StringUtils.isNotEmpty(roleLike),"role_name",roleLike);
         query.orderByAsc("role_sort");
 
         return sysRoleMapper.selectList(query);
@@ -73,27 +75,30 @@ public class SysRoleServiceImpl implements SysRoleService {
 
     @Override
     public void addRole(SysRole sysrole) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         sysrole.setStatus(false); //是否禁用:false
+        sysrole.setCreateBy(currentAccountNo);
+        sysrole.setCreateTime(LocalDateTime.now());
         sysRoleMapper.insert(sysrole);
     }
 
     @Override
-    public Map<String, Object> getRolesAndChecked(Integer userId) {
-        if(Objects.isNull(userId)){
-            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"获取角色信息必须传入用户id作为参数");
+    public Map<String, Object> getRolesAndChecked(String accountNo) {
+        if(StringUtils.isBlank(accountNo)){
+            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"获取角色信息必须传入用户唯一id作为参数");
         }
         Map<String,Object> ret = new HashMap<>();
         //所有角色记录
         ret.put("roleDatas",sysRoleMapper.selectList(null));
         //某用户具有的角色id列表
-        ret.put("checkedRoleIds",systemMapper.getCheckedRoleIds(userId));
+        ret.put("checkedRoleIds",systemMapper.getCheckedRoleIds(accountNo));
         return ret;
     }
 
     @Override
-    public void saveCheckedKeys(String phone, Integer userId, List<Integer> checkedIds) {
+    public void saveCheckedKeys(String accountNo, List<Integer> checkedIds) {
         sysUserRoleMapper.delete(new UpdateWrapper<SysUserRole>()
-                .eq("user_id",userId));
-        systemMapper.insertUserRoleIds(userId,checkedIds);
+                .eq("account_no",accountNo));
+        systemMapper.insertUserRoleIds(accountNo,checkedIds);
     }
 }

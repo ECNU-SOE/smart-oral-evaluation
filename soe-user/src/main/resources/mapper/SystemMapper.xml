@@ -103,15 +103,15 @@
 
     <select id="getCheckedRoleIds" resultType="java.lang.String">
         SELECT distinct role_id
-        FROM sys_user_role ra
-        WHERE ra.user_id = #{userId};
+        FROM user_role ra
+        WHERE ra.account_no = #{accountNo};
     </select>
 
     <insert id="insertUserRoleIds" >
-        insert into sys_user_role ( user_id,role_id )
+        insert into user_role ( account_no,role_id )
         values
         <foreach collection="checkedIds" item="item"  separator=",">
-            (#{userId},#{item})
+            (#{accountNo},#{item})
         </foreach>
     </insert>
 

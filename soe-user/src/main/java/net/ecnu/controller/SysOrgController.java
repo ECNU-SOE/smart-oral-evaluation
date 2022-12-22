@@ -29,13 +29,9 @@ public class SysOrgController {
     @Resource
     private SysUserService sysuserService;
 
-    @ApiImplicitParams(value = {
-            @ApiImplicitParam(name = "orgNameLike",value = "组织模糊字段",required = false),
-            @ApiImplicitParam(name = "orgStatus",value = "组织状态",required = false)
-    })
     @PostMapping(value = "/tree")
-    public JsonData tree(@RequestParam("orgNameLike") String orgNameLike,
-                                 @RequestParam("orgStatus") Boolean orgStatus) {
+    public JsonData tree(@RequestParam(value = "orgNameLike",required = false) String orgNameLike,
+                                 @RequestParam(value = "orgStatus",required = false) Boolean orgStatus) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         UserDO sysUser = sysuserService.getUserByUserName(currentAccountNo);
         List<SysOrgNode> orgTreeById = sysorgService.getOrgTreeById(sysUser.getOrgId(), orgNameLike, orgStatus);

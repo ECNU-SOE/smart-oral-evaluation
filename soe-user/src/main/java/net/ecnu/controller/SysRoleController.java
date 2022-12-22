@@ -25,10 +25,9 @@ public class SysRoleController {
     private SysRoleService sysroleService;
 
     //角色管理:查询
-    @ApiImplicitParam(name = "roleLike",value = "角色模糊字段",required = false)
     @ApiOperation("角色管理:查询")
     @PostMapping(value = "/query")
-    public JsonData query(@RequestParam("roleLike") String roleLike) {
+    public JsonData query(@RequestParam(value = "roleLike",required = false) String roleLike) {
         List<SysRole> sysRoles = sysroleService.queryRoles(roleLike);
         return JsonData.buildSuccess(sysRoles);
     }
@@ -60,8 +59,8 @@ public class SysRoleController {
     //用户管理：为用户分配角色，展示角色列表及勾选角色列表
     @ApiOperation("为用户分配角色，展示角色列表及勾选角色列表")
     @PostMapping(value = "/checkedroles")
-    public JsonData checkedroles(@RequestParam Integer userId) {
-        Map<String, Object> rolesAndChecked = sysroleService.getRolesAndChecked(userId);
+    public JsonData checkedroles(@RequestParam String accountNo) {
+        Map<String, Object> rolesAndChecked = sysroleService.getRolesAndChecked(accountNo);
         return JsonData.buildSuccess(rolesAndChecked);
     }
 
@@ -70,8 +69,7 @@ public class SysRoleController {
     @PostMapping(value = "/savekeys")
     public JsonData savekeys(@RequestBody UserRoleCheckedIds userRoleCheckedIds) {
         sysroleService.saveCheckedKeys(
-                userRoleCheckedIds.getUsername(),
-                userRoleCheckedIds.getUserId(),
+                userRoleCheckedIds.getAccountNo(),
                 userRoleCheckedIds.getCheckedIds()
         );
         return JsonData.buildSuccess("保存用户角色成功!");

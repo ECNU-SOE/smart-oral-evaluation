@@ -1,36 +1,15 @@
 package net.ecnu.model.vo.dto;
 
+import lombok.Data;
+
 import java.util.List;
 
+@Data
 public class UserRoleCheckedIds {
 
-  private String username;
 
-  private Integer userId;
+  private String accountNo;
 
   private List<Integer> checkedIds;
 
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public Integer getUserId() {
-    return userId;
-  }
-
-  public void setUserId(Integer userId) {
-    this.userId = userId;
-  }
-
-  public List<Integer> getCheckedIds() {
-    return checkedIds;
-  }
-
-  public void setCheckedIds(List<Integer> checkedIds) {
-    this.checkedIds = checkedIds;
-  }
 }

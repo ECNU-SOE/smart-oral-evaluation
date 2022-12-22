@@ -17,7 +17,7 @@ public interface SysRoleService {
 
     void addRole(SysRole sysrole);
 
-    Map<String,Object> getRolesAndChecked(Integer userId);
+    Map<String,Object> getRolesAndChecked(String accountNo);
 
-    void saveCheckedKeys(String phone, Integer userId, List<Integer> checkedIds);
+    void saveCheckedKeys(String accountNo, List<Integer> checkedIds);
 }

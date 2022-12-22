@@ -9,11 +9,14 @@ import net.ecnu.model.authentication.SysOrg;
 import net.ecnu.model.authentication.SysOrgNode;
 import net.ecnu.model.authentication.tree.DataTreeUtil;
 import net.ecnu.service.authentication.SysOrgService;
+import net.ecnu.utils.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.cert.ocsp.Req;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -63,21 +66,29 @@ public class SysOrgServiceImpl implements SysOrgService {
             throw new BizException(BizCodeEnum.USER_INPUT_ERROR.getCode(),
                     "修改操作必须带主键");
         }else{
+            String currentAccountNo = RequestParamUtil.currentAccountNo();
+            sysorg.setUpdateBy(currentAccountNo);
+            sysorg.setUpdateTime(LocalDateTime.now());
             sysOrgMapper.updateById(sysorg);
         }
     }
 
     @Override
     public void addOrg(SysOrg sysorg) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         setOrgIdsAndLevel(sysorg);
 
         sysorg.setIsLeaf(true); //新增的组织节点都是子节点，没有下级
         SysOrg parent = new SysOrg();
         parent.setId(sysorg.getOrgPid());
         parent.setIsLeaf(false);//更新父节点为非子节点。
+        parent.setUpdateBy(currentAccountNo);
+        parent.setUpdateTime(LocalDateTime.now());
         sysOrgMapper.updateById(parent);
 
         sysorg.setStatus(false);//设置是否禁用，新增节点默认可用
+        sysorg.setCreateBy(currentAccountNo);
+        sysorg.setCreateTime(LocalDateTime.now());
         sysOrgMapper.insert(sysorg);
     }
 
