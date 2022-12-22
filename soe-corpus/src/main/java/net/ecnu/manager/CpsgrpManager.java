@@ -16,4 +16,9 @@ public interface CpsgrpManager {
     List<CpsgrpDO> listByFilter(CpsgrpFilterReq cpsgrpFilter, PageData pageData);
 
     int countByFilter(CpsgrpFilterReq cpsgrpFilter);
+
+    /**
+     * 根据cpsgrpId查询语料组详情
+     */
+    CpsgrpVO selectDetailByCpsgrpId(String cpsgrpId);
 }

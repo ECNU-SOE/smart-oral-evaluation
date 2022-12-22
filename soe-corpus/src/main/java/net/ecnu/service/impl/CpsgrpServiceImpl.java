@@ -21,13 +21,12 @@ import net.ecnu.model.common.PageData;
 import net.ecnu.model.dto.ScoreDTO;
 import net.ecnu.model.vo.CpsgrpVO;
 import net.ecnu.model.vo.CpsrcdVO;
-import net.ecnu.model.common.LoginUser;
 import net.ecnu.service.CpsgrpService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import net.ecnu.util.CommonUtil;
 import net.ecnu.util.IDUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.commons.util.IdUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -153,6 +152,11 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         transcriptDO.setId("transcript_" + IDUtil.getSnowflakeId());
         transcriptDO.setCpsgrpId(transcriptReq.getCpsgrpId());
         transcriptDO.setRespondent(loginUser.getAccountNo());
+        //计算题目组总字数
+        StringBuilder allText = new StringBuilder();
+        CpsgrpVO cpsgrpVO = cpsgrpManager.selectDetailByCpsgrpId(transcriptReq.getCpsgrpId());
+        cpsgrpVO.getCpsrcdList().forEach(cpsrcdVO -> allText.append(cpsrcdVO.getRefText()));
+        int totalWords = CommonUtil.countWord(String.valueOf(allText));
         //计算报告完整度得分
         Double pronCompletion = computePronCompletion(transcriptReq.getScores());
         transcriptDO.setPronCompletion(BigDecimal.valueOf(pronCompletion));
@@ -163,25 +167,25 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         Double pronFluency = computePronFluency(transcriptReq.getScores());
         transcriptDO.setPronFluency(BigDecimal.valueOf(pronFluency));
         //计算建议报告得分
-        Double suggestedScore = computeSuggestedScore(transcriptReq.getScores());
+        Double suggestedScore = computeSuggestedScore(transcriptReq.getScores(), totalWords);
         transcriptDO.setSuggestedScore(BigDecimal.valueOf(suggestedScore));
         //插入数据库
-        transcriptMapper.insert(transcriptDO);
+        int rows = transcriptMapper.insert(transcriptDO);
         return transcriptMapper.selectById(transcriptDO.getId());
     }
-
 
 
     /**
      * 计算报告建议得分
      */
-    private Double computeSuggestedScore(List<ScoreDTO> scores) {
-        int totalWords = scores.stream().mapToInt(ScoreDTO::getTotalWords).sum();
-        int wrongWords = scores.stream().mapToInt(ScoreDTO::getWrongWords).sum();
+    private Double computeSuggestedScore(List<ScoreDTO> scores, int totalWords) {
+        int evalWordCount = scores.stream().mapToInt(ScoreDTO::getTotalWords).sum(); //参加评测的字数
+        int unEvalWordCount = totalWords - evalWordCount;//未参加评测的字数
+        int wrongWordCount = scores.stream().mapToInt(ScoreDTO::getWrongWords).sum(); //评测中的错字数
         double suggestedScore = 0.0;
-        // 避免除0异常
-        if (totalWords <= 0) return suggestedScore;
-        suggestedScore = (1 - wrongWords * 1.0 / totalWords) * 100;
+        // 该语料组的总字数为0,语料组异常
+        if (totalWords <= 0) throw new BizException(BizCodeEnum.CPSGRP_ERROR);
+        suggestedScore = (1 - (wrongWordCount + unEvalWordCount) * 1.0 / totalWords) * 100;
         return suggestedScore;
     }
 

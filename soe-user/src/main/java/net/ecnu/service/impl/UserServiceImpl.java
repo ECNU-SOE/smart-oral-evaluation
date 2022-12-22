@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean send(String phoneNum) {
         UserDO userDO = userManager.selectOneByPhone(phoneNum);
-        if (userDO==null)
+        if (userDO == null)
             return false;
         final String templateCode = "SMS_262610596"; //阿里云短信模板,需要向阿里云申请
         final String signName = "唐国兴的博客"; //短信签名，需要向阿里云申请
@@ -150,8 +150,8 @@ public class UserServiceImpl implements UserService {
         request.putQueryParameter("SignName", signName);    //短信签名
         request.putQueryParameter("TemplateCode", templateCode);//短信模板code
         String code = RandomUtil.randomNumbers(6);
-        HashMap<String,Object> map = new HashMap<>();
-        map.put("code",code);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("code", code);
         request.putQueryParameter("TemplateParam", JSONObject.toJSONString(map));
         try {
             CommonResponse resp = client.getCommonResponse(request);// 发送短信

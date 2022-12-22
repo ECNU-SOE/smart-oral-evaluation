@@ -14,4 +14,6 @@ public interface EvaluateService {
     Object getCorpusesByGroupId(String cpsgrpId);
 
     File convert(MultipartFile audio);
+
+    Object evaluateByXF(File convert, String refText, String pinyin, long evalMode);
 }
