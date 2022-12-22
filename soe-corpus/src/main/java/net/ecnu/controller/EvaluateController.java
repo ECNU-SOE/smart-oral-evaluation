@@ -21,17 +21,23 @@ public class EvaluateController {
     @Autowired
     private EvaluateService evaluateService;
 
-
-    /*@PostMapping("upload")
-    @Deprecated
-    public Result sentenceEvaluate(@RequestPart("audio") MultipartFile audio, @RequestParam("text") String text,
-                                   @RequestParam("pinyin") String pinyin, @RequestParam("mode") String mode) {
-        Result result = evaluateService.evaluate(audio, text, pinyin, mode);
-        return result;
-    }*/
-
     /**
      * 语音评测
+     */
+    @PostMapping("eval_xf")
+    public JsonData eval_xf(@RequestParam(value = "audio", required = true) MultipartFile audio,
+                            @RequestParam(value = "refText", required = true) String refText,
+                            @RequestParam(value = "pinyin", required = false) String pinyin,
+                            @RequestParam(value = "evalMode", required = true) long evalMode) {
+        long startTime = System.currentTimeMillis();
+        File convert = evaluateService.convert(audio);
+        System.out.println("语音格式转换耗时：" + (System.currentTimeMillis() - startTime) + "ms");
+        Object data = evaluateService.evaluateByXF(convert, refText, pinyin, evalMode);
+        return JsonData.buildSuccess(data);
+    }
+
+    /**
+     * 腾讯云——语音评测
      */
     @PostMapping("eval")
     public JsonData evaluate(@RequestParam(value = "audio", required = true) MultipartFile audio,
@@ -46,7 +52,7 @@ public class EvaluateController {
     }
 
     /**
-     * 格式转换
+     * 音频格式转换
      */
     @PostMapping(value = "convert", produces = "audio/wav")
     public ResponseEntity<Resource> convert(@RequestParam(value = "audio", required = true) MultipartFile audio) {

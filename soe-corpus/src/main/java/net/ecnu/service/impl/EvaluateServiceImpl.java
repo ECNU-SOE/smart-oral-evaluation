@@ -11,11 +11,17 @@ import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.mapper.CpsgrpMapper;
 import net.ecnu.model.CpsgrpDO;
 import net.ecnu.model.CpsrcdDO;
+import net.ecnu.model.EvalListener;
 import net.ecnu.model.vo.CpsgrpVO2;
 import net.ecnu.model.vo.CpsrcdVO2;
 import net.ecnu.model.vo.EvalResultVO;
 import net.ecnu.service.EvaluateService;
+import net.ecnu.util.CommonUtil;
 import net.ecnu.util.FileUtil;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.WebSocket;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,9 +31,15 @@ import ws.schild.jave.*;
 import ws.schild.jave.encode.AudioAttributes;
 import ws.schild.jave.encode.EncodingAttributes;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -83,25 +95,12 @@ public class EvaluateServiceImpl implements EvaluateService {
             if (word.getPronAccuracy() < SOEConst.ERR_SCORE_LINE) wrongWordCount++;
         }
         // 错字包括未读字
-        int totalWordCount = countTotalWord(refText);
+        int totalWordCount = CommonUtil.countWord(refText);
         wrongWordCount += totalWordCount - resp.getWords().length;
         evalResultVO.setTotalWordCount(totalWordCount);
         evalResultVO.setWrongWordCount(wrongWordCount);
         //返回结果
         return evalResultVO;
-    }
-
-    /**
-     * 统计文本中的汉子个数
-     */
-    private int countTotalWord(String refText) {
-        int totalWordCount = 0;
-        char[] chars = refText.toCharArray();
-        for (char ch : chars) {
-            boolean matches = String.valueOf(ch).matches("[\u4e00-\u9fa5]");
-            if (matches) totalWordCount++;
-        }
-        return totalWordCount;
     }
 
 
@@ -134,6 +133,25 @@ public class EvaluateServiceImpl implements EvaluateService {
             e.printStackTrace();
         }
         return target;
+    }
+
+    /**
+     * 讯飞语音评测
+     */
+    @Override
+    public Object evaluateByXF(File convert, String refText, String pinyin, long evalMode) {
+        String hostUrl = "https://ise-api.xfyun.cn/v2/open-ise";
+        String appid = "3adf0a1e";
+        String apiSecret = "MGEzZjQ1YTc2MzU3NDZjM2RkZmJkOWYy";
+        String apiKey = "3dc67c7ea181adb9a6c6df0f3ec5d751";
+
+        String authUrl = getAuthUrl(hostUrl, apiKey, apiSecret);// 构建鉴权url
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        //将url中的 schema http://和https://分别替换为ws:// 和 wss://
+        String url = authUrl.replace("http://", "ws://").replace("https://", "wss://");
+        Request request = new Request.Builder().url(url).build();
+        WebSocket webSocket = client.newWebSocket(request, new EvalListener());
+        return null;
     }
 
     /**
@@ -188,127 +206,6 @@ public class EvaluateServiceImpl implements EvaluateService {
         return req;
     }
 
-
-//    @Override
-//    public Result evaluate(MultipartFile audio, String text, String pinyin, String mode) {
-//        Result result = new Result();
-//        try {
-//            File wav_file = FileUtil.MultipartFile2File(audio);
-//            File file =new File("output.mp3");
-//            file = SOEFileUtil.Wav2mp3(wav_file,file);
-//            int PKG_SIZE = 2 * 1024; //分片大小
-//            String secretId = "AKIDZNBuVGvNrnbJoBYv9gr3EQWUJ8w1DPWS";
-//            String secretKey = "YxBE6oIZgh7OZYM2Zv7SghigV96g6LNw";
-//            // 实例化一个认证对象，入参需要传入腾讯云账户secretId，secretKey
-//            Credential cred = new Credential(secretId, secretKey);
-//            // 实例化要请求产品的client对象,clientProfile是可选的
-//            SoeClient client = new SoeClient(cred, "");
-//            String sessionId = UUID.randomUUID().toString();
-//            TransmitOralProcessWithInitRequest req = new TransmitOralProcessWithInitRequest();
-//            req.setVoiceEncodeType(1L);  //语音数据类型1:pcm
-//            req.setVoiceFileType(3L); //语音文件类型1: raw，2: wav，3: mp3，4: speex
-//            req.setSessionId(sessionId); //唯一标识
-//            if(pinyin.isEmpty()){//普通评测模式
-//                req.setRefText(text.trim());
-//                req.setTextMode(0L); //文本格式.0普通文本 1,音素结构
-//            }else{//指定拼音评测模式
-//                String s = SOEWordUtil.formatText(text,pinyin);
-//                req.setRefText(s); //文本
-//                req.setTextMode(1L); //文本格式.0普通文本 1,音素结构
-//            }
-//            req.setWorkMode(0L); //0,流式分片,1一次性评测
-//            if("0".equals(mode)){
-//                req.setEvalMode(0L); //评估模式,0,单词.1,句子,2,段落,3自由说,4单词纠错
-//            }else if("1".equals(mode)||"2".equals(mode)){
-//                req.setEvalMode(1L);
-//            }else if("3".equals(mode)||"5".equals(mode)){
-//                req.setEvalMode(2L);
-//            }else{
-//                return null;
-//            }
-//            req.setScoreCoeff(1.0f); //评估难度
-//            req.setServerType(1L); //服务类型.0英文,1中文
-//            req.setIsAsync(0L); //异步
-//            req.setIsQuery(0L); //轮询
-//            TransmitOralProcessWithInitResponse resp = null;
-//            //将文件装换成base64
-//            //byte[] data = Files.readAllBytes(Paths.get(file));
-//            byte[] data = SOEFileUtil.File2byte(file);
-//            int pkgNum = (int) Math.ceil((double) data.length / PKG_SIZE);
-//            for (int i = 1; i <= pkgNum; i++) {
-//                int lastIndex = i * PKG_SIZE;
-//                if (i == pkgNum) {
-//                    lastIndex = data.length;
-//                }
-//                byte[] buf = Arrays.copyOfRange(data, (i - 1) * PKG_SIZE, lastIndex);
-//                //String base64Str = new sun.misc.BASE64Encoder().encode(buf);
-//                String base64Str = Base64.getEncoder().encodeToString(buf);
-//                req.setUserVoiceData(base64Str);
-//                req.setSeqId((long) i);
-//                if (i == pkgNum) {
-//                    req.setIsEnd(1L);
-//                } else {
-//                    req.setIsEnd(0L);
-//                }
-//                resp = client.TransmitOralProcessWithInit(req);
-//                // 输出json格式的字符串回包
-//                //System.out.println(TransmitOralProcessWithInitResponse.toJsonString(resp));
-//            }
-//            if (resp==null){
-//                result.setWrongWordsCount(0);
-//                List<JSONObject> list = new ArrayList<>();
-//                JSONObject object = new JSONObject();
-//                object.put("words",0);
-//                list.add(object);
-//                if (list == null)
-//                    System.out.println("这里为null");
-//                result.setWrongwWords(list);
-//                result.setPronAccuracy(0);
-//                result.setPronFluency(0);
-//                result.setPronCompletion(0);
-//                result.setTotalWordsCount(0);
-//                result.setSuggestedScore(0);
-//            }
-//            result.setSuggestedScore(Float.valueOf(resp.getSuggestedScore().toString()));
-//            result.setPronAccuracy(Float.valueOf(resp.getPronAccuracy().toString()));
-//            result.setPronFluency(Float.valueOf(resp.getPronFluency().toString()));
-//            result.setPronCompletion(Float.valueOf(resp.getPronCompletion().toString()));
-//            WordRsp[] resp_words = resp.getWords();
-//            int wrong_words =0,total_words=0;
-//            //将所有得分不超过90分的汉字加入返回集合
-//            List<JSONObject> words = new ArrayList<>();
-//            if ("Finished".equals(resp.getStatus())){
-//                for(int k = 0; k< resp_words.length; k++){
-//                    if(!"*".equals(resp_words[k].getWord())){
-//                        total_words++;
-//                        if(Float.valueOf(resp_words[k].getPronAccuracy())<90|| Float.valueOf(resp_words[k].getPronFluency())<0.90){
-//                            wrong_words++;//统计错字字数
-//                            JSONObject temp_json = new JSONObject();
-//                            temp_json.put("word", resp_words[k].getWord());
-//                            temp_json.put("PronAccuracy", Float.valueOf(resp_words[k].getPronAccuracy().toString()));
-//                            temp_json.put("PronFluency", Float.valueOf(resp_words[k].getPronFluency().toString()));
-//                            words.add(temp_json);
-//                        }
-//                    }
-//                }
-//            }
-//            result.setWrongwWords(words);
-//            result.setTotalWordsCount(total_words);
-//            result.setWrongWordsCount(wrong_words);
-//        } catch (TencentCloudSDKException e) {
-//            e.printStackTrace();
-//        } catch (JSONException e) {
-//            throw new RuntimeException(e);
-//        } catch (InputFormatException e) {
-//            throw new RuntimeException(e);
-//        } catch (EncoderException e) {
-//            throw new RuntimeException(e);
-//        }
-//        File outputfile = new File("output.mp3");
-//        if (outputfile.exists())
-//            outputfile.delete();
-//        return result;
-//    }
 
     @Override
     public Object getCorpusesByGroupId(String cpsgrpId) {
@@ -386,4 +283,39 @@ public class EvaluateServiceImpl implements EvaluateService {
         cpsgrpVO.setCpsrcdList(list);
         return cpsgrpVO;
     }
+
+    /**
+     * 讯飞鉴权
+     */
+    public static String getAuthUrl(String hostUrl, String apiKey, String apiSecret) {
+        try {
+            URL url = new URL(hostUrl);
+            SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+            format.setTimeZone(TimeZone.getTimeZone("GMT"));
+            String date = format.format(new Date());
+            String builder = "host: " + url.getHost() + "\n" +
+                    "date: " + date + "\n" +
+                    "GET " + url.getPath() + " HTTP/1.1";
+            Charset charset = StandardCharsets.UTF_8;
+            Mac mac = Mac.getInstance("hmacsha256");
+            SecretKeySpec spec = new SecretKeySpec(apiSecret.getBytes(charset), "hmacsha256");
+            mac.init(spec);
+            byte[] hexDigits = mac.doFinal(builder.getBytes(charset));
+            String sha = Base64.getEncoder().encodeToString(hexDigits);
+            //System.err.println(sha);
+            String authorization = String.format("api_key=\"%s\", algorithm=\"%s\", headers=\"%s\", signature=\"%s\"", apiKey, "hmac-sha256", "host date request-line", sha);
+            //System.err.println(authorization);
+            HttpUrl httpUrl = HttpUrl.parse("https://" + url.getHost() + url.getPath()).newBuilder().
+                    addQueryParameter("authorization", Base64.getEncoder().encodeToString(authorization.getBytes(charset))).
+                    addQueryParameter("date", date).//
+                            addQueryParameter("host", url.getHost()).//
+                            build();
+            return httpUrl.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
 }
