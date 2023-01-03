@@ -2,15 +2,13 @@ package net.ecnu.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.mapper.UserMapper;
 import net.ecnu.model.UserDO;
 import net.ecnu.model.authentication.SysUserOrg;
+import net.ecnu.model.dto.UserDTO;
 import net.ecnu.model.vo.UserVO;
-import net.ecnu.model.vo.dto.UserDTO;
 import net.ecnu.service.authentication.SysUserService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.JsonData;

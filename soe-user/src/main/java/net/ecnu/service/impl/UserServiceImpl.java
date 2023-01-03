@@ -1,6 +1,5 @@
 package net.ecnu.service.impl;
 
-import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.CommonRequest;
@@ -14,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.ecnu.controller.request.UserReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
-import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.manager.UserManager;
 import net.ecnu.mapper.UserMapper;
 import net.ecnu.model.common.LoginUser;
@@ -24,6 +22,7 @@ import net.ecnu.model.dto.UserDTO;
 import net.ecnu.service.UserService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.JWTUtil;
+import net.ecnu.utils.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,10 +101,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Object getUserInfo() {
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
+        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        //if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
+        if(StringUtils.isBlank(currentAccountNo)){
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
         //如果token有效，数据库查询用户个人信息
-        UserDO userDO = userManager.selectOneByAccountNo(loginUser.getAccountNo());
+        UserDO userDO = userManager.selectOneByAccountNo(currentAccountNo);
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(userDO, userVO);
         return userVO;

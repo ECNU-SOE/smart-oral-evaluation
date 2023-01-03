@@ -12,7 +12,7 @@ import net.ecnu.mapper.SystemMapper;
 import net.ecnu.mapper.UserMapper;
 import net.ecnu.model.UserDO;
 import net.ecnu.model.authentication.SysUserOrg;
-import net.ecnu.model.vo.dto.UserDTO;
+import net.ecnu.model.dto.UserDTO;
 import net.ecnu.service.authentication.SysUserService;
 import net.ecnu.util.JsonData;
 import net.ecnu.utils.RequestParamUtil;

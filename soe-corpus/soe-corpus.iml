@@ -189,11 +189,9 @@
     <orderEntry type="library" name="Maven: com.aliyun:aliyun-java-sdk-sts:3.0.0" level="project" />
     <orderEntry type="library" name="Maven: com.aliyun:aliyun-java-sdk-ecs:4.2.0" level="project" />
     <orderEntry type="library" name="Maven: com.aliyun:aliyun-java-sdk-kms:2.7.0" level="project" />
-    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.8" level="project" />
     <orderEntry type="library" name="Maven: com.tencentcloudapi:tencentcloud-sdk-java-soe:3.1.561" level="project" />
     <orderEntry type="library" name="Maven: com.tencentcloudapi:tencentcloud-sdk-java-common:3.1.561" level="project" />
     <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.2" level="project" />
-    <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.12.0" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okhttp:okhttp:2.7.5" level="project" />
     <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.3.1" level="project" />
     <orderEntry type="library" name="Maven: javax.activation:javax.activation-api:1.2.0" level="project" />
@@ -222,5 +220,9 @@
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-autoconfigure:2.5.5" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot:2.5.5" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-webmvc:5.3.10" level="project" />
+    <orderEntry type="library" name="Maven: org.immutables:gson:2.3.1" level="project" />
+    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.8" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:3.9.1" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.15.0" level="project" />
   </component>
 </module>

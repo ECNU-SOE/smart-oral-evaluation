@@ -159,7 +159,6 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         transcriptDO.setCpsgrpId(transcriptReq.getCpsgrpId());
         //transcriptDO.setRespondent(loginUser.getAccountNo());
         transcriptDO.setRespondent(currentAccountNo);
-        transcriptDO.setRespondent(loginUser.getAccountNo());
         //计算题目组总字数
         StringBuilder allText = new StringBuilder();
         CpsgrpVO cpsgrpVO = cpsgrpManager.selectDetailByCpsgrpId(transcriptReq.getCpsgrpId());
