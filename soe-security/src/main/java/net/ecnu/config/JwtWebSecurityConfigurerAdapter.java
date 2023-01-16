@@ -42,8 +42,8 @@ public class JwtWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapte
             JWTConstants.LOGIN,
             //注册
             JWTConstants.REGISTER,
-            //角色
-            JWTConstants.ROLES
+            //刷新token
+            JWTConstants.REFRESH_TOKEN
     };
 
     private String[] PERMIT_RES_LIST = {
