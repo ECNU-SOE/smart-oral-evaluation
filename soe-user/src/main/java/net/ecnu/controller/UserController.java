@@ -24,11 +24,18 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/user/v1")
-@CrossOrigin //sendSms跨域支持
 public class UserController {
 
     @Autowired
     private UserService userService;
+
+    /**
+     * 用户注册
+     */
+    @GetMapping("test")
+    public JsonData test() {
+        return JsonData.buildSuccess("data");
+    }
 
 
     /**

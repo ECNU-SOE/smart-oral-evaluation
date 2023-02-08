@@ -3,6 +3,8 @@ package net.ecnu.model;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import okhttp3.*;
+import cn.hutool.core.util.XmlUtil;
+
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -28,7 +30,7 @@ public class EvalListener extends WebSocketListener {
     //题型、文本、音频要请注意做同步变更(如果是英文评测,请注意变更ent参数的值)
     private static final String category = "read_sentence";//题型
     private static String text = "今天天气怎么样";//评测试题,英文试题:[content]\nthere was a gentleman live near my house.
-    private static final String file = "iseAudio/cn/read_sentence_cn.pcm";//评测音频,如传mp3格式请改变参数aue的值为lame
+    private static final String file = "/Users/lyw/projects/smart-oral-evaluation/soe-corpus/src/main/resources/iseAudio/cn/read_sentence_cn.pcm";//评测音频,如传mp3格式请改变参数aue的值为lame
 
     public static final int StatusFirstFrame = 0;//第一帧
     public static final int StatusContinueFrame = 1;//中间帧
@@ -193,8 +195,7 @@ public class EvalListener extends WebSocketListener {
                 if (resp.getData().getStatus() == 2) {
                     try {
                         String res = new String(decoder.decode(resp.getData().getData()), StandardCharsets.UTF_8);
-
-                        System.out.println("sid:" + resp.getSid() + " 最终识别结果" + res);
+                        System.out.println("sid:" + resp.getSid() + " 最终识别结果：\n" + res);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

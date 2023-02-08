@@ -22,7 +22,7 @@ public class EvaluateController {
     private EvaluateService evaluateService;
 
     /**
-     * 语音评测
+     * 讯飞——语音评测
      */
     @PostMapping("eval_xf")
     public JsonData eval_xf(@RequestParam(value = "audio", required = true) MultipartFile audio,
