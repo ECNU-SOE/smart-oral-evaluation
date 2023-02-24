@@ -15,5 +15,5 @@ public interface EvaluateService {
 
     File convert(MultipartFile audio);
 
-    Object evaluateByXF(File convert, String refText, String pinyin, long evalMode);
+    Object evaluateByXF(File audio, String refText, String pinyin, String evalMode);
 }
