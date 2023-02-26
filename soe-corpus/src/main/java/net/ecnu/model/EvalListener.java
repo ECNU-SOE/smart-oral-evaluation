@@ -25,7 +25,7 @@ import java.util.*;
 public class EvalListener extends WebSocketListener {
     private String category;//题型
 
-    private String file;//待评测音频
+    private File file;//待评测音频
 
     private String text;//评测文本
 
@@ -40,11 +40,11 @@ public class EvalListener extends WebSocketListener {
         this.category = category;
     }
 
-    public String getFile() {
+    public File getFile() {
         return file;
     }
 
-    public void setFile(String file) {
+    public void setFile(File file) {
         this.file = file;
     }
 
@@ -56,10 +56,10 @@ public class EvalListener extends WebSocketListener {
         this.text = text;
     }
 
-    private static final String hostUrl = "https://ise-api.xfyun.cn/v2/open-ise";//开放评测地址
+//    private static final String hostUrl = "https://ise-api.xfyun.cn/v2/open-ise";//开放评测地址
     private static final String appid = "3adf0a1e";//控制台获取
-    private static final String apiSecret = "MGEzZjQ1YTc2MzU3NDZjM2RkZmJkOWYy";//控制台获取
-    private static final String apiKey = "3dc67c7ea181adb9a6c6df0f3ec5d751";//控制台获取
+//    private static final String apiSecret = "MGEzZjQ1YTc2MzU3NDZjM2RkZmJkOWYy";//控制台获取
+//    private static final String apiKey = "3dc67c7ea181adb9a6c6df0f3ec5d751";//控制台获取
 
     private static final String sub = "ise";//服务类型sub,开放评测值为ise
     private static final String ent = "cn_vip";//语言标记参数 ent(cn_vip中文,en_vip英文)
