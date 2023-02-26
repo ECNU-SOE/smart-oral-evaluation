@@ -56,7 +56,7 @@ public class EvalListener extends WebSocketListener {
         this.text = text;
     }
 
-//    private static final String hostUrl = "https://ise-api.xfyun.cn/v2/open-ise";//开放评测地址
+    //    private static final String hostUrl = "https://ise-api.xfyun.cn/v2/open-ise";//开放评测地址
     private static final String appid = "3adf0a1e";//控制台获取
 //    private static final String apiSecret = "MGEzZjQ1YTc2MzU3NDZjM2RkZmJkOWYy";//控制台获取
 //    private static final String apiKey = "3dc67c7ea181adb9a6c6df0f3ec5d751";//控制台获取
@@ -83,8 +83,6 @@ public class EvalListener extends WebSocketListener {
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd HH:mm:ss.SSS");*/
     private static long beginTime = (new Date()).getTime();
     private static long endTime = (new Date()).getTime();
-
-
 
 
     //WebSocket握手连接并上传音频数据
@@ -215,6 +213,8 @@ public class EvalListener extends WebSocketListener {
                 return;
             }
             if (resp.getData() != null) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                System.out.println(sdf.format(new Date()) + "；" + resp.getData());
                 if (resp.getData().getData() != null) {
                     //中间结果处理
                 }

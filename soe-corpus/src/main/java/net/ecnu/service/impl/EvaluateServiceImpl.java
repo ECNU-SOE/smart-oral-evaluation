@@ -168,14 +168,12 @@ public class EvaluateServiceImpl implements EvaluateService {
         System.out.println("创建socket成功，开始等待评测结果");
         long beginTime = (new Date()).getTime();
 
-        int cnt = 0;
         while (evalListener.getEvalRes() == null) {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println(cnt++);
         }
         long endTime = (new Date()).getTime();
         System.out.println("等待评测结果耗时：" + (endTime - beginTime) + "ms");
