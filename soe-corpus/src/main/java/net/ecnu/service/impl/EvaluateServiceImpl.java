@@ -160,11 +160,14 @@ public class EvaluateServiceImpl implements EvaluateService {
 
         OkHttpClient client = new OkHttpClient.Builder().build();
         Request request = new Request.Builder().url(url).build();
+        System.out.println("评测音频路径：" + audio.getPath());
+
         EvalListener evalListener = new EvalListener();
         evalListener.setFile(audio.getPath());
         evalListener.setText(refText);
         evalListener.setCategory(category);//category校验
         WebSocket webSocket = client.newWebSocket(request, evalListener);
+        System.out.println("创建socket成功，开始等待评测结果");
         long beginTime = (new Date()).getTime();
         while (evalListener.getEvalRes() == null) ; //循环等待结果
         long endTime = (new Date()).getTime();
