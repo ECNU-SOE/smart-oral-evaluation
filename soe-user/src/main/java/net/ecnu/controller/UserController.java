@@ -94,4 +94,9 @@ public class UserController {
             return JsonData.buildError("短信发送错误");
     }
 
+    @PostMapping("create")
+    public JsonData create(){
+
+        return null;
+    }
 }
