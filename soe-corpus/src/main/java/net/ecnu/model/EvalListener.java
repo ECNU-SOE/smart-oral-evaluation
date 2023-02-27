@@ -123,7 +123,7 @@ public class EvalListener extends WebSocketListener {
                         case StatusLastFrame:    // 最后一帧音频status = 2 ，标志音频发送结束
                             send(webSocket, 4, 2, "");
                             endTime = (new Date()).getTime();
-                            System.out.println("音频上传耗时：" + (endTime - beginTime) + "ms");
+                            System.out.println("onOpen方法耗时：" + (endTime - beginTime) + "ms");
                             break end;
                     }
 //                    Thread.sleep(intervel); //模拟音频采样延时
@@ -225,7 +225,8 @@ public class EvalListener extends WebSocketListener {
                     try {
                         String res = new String(decoder.decode(resp.getData().getData()), StandardCharsets.UTF_8);
                         JSONObject xmlJSONObj = XML.toJSONObject(res);
-                        System.out.println("获取结果耗时：" + ((new Date()).getTime() - t) + "ms");
+                        System.out.println("onMessage方法耗时：" + ((new Date()).getTime() - t) + "ms");
+                        System.out.println(xmlJSONObj.get("xml_result"));
                         setEvalRes(xmlJSONObj);
                     } catch (Exception e) {
                         e.printStackTrace();
