@@ -23,6 +23,8 @@ import java.util.*;
 其他试题示例请到Demo中查看试题示例与音频示例并注意修改相关评测参数值,
 到平台文档下方进行音频试题示例下载也可以*/
 public class EvalListener extends WebSocketListener {
+    private long t = 0;
+
     private String category;//题型
 
     private File file;//待评测音频
@@ -203,6 +205,7 @@ public class EvalListener extends WebSocketListener {
     //客户端接收服务端消息
     @Override
     public void onMessage(WebSocket webSocket, String text) {
+        if (this.t == 0) t = (new Date()).getTime();
         super.onMessage(webSocket, text);
         //System.out.println(text);
         IseNewResponseData resp = json.fromJson(text, IseNewResponseData.class);
@@ -213,8 +216,8 @@ public class EvalListener extends WebSocketListener {
                 return;
             }
             if (resp.getData() != null) {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                System.out.println(sdf.format(new Date()) + "；" + resp.getData());
+//                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                System.out.println(sdf.format(new Date()) + "；" + resp.getData());
                 if (resp.getData().getData() != null) {
                     //中间结果处理
                 }
@@ -222,6 +225,7 @@ public class EvalListener extends WebSocketListener {
                     try {
                         String res = new String(decoder.decode(resp.getData().getData()), StandardCharsets.UTF_8);
                         JSONObject xmlJSONObj = XML.toJSONObject(res);
+                        System.out.println("获取结果耗时：" + ((new Date()).getTime() - t) + "ms");
                         setEvalRes(xmlJSONObj);
                     } catch (Exception e) {
                         e.printStackTrace();

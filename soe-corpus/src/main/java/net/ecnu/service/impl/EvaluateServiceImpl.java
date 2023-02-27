@@ -157,7 +157,7 @@ public class EvaluateServiceImpl implements EvaluateService {
         String authUrl = getAuthUrl(hostUrl, apiKey, apiSecret);// 构建鉴权url
         //将url中的 schema http://和https://分别替换为ws:// 和 wss://
         String url = authUrl.replace("http://", "ws://").replace("https://", "wss://");
-
+        System.out.println(url);
         OkHttpClient client = new OkHttpClient.Builder().build();
         Request request = new Request.Builder().url(url).build();
         EvalListener evalListener = new EvalListener();
@@ -166,18 +166,20 @@ public class EvaluateServiceImpl implements EvaluateService {
         evalListener.setCategory(category);//category校验
         WebSocket webSocket = client.newWebSocket(request, evalListener);
         System.out.println("创建socket成功，开始等待评测结果");
-        long beginTime = (new Date()).getTime();
-
-        while (evalListener.getEvalRes() == null) {
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        long endTime = (new Date()).getTime();
-        System.out.println("等待评测结果耗时：" + (endTime - beginTime) + "ms");
-        return ((cn.hutool.json.JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
+//        long beginTime = (new Date()).getTime();
+//
+//        while (evalListener.getEvalRes() == null) {
+//            try {
+//                Thread.sleep(50);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        long endTime = (new Date()).getTime();
+//        System.out.println("等待评测结果耗时：" + (endTime - beginTime) + "ms");
+//        return ((cn.hutool.json.JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
+        System.out.println("返回消息");
+        return "message";
     }
 
     /**
