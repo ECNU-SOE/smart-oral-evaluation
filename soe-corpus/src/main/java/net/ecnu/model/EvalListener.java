@@ -93,7 +93,7 @@ public class EvalListener extends WebSocketListener {
         super.onOpen(webSocket, response);
         new Thread(() -> {
             //连接成功，开始发送数据
-            int frameSize = 1280; //每一帧音频的大小,建议每 40ms 发送 1280B，大小可调整，但是不要超过19200B，即base64压缩后能超过26000B，否则会报错10163数据过长错误
+            int frameSize = 19000; //每一帧音频的大小,建议每 40ms 发送 1280B，大小可调整，但是不要超过19200B，即base64压缩后能超过26000B，否则会报错10163数据过长错误
             int intervel = 40;
             int status = 0;  // 音频的状态
             //FileInputStream fs = new FileInputStream("0.pcm");
@@ -126,7 +126,7 @@ public class EvalListener extends WebSocketListener {
                             System.out.println("onOpen方法耗时：" + (endTime - beginTime) + "ms");
                             break end;
                     }
-//                    Thread.sleep(intervel); //模拟音频采样延时
+                    Thread.sleep(intervel); //模拟音频采样延时
                 }
 //                System.out.println("all data is send");
             } catch (Exception e) {
