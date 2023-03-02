@@ -164,20 +164,20 @@ public class EvaluateServiceImpl implements EvaluateService {
         evalListener.setText(refText);
         evalListener.setCategory(category);//category校验
         WebSocket webSocket = client.newWebSocket(request, evalListener);
-//        long beginTime = (new Date()).getTime();
-//
-//        while (evalListener.getEvalRes() == null) {
-//            try {
-//                Thread.sleep(50);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        long endTime = (new Date()).getTime();
-//        System.out.println("等待评测结果耗时：" + (endTime - beginTime) + "ms");
-//        return ((cn.hutool.json.JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
-        System.out.println("return message");
-        return "message";
+        long beginTime = (new Date()).getTime();
+
+        while (evalListener.getEvalRes() == null) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        long endTime = (new Date()).getTime();
+        System.out.println("等待评测结果耗时：" + (endTime - beginTime) + "ms");
+        return ((cn.hutool.json.JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
+//        System.out.println("return message");
+//        return "message";
     }
 
     /**
