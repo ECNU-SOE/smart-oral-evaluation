@@ -165,21 +165,18 @@ public class EvaluateServiceImpl implements EvaluateService {
         File target = new File("C:\\Users\\tgx\\Desktop\\tmp.mp3");
 
         try {
-//			File source = new File("file path source");
-//			File target = new File("file path target");
             AudioAttributes audio = new AudioAttributes();
             audio.setCodec("libmp3lame");
             audio.setBitRate(128000);
             audio.setChannels(2);
             audio.setSamplingRate(44100);
-            audio.setVolume(new Integer(256));
+            audio.setVolume(256);
 
             EncodingAttributes attrs = new EncodingAttributes();
             attrs.setFormat("mp3");
             attrs.setAudioAttributes(audio);
             // attrs.setOffset(5F);
             // attrs.setDuration(30F);
-
             Encoder encoder = new Encoder();
             encoder.encode(new MultimediaObject(source), target, attrs);
 
