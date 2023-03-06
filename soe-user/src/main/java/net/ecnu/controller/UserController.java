@@ -17,11 +17,18 @@ import javax.servlet.http.HttpServletRequest;
 @Api(value = "端上用户管理")
 @RestController
 @RequestMapping("/api/user/v1")
-@CrossOrigin //sendSms跨域支持
 public class UserController {
 
     @Autowired
     private UserService userService;
+
+    /**
+     * 用户注册
+     */
+    @GetMapping("test")
+    public JsonData test() {
+        return JsonData.buildSuccess("data");
+    }
 
 
     /**
@@ -85,4 +92,9 @@ public class UserController {
             return JsonData.buildError("短信发送错误");
     }
 
+    @PostMapping("create")
+    public JsonData create(){
+
+        return null;
+    }
 }
