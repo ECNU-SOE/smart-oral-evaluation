@@ -24,8 +24,20 @@ public class EvaluateController {
     /**
      * 语音评测（讯飞版）
      */
-    @PostMapping("eval_xf")
-    public JsonData eval_xf(@RequestParam(value = "audio", required = true) MultipartFile audio,
+//    @PostMapping("eval_xf")
+//    public JsonData eval_xf(@RequestParam(value = "audio", required = true) MultipartFile audio,
+//                            @RequestParam(value = "refText", required = true) String refText,
+//                            @RequestParam(value = "category", required = true) String category,
+//                            @RequestParam(value = "pinyin", required = false) String pinyin) {
+//        long startTime = System.currentTimeMillis();
+//        File convertAudio = evaluateService.convert(audio);
+//        System.out.println("语音格式转换耗时：" + (System.currentTimeMillis() - startTime) + "ms");
+//        Object data = evaluateService.evaluateByXF(convertAudio, refText, pinyin, category);
+//        return JsonData.buildSuccess(data);
+//    }
+
+    @PostMapping("eval_xf2")
+    public JsonData eval_xf2(@RequestParam(value = "audio", required = true) MultipartFile audio,
                             @RequestParam(value = "refText", required = true) String refText,
                             @RequestParam(value = "category", required = true) String category,
                             @RequestParam(value = "pinyin", required = false) String pinyin) {
@@ -35,6 +47,8 @@ public class EvaluateController {
         Object data = evaluateService.evaluateByXF(convertAudio, refText, pinyin, category);
         return JsonData.buildSuccess(data);
     }
+
+
 
     /**
      * 语音评测（腾讯版）
