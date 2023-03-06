@@ -22,22 +22,22 @@ public class EvaluateController {
     private EvaluateService evaluateService;
 
     /**
-     * 语音评测
+     * 语音评测（讯飞版）
      */
     @PostMapping("eval_xf")
     public JsonData eval_xf(@RequestParam(value = "audio", required = true) MultipartFile audio,
                             @RequestParam(value = "refText", required = true) String refText,
-                            @RequestParam(value = "pinyin", required = false) String pinyin,
-                            @RequestParam(value = "evalMode", required = true) long evalMode) {
+                            @RequestParam(value = "category", required = true) String category,
+                            @RequestParam(value = "pinyin", required = false) String pinyin) {
         long startTime = System.currentTimeMillis();
-        File convert = evaluateService.convert(audio);
+        File convertAudio = evaluateService.convert(audio);
         System.out.println("语音格式转换耗时：" + (System.currentTimeMillis() - startTime) + "ms");
-        Object data = evaluateService.evaluateByXF(convert, refText, pinyin, evalMode);
+        Object data = evaluateService.evaluateByXF(convertAudio, refText, pinyin, category);
         return JsonData.buildSuccess(data);
     }
 
     /**
-     * 腾讯云——语音评测
+     * 语音评测（腾讯版）
      */
     @PostMapping("eval")
     public JsonData evaluate(@RequestParam(value = "audio", required = true) MultipartFile audio,

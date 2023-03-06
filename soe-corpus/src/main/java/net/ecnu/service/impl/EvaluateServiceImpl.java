@@ -59,6 +59,19 @@ public class EvaluateServiceImpl implements EvaluateService {
     @Value("${tencent.soe.secret-key}")
     private String secretKey;
 
+    @Value("${xunfei.ve.host-url}")
+    private String hostUrl;
+
+    @Value("${xunfei.ve.appid}")
+    private String appid;
+
+    @Value("${xunfei.ve.api-secret}")
+    private String apiSecret;
+
+    @Value("${xunfei.ve.api-key}")
+    private String apiKey;
+
+
     @Autowired
     private CpsrcdManager cpsrcdManager;
 
@@ -136,22 +149,35 @@ public class EvaluateServiceImpl implements EvaluateService {
     }
 
     /**
-     * 讯飞语音评测
+     * 语音评测（讯飞版）
      */
     @Override
-    public Object evaluateByXF(File convert, String refText, String pinyin, long evalMode) {
-        String hostUrl = "https://ise-api.xfyun.cn/v2/open-ise";
-        String appid = "3adf0a1e";
-        String apiSecret = "MGEzZjQ1YTc2MzU3NDZjM2RkZmJkOWYy";
-        String apiKey = "3dc67c7ea181adb9a6c6df0f3ec5d751";
+    public Object evaluateByXF(File audio, String refText, String pinyin, String category) {
 
         String authUrl = getAuthUrl(hostUrl, apiKey, apiSecret);// 构建鉴权url
-        OkHttpClient client = new OkHttpClient.Builder().build();
         //将url中的 schema http://和https://分别替换为ws:// 和 wss://
         String url = authUrl.replace("http://", "ws://").replace("https://", "wss://");
+        OkHttpClient client = new OkHttpClient.Builder().build();
         Request request = new Request.Builder().url(url).build();
-        WebSocket webSocket = client.newWebSocket(request, new EvalListener());
-        return null;
+        EvalListener evalListener = new EvalListener();
+        evalListener.setFile(audio);
+        evalListener.setText(refText);
+        evalListener.setCategory(category);//category校验
+        WebSocket webSocket = client.newWebSocket(request, evalListener);
+        long beginTime = (new Date()).getTime();
+
+        while (evalListener.getEvalRes() == null) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        long endTime = (new Date()).getTime();
+        System.out.println("等待评测结果耗时：" + (endTime - beginTime) + "ms");
+        return ((cn.hutool.json.JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
+//        System.out.println("return message");
+//        return "message";
     }
 
     /**
@@ -303,7 +329,8 @@ public class EvaluateServiceImpl implements EvaluateService {
             byte[] hexDigits = mac.doFinal(builder.getBytes(charset));
             String sha = Base64.getEncoder().encodeToString(hexDigits);
             //System.err.println(sha);
-            String authorization = String.format("api_key=\"%s\", algorithm=\"%s\", headers=\"%s\", signature=\"%s\"", apiKey, "hmac-sha256", "host date request-line", sha);
+            String authorization = String.format("api_key=\"%s\", algorithm=\"%s\", headers=\"%s\", signature=\"%s\"",
+                    apiKey, "hmac-sha256", "host date request-line", sha);
             //System.err.println(authorization);
             HttpUrl httpUrl = HttpUrl.parse("https://" + url.getHost() + url.getPath()).newBuilder().
                     addQueryParameter("authorization", Base64.getEncoder().encodeToString(authorization.getBytes(charset))).

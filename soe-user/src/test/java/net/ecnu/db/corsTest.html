@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>跨域测试</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/bootstrap/4.5.3/css/bootstrap.min.css" >
+</head>
+<body>
+<div class="container">
+    <h1 style="margin-top:50px">跨域测试</h1>
+    <!-- Content here -->
+    <p class="text-left">API地址:</p>
+    <input type="text" style="width:600px;height:30px;font-size:14px;" id="urlText" value=""/>
+    <p>&nbsp;
+    <p/>
+    <p class="text-left">Token:</p>
+    <input type="text" style="width:600px;height:30px;font-size:14px;" id="tokenTxt"  value=""/>
+    <p>&nbsp;
+    <p/>
+    <input type="button" class="btn btn-outline-primary" id="cors" value="验证跨域"/>
+</div>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script src="https://cdn.staticfile.org/popper.js/1.8.0/popper.min.js" ></script>
+<script src="https://cdn.staticfile.org/bootstrap/4.5.3/js/bootstrap.min.js" ></script>
+
+<script type="text/javascript">
+    $("#cors").on('click', function (event) {
+        event.preventDefault();
+        var url2 = $("#urlText").val();
+        $.get({
+            contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
+            url: url2,
+            beforeSend: function (xhr) {
+                if ($("#tokenTxt").val().trim()) {
+                    /* Authorization header */
+                    xhr.setRequestHeader("Authorization", "Bearer " + $("#tokenTxt").val());
+                }
+            },
+            success: function (data) {
+                alert("success");
+            },
+            error:function(data){
+                alert("failed");
+            }
+        })
+    });
+</script>
+</body>
+</html>
+
