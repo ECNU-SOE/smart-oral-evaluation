@@ -9,23 +9,27 @@ import net.ecnu.model.common.LoginUser;
 import net.ecnu.service.JwtAuthService;
 import net.ecnu.util.JsonData;
 import net.ecnu.utils.JWTConstants;
+import net.ecnu.utils.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import java.util.Objects;
 
+//@ApiIgnore
 @RestController
 @ConditionalOnBean({JwtAuthService.class})
 @ConditionalOnProperty(name = "soe.jwt.useDefaultController",havingValue = "true")
 public class JwtAuthController {
 
-    @Resource
-    private JwtProperties jwtProperties;
+    /*@Resource
+    private JwtProperties jwtProperties;*/
 
     @Resource
     private JwtAuthService jwtAuthService;
@@ -49,7 +53,7 @@ public class JwtAuthController {
      * 支持用户在登录后定时刷新JWT令牌
      */
     @RequestMapping(JWTConstants.REFRESH_TOKEN)
-    public JsonData refresh(@RequestHeader("${soe.jwt.header}")String token){
+    public JsonData refresh(@RequestHeader("token") String token){
         try{
             String newToken = jwtAuthService.refreshToken(token);
             return JsonData.buildSuccess(newToken);

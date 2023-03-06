@@ -7,7 +7,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /**
  * 跨域配置
  */
-@Configuration//功能：将想要的组件添加到容器中
+/*@Configuration//功能：将想要的组件添加到容器中
 public class CorsConfig implements WebMvcConfigurer {
 
     @Override
@@ -19,5 +19,5 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .exposedHeaders("*");
     }
-}
+}*/
 
