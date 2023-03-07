@@ -129,12 +129,12 @@ public class EvaluateServiceImpl implements EvaluateService {
     @Override
     public File convert_lyw(MultipartFile file) {
         File source = FileUtil.transferToFile(file);
-        File target = new File("eval_audio.wav");
+        File target = new File("eval_audio.mp3");
         target.deleteOnExit();// 在虚拟机终止时，请求删除此抽象路径名表示的文件或目录。
         // 创建音频属性实例
         AudioAttributes audio = new AudioAttributes();
         // 设置编码 libmp3lame pcm_s16le
-        audio.setCodec("pcm_s16le");
+        audio.setCodec("libmp3lame");
         // 音频比特率
         audio.setBitRate(16000);
         // 声道 1 =单声道，2 =立体声
@@ -145,7 +145,7 @@ public class EvaluateServiceImpl implements EvaluateService {
         EncodingAttributes attrs = new EncodingAttributes();
         // 转码格式
 //        attrs.setOutputFormat("wav");
-        attrs.setFormat("wav");
+        attrs.setFormat("mp3");
         attrs.setAudioAttributes(audio);
         MultimediaObject sourceObj = new MultimediaObject(source);
         try {
