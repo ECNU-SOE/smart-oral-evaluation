@@ -148,6 +148,39 @@ public class EvaluateServiceImpl implements EvaluateService {
         return target;
     }
 
+
+    /**
+     * 语音评测（讯飞版）——异步
+     */
+    @Override
+    public Object evaluateByXF2(File audio, String refText, String pinyin, String category) {
+
+        String authUrl = getAuthUrl(hostUrl, apiKey, apiSecret);// 构建鉴权url
+        //将url中的 schema http://和https://分别替换为ws:// 和 wss://
+        String url = authUrl.replace("http://", "ws://").replace("https://", "wss://");
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        Request request = new Request.Builder().url(url).build();
+        EvalListener evalListener = new EvalListener();
+        evalListener.setFile(audio);
+        evalListener.setText(refText);
+        evalListener.setCategory(category);//category校验
+        WebSocket webSocket = client.newWebSocket(request, evalListener);
+//        long beginTime = (new Date()).getTime();
+//
+//        while (evalListener.getEvalRes() == null) {
+//            try {
+//                Thread.sleep(50);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        long endTime = (new Date()).getTime();
+//        System.out.println("等待评测结果耗时：" + (endTime - beginTime) + "ms");
+//        return ((cn.hutool.json.JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
+        System.out.println("return message");
+        return "message";
+    }
+
     /**
      * 语音评测（讯飞版）
      */

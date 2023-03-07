@@ -6,10 +6,9 @@
     <resultMap id="BaseResultMap" type="net.ecnu.model.CpsgrpDO">
         <id column="id" property="id" />
         <result column="type" property="type" />
+        <result column="level" property="level" />
         <result column="name" property="name" />
         <result column="description" property="description" />
-        <result column="start_time" property="startTime" />
-        <result column="end_time" property="endTime" />
         <result column="creator" property="creator" />
         <result column="gmt_create" property="gmtCreate" />
         <result column="gmt_modified" property="gmtModified" />
@@ -17,7 +16,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, `type`, `name`, description, start_time, end_time, creator, gmt_create, gmt_modified
+        id, type, level, name, description, creator, gmt_create, gmt_modified
     </sql>
 
 </mapper>
