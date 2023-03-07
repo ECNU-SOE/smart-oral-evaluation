@@ -51,8 +51,6 @@ import ws.schild.jave.MultimediaObject;
 import java.io.File;
 
 
-
-
 /**
  * <p>
  * 语料原型 服务实现类
@@ -128,39 +126,39 @@ public class EvaluateServiceImpl implements EvaluateService {
     }
 
 
-//    @Override
-//    public File convert(MultipartFile file) {
-//        File source = FileUtil.transferToFile(file);
-//        File target = new File("/Users/lyw/Desktop/tmp.wav");
-//        target.deleteOnExit();// 在虚拟机终止时，请求删除此抽象路径名表示的文件或目录。
-//        // 创建音频属性实例
-//        AudioAttributes audio = new AudioAttributes();
-//        // 设置编码 libmp3lame pcm_s16le
-//        audio.setCodec("pcm_s16le");
-//        // 音频比特率
-//        audio.setBitRate(16000);
-//        // 声道 1 =单声道，2 =立体声
-//        audio.setChannels(1);
-//        // 采样率
-//        audio.setSamplingRate(16000);
-//        // 转码属性实例
-//        EncodingAttributes attrs = new EncodingAttributes();
-//        // 转码格式
+    @Override
+    public File convert_lyw(MultipartFile file) {
+        File source = FileUtil.transferToFile(file);
+        File target = new File("eval_audio.wav");
+        target.deleteOnExit();// 在虚拟机终止时，请求删除此抽象路径名表示的文件或目录。
+        // 创建音频属性实例
+        AudioAttributes audio = new AudioAttributes();
+        // 设置编码 libmp3lame pcm_s16le
+        audio.setCodec("pcm_s16le");
+        // 音频比特率
+        audio.setBitRate(16000);
+        // 声道 1 =单声道，2 =立体声
+        audio.setChannels(1);
+        // 采样率
+        audio.setSamplingRate(16000);
+        // 转码属性实例
+        EncodingAttributes attrs = new EncodingAttributes();
+        // 转码格式
 //        attrs.setOutputFormat("wav");
-//        attrs.setAudioAttributes(audio);
-//
-//        MultimediaObject sourceObj = new MultimediaObject(source);
-//        try {
-//            Encoder encoder = new Encoder();
-//            encoder.encode(sourceObj, target, attrs);
-//        } catch (EncoderException e) {
-//            e.printStackTrace();
-//        }
-//        return target;
-//    }
+        attrs.setFormat("wav");
+        attrs.setAudioAttributes(audio);
+        MultimediaObject sourceObj = new MultimediaObject(source);
+        try {
+            Encoder encoder = new Encoder();
+            encoder.encode(sourceObj, target, attrs);
+        } catch (EncoderException e) {
+            e.printStackTrace();
+        }
+        return target;
+    }
 
     @Override
-    public File convert(MultipartFile file) {
+    public File convert_tgx(MultipartFile file) {
         File source = FileUtil.transferToFile(file);
         File target = new File("C:\\Users\\tgx\\Desktop\\tmp.mp3");
 
