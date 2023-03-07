@@ -32,12 +32,12 @@
             <version>3.1.561</version>
         </dependency>
 
-        <!--音频格式转换-->
+<!--        &lt;!&ndash;音频格式转换&ndash;&gt;
         <dependency>
             <groupId>ws.schild</groupId>
             <artifactId>jave-all-deps</artifactId>
             <version>3.3.1</version>
-        </dependency>
+        </dependency>-->
 
         <!--gson-->
         <dependency>
@@ -73,6 +73,62 @@
             <version>1.2.68</version>
             <scope>compile</scope>
         </dependency>
+
+
+
+        <!--音频格式转换相关依赖：开始-->
+        <!-- Java音频视频编码器 -->
+        <dependency>
+            <groupId>ws.schild</groupId>
+            <artifactId>jave-all-deps</artifactId>
+            <version>2.4.2</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/ws.schild/jave-core -->
+        <dependency>
+            <groupId>ws.schild</groupId>
+            <artifactId>jave-core</artifactId>
+            <version>2.4.2</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/commons-logging/commons-logging-api -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging-api</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/ws.schild/jave-native-win64 -->
+        <dependency>
+            <groupId>ws.schild</groupId>
+            <artifactId>jave-native-win64</artifactId>
+            <version>2.4.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/ws.schild/jave-native-osx64 -->
+        <dependency>
+            <groupId>ws.schild</groupId>
+            <artifactId>jave-native-osx64</artifactId>
+            <version>2.4.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/ws.schild/jave-native-linux64 -->
+        <dependency>
+            <groupId>ws.schild</groupId>
+            <artifactId>jave-native-linux64</artifactId>
+            <version>2.4.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/ws.schild/jave-native-win32 -->
+        <dependency>
+            <groupId>ws.schild</groupId>
+            <artifactId>jave-native-win32</artifactId>
+            <version>2.4.2</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/ws.schild/jave-native-linux32 -->
+        <dependency>
+            <groupId>ws.schild</groupId>
+            <artifactId>jave-native-linux32</artifactId>
+            <version>2.4.2</version>
+        </dependency>
+        <!--音频格式转换相关依赖：结束-->
 
 
     </dependencies>

@@ -28,8 +28,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ws.schild.jave.*;
-import ws.schild.jave.encode.AudioAttributes;
-import ws.schild.jave.encode.EncodingAttributes;
+//import ws.schild.jave.encode.AudioAttributes;
+//import ws.schild.jave.encode.EncodingAttributes;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -41,6 +41,17 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+
+import ws.schild.jave.AudioAttributes;
+import ws.schild.jave.Encoder;
+import ws.schild.jave.EncodingAttributes;
+import ws.schild.jave.MultimediaObject;
+
+import java.io.File;
+
+
+
 
 /**
  * <p>
@@ -117,33 +128,60 @@ public class EvaluateServiceImpl implements EvaluateService {
     }
 
 
+//    @Override
+//    public File convert(MultipartFile file) {
+//        File source = FileUtil.transferToFile(file);
+//        File target = new File("/Users/lyw/Desktop/tmp.wav");
+//        target.deleteOnExit();// 在虚拟机终止时，请求删除此抽象路径名表示的文件或目录。
+//        // 创建音频属性实例
+//        AudioAttributes audio = new AudioAttributes();
+//        // 设置编码 libmp3lame pcm_s16le
+//        audio.setCodec("pcm_s16le");
+//        // 音频比特率
+//        audio.setBitRate(16000);
+//        // 声道 1 =单声道，2 =立体声
+//        audio.setChannels(1);
+//        // 采样率
+//        audio.setSamplingRate(16000);
+//        // 转码属性实例
+//        EncodingAttributes attrs = new EncodingAttributes();
+//        // 转码格式
+//        attrs.setOutputFormat("wav");
+//        attrs.setAudioAttributes(audio);
+//
+//        MultimediaObject sourceObj = new MultimediaObject(source);
+//        try {
+//            Encoder encoder = new Encoder();
+//            encoder.encode(sourceObj, target, attrs);
+//        } catch (EncoderException e) {
+//            e.printStackTrace();
+//        }
+//        return target;
+//    }
+
     @Override
     public File convert(MultipartFile file) {
         File source = FileUtil.transferToFile(file);
-        File target = new File("/Users/lyw/Desktop/tmp.wav");
-        target.deleteOnExit();// 在虚拟机终止时，请求删除此抽象路径名表示的文件或目录。
-        // 创建音频属性实例
-        AudioAttributes audio = new AudioAttributes();
-        // 设置编码 libmp3lame pcm_s16le
-        audio.setCodec("pcm_s16le");
-        // 音频比特率
-        audio.setBitRate(16000);
-        // 声道 1 =单声道，2 =立体声
-        audio.setChannels(1);
-        // 采样率
-        audio.setSamplingRate(16000);
-        // 转码属性实例
-        EncodingAttributes attrs = new EncodingAttributes();
-        // 转码格式
-        attrs.setOutputFormat("wav");
-        attrs.setAudioAttributes(audio);
+        File target = new File("C:\\Users\\tgx\\Desktop\\tmp.mp3");
 
-        MultimediaObject sourceObj = new MultimediaObject(source);
         try {
+            AudioAttributes audio = new AudioAttributes();
+            audio.setCodec("libmp3lame");
+            audio.setBitRate(128000);
+            audio.setChannels(2);
+            audio.setSamplingRate(44100);
+            audio.setVolume(256);
+
+            EncodingAttributes attrs = new EncodingAttributes();
+            attrs.setFormat("mp3");
+            attrs.setAudioAttributes(audio);
+            // attrs.setOffset(5F);
+            // attrs.setDuration(30F);
             Encoder encoder = new Encoder();
-            encoder.encode(sourceObj, target, attrs);
-        } catch (EncoderException e) {
-            e.printStackTrace();
+            encoder.encode(new MultimediaObject(source), target, attrs);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
         return target;
     }
