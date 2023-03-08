@@ -8,6 +8,11 @@ import java.util.Date;
 
 @Data
 public class CourseReq {
+    /**
+     * 班级id
+     */
+    @NotBlank
+    private String id;
 
     /**
      * 课程id

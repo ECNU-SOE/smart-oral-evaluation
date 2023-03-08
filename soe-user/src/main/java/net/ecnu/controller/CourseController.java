@@ -6,10 +6,7 @@ import net.ecnu.service.CourseService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -25,4 +22,29 @@ public class CourseController {
         Object data = courseService.create(courseReq);
         return JsonData.buildSuccess(data);
     }
+
+    @DeleteMapping("delete")
+    public JsonData delete(@RequestBody CourseReq courseReq){
+        Object data = courseService.delete(courseReq);
+        return JsonData.buildSuccess(data);
+    }
+
+    @PutMapping("update")
+    public JsonData update(@RequestBody CourseReq courseReq){
+        Object data = courseService.update(courseReq);
+        return JsonData.buildSuccess(data);
+    }
+
+    @GetMapping("classes")
+    public JsonData getClasses(){
+        Object data = courseService.getClasses();
+        return JsonData.buildSuccess(data);
+    }
+
+    @GetMapping("courses")
+    public JsonData getCourses(@RequestBody CourseReq courseReq){
+        Object data = courseService.getCourses(courseReq);
+        return JsonData.buildSuccess(data);
+    }
+
 }
