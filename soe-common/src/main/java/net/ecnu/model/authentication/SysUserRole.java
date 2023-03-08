@@ -18,7 +18,7 @@ public class SysUserRole {
     /**
      * 用户自增id
      */
-    private Long userId;
+    private String accountNO;
 
 
 }

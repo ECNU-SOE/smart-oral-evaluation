@@ -13,6 +13,7 @@ import net.ecnu.service.authentication.SysRoleService;
 import net.ecnu.utils.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class SysRoleServiceImpl implements SysRoleService {
@@ -55,6 +57,7 @@ public class SysRoleServiceImpl implements SysRoleService {
     }
 
     @Override
+    @Transactional
     public void deleteRole(Integer id) {
         if(Objects.isNull(id)){
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"删除数据必须指定数据删除条件（主键）");
@@ -96,9 +99,11 @@ public class SysRoleServiceImpl implements SysRoleService {
     }
 
     @Override
+    @Transactional
     public void saveCheckedKeys(String accountNo, List<Integer> checkedIds) {
+        List<String> collect = checkedIds.stream().map(String::valueOf).collect(Collectors.toList());
         sysUserRoleMapper.delete(new UpdateWrapper<SysUserRole>()
                 .eq("account_no",accountNo));
-        systemMapper.insertUserRoleIds(accountNo,checkedIds);
+        systemMapper.insertUserRoleIds(accountNo,collect);
     }
 }
