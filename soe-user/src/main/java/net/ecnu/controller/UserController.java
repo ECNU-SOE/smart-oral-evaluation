@@ -32,15 +32,6 @@ public class UserController {
     /**
      * 用户注册
      */
-    @GetMapping("test")
-    public JsonData test() {
-        return JsonData.buildSuccess("data");
-    }
-
-
-    /**
-     * 用户注册
-     */
     @PostMapping("register")
     public JsonData register(@RequestBody @Validated(Create.class) UserReq userReq) {
         Object data = userService.register(userReq);
@@ -95,7 +86,7 @@ public class UserController {
     }
 
     @PostMapping("create")
-    public JsonData create(){
+    public JsonData create() {
 
         return null;
     }

@@ -14,7 +14,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 语料组(作业、试卷、测验)
+ * 课程-语料组 关系表
  * </p>
  *
  * @author LYW
@@ -22,41 +22,46 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("cpsgrp")
-public class CpsgrpDO implements Serializable {
+@TableName("course_cpsgrp")
+public class CourseCpsgrpDO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 语料组id
+     * 主键id
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private String id;
+    private Long id;
 
     /**
-     * 语料组类型
+     * 课程id
+     */
+    private String courseId;
+
+    /**
+     * 语料组id
+     */
+    private String cpsgrpId;
+
+    /**
+     * 题目组类型
      */
     private Integer type;
 
     /**
-     * 难易程度
+     * 题目组名称
      */
-    private Integer level;
+    private String title;
 
     /**
-     * 语料组名称
+     * 开始时间
      */
-    private String name;
+    private Date startTime;
 
     /**
-     * 语料组描述
+     * 截止时间
      */
-    private String description;
-
-    /**
-     * 创建者账号id
-     */
-    private String creator;
+    private Date endTime;
 
     /**
      * 创建时间

@@ -51,8 +51,6 @@ import ws.schild.jave.MultimediaObject;
 import java.io.File;
 
 
-
-
 /**
  * <p>
  * 语料原型 服务实现类
@@ -128,70 +126,103 @@ public class EvaluateServiceImpl implements EvaluateService {
     }
 
 
-//    @Override
-//    public File convert(MultipartFile file) {
-//        File source = FileUtil.transferToFile(file);
-//        File target = new File("/Users/lyw/Desktop/tmp.wav");
-//        target.deleteOnExit();// 在虚拟机终止时，请求删除此抽象路径名表示的文件或目录。
-//        // 创建音频属性实例
-//        AudioAttributes audio = new AudioAttributes();
-//        // 设置编码 libmp3lame pcm_s16le
-//        audio.setCodec("pcm_s16le");
-//        // 音频比特率
-//        audio.setBitRate(16000);
-//        // 声道 1 =单声道，2 =立体声
-//        audio.setChannels(1);
-//        // 采样率
-//        audio.setSamplingRate(16000);
-//        // 转码属性实例
-//        EncodingAttributes attrs = new EncodingAttributes();
-//        // 转码格式
-//        attrs.setOutputFormat("wav");
-//        attrs.setAudioAttributes(audio);
-//
-//        MultimediaObject sourceObj = new MultimediaObject(source);
-//        try {
-//            Encoder encoder = new Encoder();
-//            encoder.encode(sourceObj, target, attrs);
-//        } catch (EncoderException e) {
-//            e.printStackTrace();
-//        }
-//        return target;
-//    }
-
     @Override
-    public File convert(MultipartFile file) {
+    public File convert_lyw(MultipartFile file) {
         File source = FileUtil.transferToFile(file);
-        File target = new File("C:\\Users\\tgx\\Desktop\\tmp.mp3");
-
+        File target = new File("eval_audio.mp3");
+        target.deleteOnExit();// 在虚拟机终止时，请求删除此抽象路径名表示的文件或目录。
+        // 创建音频属性实例
+        AudioAttributes audio = new AudioAttributes();
+        // 设置编码 libmp3lame pcm_s16le
+        audio.setCodec("libmp3lame");
+        // 音频比特率
+        audio.setBitRate(16000);
+        // 声道 1 =单声道，2 =立体声
+        audio.setChannels(1);
+        // 采样率
+        audio.setSamplingRate(16000);
+        // 转码属性实例
+        EncodingAttributes attrs = new EncodingAttributes();
+        // 转码格式
+//        attrs.setOutputFormat("wav");
+        attrs.setFormat("mp3");
+        attrs.setAudioAttributes(audio);
+        MultimediaObject sourceObj = new MultimediaObject(source);
         try {
-            AudioAttributes audio = new AudioAttributes();
-            audio.setCodec("libmp3lame");
-            audio.setBitRate(128000);
-            audio.setChannels(2);
-            audio.setSamplingRate(44100);
-            audio.setVolume(256);
-
-            EncodingAttributes attrs = new EncodingAttributes();
-            attrs.setFormat("mp3");
-            attrs.setAudioAttributes(audio);
-            // attrs.setOffset(5F);
-            // attrs.setDuration(30F);
             Encoder encoder = new Encoder();
-            encoder.encode(new MultimediaObject(source), target, attrs);
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            encoder.encode(sourceObj, target, attrs);
+        } catch (EncoderException e) {
+            e.printStackTrace();
         }
         return target;
     }
 
+//    @Override
+//    public File convert_tgx(MultipartFile file) {
+//        File source = FileUtil.transferToFile(file);
+//        File target = new File("C:\\Users\\tgx\\Desktop\\tmp.mp3");
+//
+//        try {
+//            AudioAttributes audio = new AudioAttributes();
+//            audio.setCodec("libmp3lame");
+//            audio.setBitRate(128000);
+//            audio.setChannels(2);
+//            audio.setSamplingRate(44100);
+//            audio.setVolume(256);
+//
+//            EncodingAttributes attrs = new EncodingAttributes();
+//            attrs.setFormat("mp3");
+//            attrs.setAudioAttributes(audio);
+//            // attrs.setOffset(5F);
+//            // attrs.setDuration(30F);
+//            Encoder encoder = new Encoder();
+//            encoder.encode(new MultimediaObject(source), target, attrs);
+//
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+//        return target;
+//    }
+
+
+    /**
+     * 语音评测（讯飞版）——异步
+     */
+    @Override
+    public Object evaluateByXF2(File audio, String refText, String pinyin, String category) {
+
+        String authUrl = getAuthUrl(hostUrl, apiKey, apiSecret);// 构建鉴权url
+        //将url中的 schema http://和https://分别替换为ws:// 和 wss://
+        String url = authUrl.replace("http://", "ws://").replace("https://", "wss://");
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        Request request = new Request.Builder().url(url).build();
+        EvalListener evalListener = new EvalListener();
+        evalListener.setFile(audio);
+        evalListener.setText(refText);
+        evalListener.setCategory(category);//category校验
+        WebSocket webSocket = client.newWebSocket(request, evalListener);
+//        long beginTime = (new Date()).getTime();
+//
+//        while (evalListener.getEvalRes() == null) {
+//            try {
+//                Thread.sleep(50);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        long endTime = (new Date()).getTime();
+//        System.out.println("等待评测结果耗时：" + (endTime - beginTime) + "ms");
+//        return ((cn.hutool.json.JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
+        System.out.println("return message");
+        return "message";
+    }
 
     /**
      * 语音评测（讯飞版）
      */
     @Override
     public Object evaluateByXF(File audio, String refText, String pinyin, String category) {
+        System.out.println("text:" + refText);
 
         String authUrl = getAuthUrl(hostUrl, apiKey, apiSecret);// 构建鉴权url
         //将url中的 schema http://和https://分别替换为ws:// 和 wss://
@@ -213,7 +244,7 @@ public class EvaluateServiceImpl implements EvaluateService {
             }
         }
         long endTime = (new Date()).getTime();
-        System.out.println("等待评测结果耗时：" + (endTime - beginTime) + "ms");
+//        System.out.println("等待评测结果耗时：" + (endTime - beginTime) + "ms");
         return ((cn.hutool.json.JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
 //        System.out.println("return message");
 //        return "message";
