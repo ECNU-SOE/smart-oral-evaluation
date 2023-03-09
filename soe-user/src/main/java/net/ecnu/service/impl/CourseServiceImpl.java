@@ -1,5 +1,9 @@
 package net.ecnu.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import net.ecnu.controller.request.CourseFilterReq;
 import net.ecnu.controller.request.CourseReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
@@ -9,6 +13,7 @@ import net.ecnu.mapper.CourseMapper;
 import net.ecnu.model.CourseDO;
 import net.ecnu.model.CpsrcdDO;
 import net.ecnu.model.common.LoginUser;
+import net.ecnu.model.common.PageData;
 import net.ecnu.model.vo.CourseVO;
 import net.ecnu.service.CourseService;
 import org.springframework.beans.BeanUtils;
@@ -84,17 +89,11 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Object getClasses() {
-        List<CourseDO> courseDOS = courseMapper.selectList(null);
-        List<CourseVO> courseVOs = courseDOS.stream().map(this::beanProcess).collect(Collectors.toList());
-        return courseVOs;
-    }
-
-    @Override
-    public Object getCourses(CourseReq courseReq) {
-        List<CourseDO> courseDOS = courseManager.selectAllByCourseId(courseReq.getCourseId());
-        List<CourseVO> courseVOs = courseDOS.stream().map(this::beanProcess).collect(Collectors.toList());
-        return courseVOs;
+    public Object pageByFilter(CourseFilterReq courseFilter,Page<CourseDO> page) {
+        IPage<CourseDO> iPage = courseManager.pageByFilter(courseFilter,page);
+        PageData pageData = new PageData();
+        BeanUtils.copyProperties(iPage,pageData);
+        return pageData;
     }
 
     private CourseVO beanProcess(CourseDO courseDO) {
