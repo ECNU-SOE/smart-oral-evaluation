@@ -14,7 +14,7 @@ public interface EvaluateService {
 
     File convert_lyw(MultipartFile audio);
 
-    File convert_tgx(MultipartFile audio);
+//    File convert_tgx(MultipartFile audio);
 
     Object evaluateByXF(File audio, String refText, String pinyin, String evalMode);
 

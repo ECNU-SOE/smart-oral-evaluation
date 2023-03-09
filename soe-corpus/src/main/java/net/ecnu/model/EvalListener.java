@@ -233,7 +233,6 @@ public class EvalListener extends WebSocketListener {
                         String res = new String(decoder.decode(resp.getData().getData()), StandardCharsets.UTF_8);
                         JSONObject xmlJSONObj = XML.toJSONObject(res);
                         System.out.println("onMessage方法耗时：" + ((new Date()).getTime() - t) + "ms");
-                        System.out.println("text:" + this.text);
                         setEvalRes(xmlJSONObj);
                     } catch (Exception e) {
                         e.printStackTrace();

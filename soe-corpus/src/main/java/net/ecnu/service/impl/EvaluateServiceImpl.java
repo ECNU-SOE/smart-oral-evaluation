@@ -157,32 +157,32 @@ public class EvaluateServiceImpl implements EvaluateService {
         return target;
     }
 
-    @Override
-    public File convert_tgx(MultipartFile file) {
-        File source = FileUtil.transferToFile(file);
-        File target = new File("C:\\Users\\tgx\\Desktop\\tmp.mp3");
-
-        try {
-            AudioAttributes audio = new AudioAttributes();
-            audio.setCodec("libmp3lame");
-            audio.setBitRate(128000);
-            audio.setChannels(2);
-            audio.setSamplingRate(44100);
-            audio.setVolume(256);
-
-            EncodingAttributes attrs = new EncodingAttributes();
-            attrs.setFormat("mp3");
-            attrs.setAudioAttributes(audio);
-            // attrs.setOffset(5F);
-            // attrs.setDuration(30F);
-            Encoder encoder = new Encoder();
-            encoder.encode(new MultimediaObject(source), target, attrs);
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return target;
-    }
+//    @Override
+//    public File convert_tgx(MultipartFile file) {
+//        File source = FileUtil.transferToFile(file);
+//        File target = new File("C:\\Users\\tgx\\Desktop\\tmp.mp3");
+//
+//        try {
+//            AudioAttributes audio = new AudioAttributes();
+//            audio.setCodec("libmp3lame");
+//            audio.setBitRate(128000);
+//            audio.setChannels(2);
+//            audio.setSamplingRate(44100);
+//            audio.setVolume(256);
+//
+//            EncodingAttributes attrs = new EncodingAttributes();
+//            attrs.setFormat("mp3");
+//            attrs.setAudioAttributes(audio);
+//            // attrs.setOffset(5F);
+//            // attrs.setDuration(30F);
+//            Encoder encoder = new Encoder();
+//            encoder.encode(new MultimediaObject(source), target, attrs);
+//
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+//        return target;
+//    }
 
 
     /**
@@ -222,6 +222,7 @@ public class EvaluateServiceImpl implements EvaluateService {
      */
     @Override
     public Object evaluateByXF(File audio, String refText, String pinyin, String category) {
+        System.out.println("text:" + refText);
 
         String authUrl = getAuthUrl(hostUrl, apiKey, apiSecret);// 构建鉴权url
         //将url中的 schema http://和https://分别替换为ws:// 和 wss://
@@ -243,7 +244,7 @@ public class EvaluateServiceImpl implements EvaluateService {
             }
         }
         long endTime = (new Date()).getTime();
-        System.out.println("等待评测结果耗时：" + (endTime - beginTime) + "ms");
+//        System.out.println("等待评测结果耗时：" + (endTime - beginTime) + "ms");
         return ((cn.hutool.json.JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
 //        System.out.println("return message");
 //        return "message";
