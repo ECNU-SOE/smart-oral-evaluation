@@ -7,13 +7,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
 @Data
-public class CourseReq {
-    /**
-     * 班级id
-     */
-    @NotBlank
-    private String id;
-
+public class CourseFilterReq {
     /**
      * 课程id
      */
