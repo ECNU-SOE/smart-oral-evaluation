@@ -9,6 +9,7 @@
         <result column="order" property="order" />
         <result column="type" property="type" />
         <result column="level" property="level" />
+        <result column="weight" property="weight" />
         <result column="pinyin" property="pinyin" />
         <result column="ref_text" property="refText" />
         <result column="gmt_create" property="gmtCreate" />
@@ -17,7 +18,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, cpsgrp_id, `order`, `type`, `level`, pinyin, ref_text, gmt_create, gmt_modified
+        id, cpsgrp_id, `order`, `type`, `level`, weight, pinyin, ref_text, gmt_create, gmt_modified
     </sql>
 
 </mapper>
