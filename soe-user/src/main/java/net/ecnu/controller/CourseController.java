@@ -1,15 +1,13 @@
 package net.ecnu.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.request.CourseFilterReq;
-import net.ecnu.controller.request.CourseReq;
-import net.ecnu.model.CourseDO;
+import net.ecnu.controller.request.CourseCreateReq;
+import net.ecnu.controller.request.CourseUpdateReq;
 import net.ecnu.service.CourseService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,28 +21,23 @@ public class CourseController {
 
 
     @PostMapping("create")
-    public JsonData create(@RequestBody @Validated(Create.class) CourseReq courseReq){
-        Object data = courseService.create(courseReq);
+    public JsonData create(@RequestBody @Validated(Create.class) CourseCreateReq courseCreateReq){
+        Object data = courseService.create(courseCreateReq);
         return JsonData.buildSuccess(data);
     }
 
     @DeleteMapping("delete")
-    public JsonData delete(@RequestBody CourseReq courseReq){
-        Object data = courseService.delete(courseReq);
+    public JsonData delete(@RequestBody CourseCreateReq courseCreateReq){
+        Object data = courseService.delete(courseCreateReq);
         return JsonData.buildSuccess(data);
     }
 
     @PutMapping("update")
-    public JsonData update(@RequestBody CourseReq courseReq){
-        Object data = courseService.update(courseReq);
+    public JsonData update(@RequestBody CourseUpdateReq courseUpdateReq){
+        Object data = courseService.update(courseUpdateReq);
         return JsonData.buildSuccess(data);
     }
 
-//    @GetMapping("classes")
-//    public JsonData getClasses(){
-//        Object data = courseService.getClasses();
-//        return JsonData.buildSuccess(data);
-//    }
 
     @PostMapping("list")
     public JsonData getCourses(
@@ -54,5 +47,4 @@ public class CourseController {
         Object data = courseService.pageByFilter(courseFilter,new Page<>(cur,size));
         return JsonData.buildSuccess(data);
     }
-
 }

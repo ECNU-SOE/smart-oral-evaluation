@@ -30,7 +30,8 @@ public class CourseManagerImpl implements CourseManager {
     @Override
     public IPage<CourseDO> pageByFilter(CourseFilterReq courseFilter, Page<CourseDO> courseDOPage) {
         return courseMapper.selectPage(courseDOPage,new QueryWrapper<CourseDO>()
-                .eq("del",0)
+                        .eq("del",0)
+                        .eq("id",courseFilter.getId())
                 );
     }
 }

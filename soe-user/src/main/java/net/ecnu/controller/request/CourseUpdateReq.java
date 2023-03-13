@@ -2,28 +2,23 @@ package net.ecnu.controller.request;
 
 import lombok.Data;
 import net.ecnu.controller.group.Create;
+import net.ecnu.controller.group.Update;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
 @Data
-public class CourseReq {
+public class CourseUpdateReq {
     /**
      * 班级id
      */
-    @NotBlank
+    @NotBlank(message = "必须指定班级id",groups = {Update.class})
     private String id;
 
-    /**
-     * 课程id
-     */
-    @NotBlank(message = "必须指定课程id",groups = {Create.class})
-    private String courseId;
 
     /**
      * 课程名
      */
-    @NotBlank(message = "班级名字不能为空",groups = {Create.class})
     private String name;
 
     /**
@@ -32,7 +27,7 @@ public class CourseReq {
     private String description;
 
     /**
-     * 课程分级
+     * 班级分级
      */
     private Integer level;
 
