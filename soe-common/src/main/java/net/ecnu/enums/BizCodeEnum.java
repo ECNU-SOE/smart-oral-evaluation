@@ -16,6 +16,8 @@ public enum BizCodeEnum {
 
     CLASS_RPEAT(25006,"班级已存在"),
     CLASS_UNEXISTS(250007, "班级不存在"),
+    REPEAT_CHOOSE(250008,"重复选课"),
+    USER_COURSE_UNEXISTS(250009,"该用户已退课"),
 
     /**
      * 语料组相关

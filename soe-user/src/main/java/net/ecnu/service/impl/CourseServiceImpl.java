@@ -19,6 +19,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class CourseServiceImpl implements CourseService {
 
@@ -43,14 +46,15 @@ public class CourseServiceImpl implements CourseService {
         BeanUtils.copyProperties(courseCreateReq,csDO);
         csDO.setCreator(loginUser.getAccountNo());
         csDO.setId(courseCreateReq.getId());
+        csDO.setDel(false);
         int rows = courseMapper.insert(csDO);
         return rows;
     }
 
     @Override
-    public Object delete(CourseCreateReq courseCreateReq) {
+    public Object delete(String id) {
         //判断班级是否存在
-        CourseDO courseDO = courseMapper.selectById(courseCreateReq.getId());
+        CourseDO courseDO = courseMapper.selectById(id);
         if (courseDO==null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
@@ -59,7 +63,7 @@ public class CourseServiceImpl implements CourseService {
         if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
         if(loginUser.getRoleId()==null||loginUser.getRoleId()>3)
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
-        int i = courseMapper.deleteById(courseCreateReq.getId());
+        int i = courseMapper.deleteById(id);
         return i;
     }
 
@@ -82,11 +86,23 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Object pageByFilter(CourseFilterReq courseFilter,Page<CourseDO> page) {
-        IPage<CourseDO> iPage = courseManager.pageByFilter(courseFilter,page);
-        PageData pageData = new PageData();
-        BeanUtils.copyProperties(iPage,pageData);
+    public Object pageByFilter(CourseFilterReq courseFilter,PageData pageData) {
+        List<CourseDO> courseDOS = courseManager.pageByFilter(courseFilter,pageData);
+        int total = courseManager.countByFilter(courseFilter);
+        pageData.setTotal(total);
+        List<CourseVO> courseVOS = courseDOS.stream().map(this::beanProcess).collect(Collectors.toList());
+        pageData.setRecords(courseVOS);
         return pageData;
+    }
+
+    @Override
+    public Object getById(String id) {
+        CourseDO courseDO = courseMapper.selectById(id);
+        if (courseDO==null)
+            throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
+        CourseVO courseVO = new CourseVO();
+        BeanUtils.copyProperties(courseDO,courseVO);
+        return courseVO;
     }
 
     private CourseVO beanProcess(CourseDO courseDO) {

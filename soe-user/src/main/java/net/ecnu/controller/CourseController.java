@@ -5,6 +5,7 @@ import net.ecnu.controller.group.Create;
 import net.ecnu.controller.request.CourseFilterReq;
 import net.ecnu.controller.request.CourseCreateReq;
 import net.ecnu.controller.request.CourseUpdateReq;
+import net.ecnu.model.common.PageData;
 import net.ecnu.service.CourseService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +27,9 @@ public class CourseController {
         return JsonData.buildSuccess(data);
     }
 
-    @DeleteMapping("delete")
-    public JsonData delete(@RequestBody CourseCreateReq courseCreateReq){
-        Object data = courseService.delete(courseCreateReq);
+    @DeleteMapping("/delete/{id}")
+    public JsonData delete(@PathVariable("id") String id){
+        Object data = courseService.delete(id);
         return JsonData.buildSuccess(data);
     }
 
@@ -44,7 +45,16 @@ public class CourseController {
             @RequestParam(value = "cur",defaultValue = "1") int cur,
             @RequestParam(value = "size",defaultValue = "50") int size,
             @RequestBody CourseFilterReq courseFilter){
-        Object data = courseService.pageByFilter(courseFilter,new Page<>(cur,size));
+        Object data = courseService.pageByFilter(courseFilter,new PageData(cur,size));
         return JsonData.buildSuccess(data);
     }
+
+    @GetMapping("/info/{id}")
+    public JsonData getCourse(@PathVariable("id") String id){
+        Object data = courseService.getById(id);
+        return JsonData.buildSuccess(data);
+    }
+
+
+
 }
