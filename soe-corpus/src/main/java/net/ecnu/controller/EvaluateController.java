@@ -83,6 +83,7 @@ public class EvaluateController {
     }
 
 
+    @Deprecated
     @GetMapping("details")
     public JsonData details(@RequestParam String cpsgrpId) {
         Object data = evaluateService.getCorpusesByGroupId(cpsgrpId);
