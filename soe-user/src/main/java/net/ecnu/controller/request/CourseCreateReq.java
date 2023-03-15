@@ -7,11 +7,11 @@ import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
 @Data
-public class CourseReq {
+public class CourseCreateReq {
     /**
      * 班级id
      */
-    @NotBlank
+    @NotBlank(message = "必须指定班级id",groups = {Create.class})
     private String id;
 
     /**
@@ -32,7 +32,7 @@ public class CourseReq {
     private String description;
 
     /**
-     * 课程分级
+     * 班级分级
      */
     private Integer level;
 

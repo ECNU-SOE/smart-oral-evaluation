@@ -17,7 +17,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 //添加拦截的路径
                 .addPathPatterns("/api/user/v1/info2")
                 .addPathPatterns("/api/course/v1/create")
-                .addPathPatterns("/api/course/v1/delete")
+                .addPathPatterns("/api/course/v1/delete/{id}")
                 .addPathPatterns("/api/course/v1/update")
 
                 //排除不拦截

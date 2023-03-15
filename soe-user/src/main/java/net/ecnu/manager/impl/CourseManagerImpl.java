@@ -8,6 +8,7 @@ import net.ecnu.controller.request.CourseFilterReq;
 import net.ecnu.manager.CourseManager;
 import net.ecnu.mapper.CourseMapper;
 import net.ecnu.model.CourseDO;
+import net.ecnu.model.common.PageData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,17 +21,17 @@ public class CourseManagerImpl implements CourseManager {
     private CourseMapper courseMapper;
 
     @Override
-    public List<CourseDO> selectByCourseId(String courseId) {
-        List<CourseDO> courseDOS = courseMapper.selectList(new QueryWrapper<CourseDO>()
-                .eq("course_id", courseId)
-                .eq("del", 0));
-        return courseDOS;
+    public List<CourseDO> pageByFilter(CourseFilterReq courseFilter, PageData pageData) {
+        return courseMapper.selectPage(new Page<CourseDO>(pageData.getCurrent(),pageData.getSize()),
+                new QueryWrapper<CourseDO>()
+                .eq("del", 0)
+        ).getRecords();
     }
 
     @Override
-    public IPage<CourseDO> pageByFilter(CourseFilterReq courseFilter, Page<CourseDO> courseDOPage) {
-        return courseMapper.selectPage(courseDOPage,new QueryWrapper<CourseDO>()
+    public int countByFilter(CourseFilterReq courseFilterReq) {
+        return courseMapper.selectCount(new QueryWrapper<CourseDO>()
                 .eq("del",0)
-                );
+        );
     }
 }
