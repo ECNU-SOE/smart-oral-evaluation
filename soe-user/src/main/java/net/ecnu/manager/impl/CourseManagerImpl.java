@@ -1,10 +1,9 @@
 package net.ecnu.manager.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
-import net.ecnu.controller.request.CourseFilterReq;
+import net.ecnu.controller.request.CourFilterReq;
 import net.ecnu.manager.CourseManager;
 import net.ecnu.mapper.CourseMapper;
 import net.ecnu.model.CourseDO;
@@ -21,7 +20,7 @@ public class CourseManagerImpl implements CourseManager {
     private CourseMapper courseMapper;
 
     @Override
-    public List<CourseDO> pageByFilter(CourseFilterReq courseFilter, PageData pageData) {
+    public List<CourseDO> pageByFilter(CourFilterReq courseFilter, PageData pageData) {
         return courseMapper.selectPage(new Page<CourseDO>(pageData.getCurrent(),pageData.getSize()),
                 new QueryWrapper<CourseDO>()
                 .eq("del", 0)
@@ -29,7 +28,7 @@ public class CourseManagerImpl implements CourseManager {
     }
 
     @Override
-    public int countByFilter(CourseFilterReq courseFilterReq) {
+    public int countByFilter(CourFilterReq courFilterReq) {
         return courseMapper.selectCount(new QueryWrapper<CourseDO>()
                 .eq("del",0)
         );

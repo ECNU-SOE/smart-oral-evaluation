@@ -1,15 +1,12 @@
 package net.ecnu.controller.request;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import net.ecnu.controller.group.Create;
 
 import javax.validation.constraints.NotBlank;
-import java.util.Date;
 
 @Data
-public class UserCourseCreateReq {
+public class UsrCourAddReq {
 
     @NotBlank(message = "用户账号不能为空",groups = {Create.class})
     private String accountNo;

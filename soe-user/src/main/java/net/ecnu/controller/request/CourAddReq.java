@@ -7,20 +7,23 @@ import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
 @Data
-public class CourseFilterReq {
+public class CourAddReq {
     /**
      * 班级id
      */
+    @NotBlank(message = "必须指定班级id",groups = {Create.class})
     private String id;
 
     /**
      * 课程id
      */
+    @NotBlank(message = "必须指定课程id",groups = {Create.class})
     private String courseId;
 
     /**
      * 课程名
      */
+    @NotBlank(message = "班级名字不能为空",groups = {Create.class})
     private String name;
 
     /**
@@ -29,7 +32,7 @@ public class CourseFilterReq {
     private String description;
 
     /**
-     * 课程分级
+     * 班级分级
      */
     private Integer level;
 
@@ -42,11 +45,5 @@ public class CourseFilterReq {
      * 结束时间
      */
     private Date endTime;
-
-    /**
-     * 课程创建者
-     */
-    private String creator;
-
 
 }

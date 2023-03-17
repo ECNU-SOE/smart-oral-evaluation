@@ -1,10 +1,8 @@
 package net.ecnu.service.impl;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import net.ecnu.controller.request.CourseFilterReq;
-import net.ecnu.controller.request.CourseCreateReq;
-import net.ecnu.controller.request.CourseUpdateReq;
+import net.ecnu.controller.request.CourFilterReq;
+import net.ecnu.controller.request.CourAddReq;
+import net.ecnu.controller.request.CourUpdateReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.interceptor.LoginInterceptor;
@@ -31,9 +29,9 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private CourseManager courseManager;
     @Override
-    public Object create(CourseCreateReq courseCreateReq) {
+    public Object create(CourAddReq courAddReq) {
         //检验数据库唯一性
-        CourseDO  courseDO= courseMapper.selectById(courseCreateReq.getId());
+        CourseDO  courseDO= courseMapper.selectById(courAddReq.getId());
         if (courseDO!=null)
             throw new BizException(BizCodeEnum.CLASS_RPEAT);
 
@@ -43,9 +41,9 @@ public class CourseServiceImpl implements CourseService {
         if(loginUser.getRoleId()==null||loginUser.getRoleId()>3)
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         CourseDO csDO = new CourseDO();
-        BeanUtils.copyProperties(courseCreateReq,csDO);
+        BeanUtils.copyProperties(courAddReq,csDO);
         csDO.setCreator(loginUser.getAccountNo());
-        csDO.setId(courseCreateReq.getId());
+        csDO.setId(courAddReq.getId());
         csDO.setDel(false);
         int rows = courseMapper.insert(csDO);
         return rows;
@@ -68,9 +66,9 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Object update(CourseUpdateReq courseUpdateReq) {
+    public Object update(CourUpdateReq courUpdateReq) {
         //判断班级是否存在
-        CourseDO courseDO = courseMapper.selectById(courseUpdateReq.getId());
+        CourseDO courseDO = courseMapper.selectById(courUpdateReq.getId());
         if (courseDO==null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
 
@@ -80,13 +78,13 @@ public class CourseServiceImpl implements CourseService {
         if(loginUser.getRoleId()==null||loginUser.getRoleId()>3)
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         CourseDO csDO = new CourseDO();
-        BeanUtils.copyProperties(courseUpdateReq,csDO);
+        BeanUtils.copyProperties(courUpdateReq,csDO);
         int rows = courseMapper.updateById(csDO);
         return rows;
     }
 
     @Override
-    public Object pageByFilter(CourseFilterReq courseFilter,PageData pageData) {
+    public Object pageByFilter(CourFilterReq courseFilter, PageData pageData) {
         List<CourseDO> courseDOS = courseManager.pageByFilter(courseFilter,pageData);
         int total = courseManager.countByFilter(courseFilter);
         pageData.setTotal(total);
