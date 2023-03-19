@@ -59,7 +59,7 @@ public class CpsgrpManagerImpl implements CpsgrpManager {
         //处理cpsrcdVOS题目列表
         List<CpsrcdDO> cpsrcdDOS = cpsrcdManager.listByCpsgrpId(cpsgrpId);
         List<CpsrcdVO> cpsrcdVOS = cpsrcdDOS.stream().map(this::beanProcess).collect(Collectors.toList());
-        cpsgrpVO.setCpsrcdList(cpsrcdVOS);
+//        cpsgrpVO.setCpsrcdList(cpsrcdVOS);
         return cpsgrpVO;
     }
 

@@ -5,10 +5,10 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="net.ecnu.model.CorpusDO">
         <id column="id" property="id" />
-        <result column="type" property="type" />
-        <result column="level" property="level" />
         <result column="pinyin" property="pinyin" />
         <result column="ref_text" property="refText" />
+        <result column="eval_mode" property="evalMode" />
+        <result column="difficulty" property="difficulty" />
         <result column="creator" property="creator" />
         <result column="del" property="del" />
         <result column="gmt_create" property="gmtCreate" />
@@ -17,7 +17,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, `type`, `level`, pinyin, ref_text, creator, del, gmt_create, gmt_modified
+        id, pinyin, ref_text, eval_mode, difficulty, creator, del, gmt_create, gmt_modified
     </sql>
 
 </mapper>

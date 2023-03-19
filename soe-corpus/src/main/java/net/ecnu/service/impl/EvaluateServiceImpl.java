@@ -12,8 +12,6 @@ import net.ecnu.mapper.CpsgrpMapper;
 import net.ecnu.model.CpsgrpDO;
 import net.ecnu.model.CpsrcdDO;
 import net.ecnu.model.EvalListener;
-import net.ecnu.model.vo.CpsgrpVO2;
-import net.ecnu.model.vo.CpsrcdVO2;
 import net.ecnu.model.vo.EvalResultVO;
 import net.ecnu.service.EvaluateService;
 import net.ecnu.util.CommonUtil;
@@ -299,82 +297,82 @@ public class EvaluateServiceImpl implements EvaluateService {
     }
 
 
-    @Override
-    public Object getCorpusesByGroupId(String cpsgrpId) {
-        List<CpsrcdDO> cpsrcdDOS = cpsrcdManager.listByCpsgrpId(cpsgrpId);
-        CpsgrpDO cpsgrp = cpsgrpMapper.selectById(cpsgrpId);
-        CpsgrpVO2 cpsgrpVO = new CpsgrpVO2();
-        BeanUtils.copyProperties(cpsgrp, cpsgrpVO);
-        List<JSONObject> list = new ArrayList<>();
-        for (CpsrcdDO cpsrcd : cpsrcdDOS) {
-            JSONObject o = new JSONObject();
-            //如果list为空则创建list的第一项
-            if (cpsrcd.getType() == 1) {
-                boolean exist = false;
-                //否则遍历list，查看是否已经存在对应type的项
-                for (JSONObject jsonObject : list) {
-                    if ((int) jsonObject.get("type") == 1)
-                        exist = true;
-                }
-                //如果list为空,或者list中不存在对应type的项则新建cpsrcdVO加入corpus_list
-                if (!exist || list.isEmpty()) {
-                    o.put("type", cpsrcd.getType());
-                    List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
-                    CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
-                    BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
-                    cpsrcdVO2s.add(cpsrcdVO2);
-                    o.put("corpus_list", cpsrcdVO2s);
-                    list.add(o);
-                } else {
-                    //找到list中对应的项并插入
-                    for (JSONObject jsonObject : list) {
-                        List<CpsrcdVO2> temp_list = (List<CpsrcdVO2>) jsonObject.get("corpus_list");
-                        if ((int) jsonObject.get("type") == 1) {
-                            CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
-                            BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
-                            temp_list.add(cpsrcdVO2);
-                        }
-                    }
-                }
-            } else if (cpsrcd.getType() == 2) {
-                boolean exist = false;
-                for (JSONObject jsonObject : list) {
-                    if ((int) jsonObject.get("type") == 2)
-                        exist = true;
-                }
-                if (!exist || list.isEmpty()) {
-                    o.put("type", cpsrcd.getType());
-                    List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
-                    CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
-                    BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
-                    cpsrcdVO2s.add(cpsrcdVO2);
-                    o.put("corpus_list", cpsrcdVO2s);
-                    list.add(o);
-                } else {
-                    //找到list中对应的项并插入
-                    for (JSONObject jsonObject : list) {
-                        List<CpsrcdVO2> temp_list = (List<CpsrcdVO2>) jsonObject.get("corpus_list");
-                        if ((int) jsonObject.get("type") == 2) {
-                            CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
-                            BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
-                            temp_list.add(cpsrcdVO2);
-                        }
-                    }
-                }
-            } else {
-                o.put("type", cpsrcd.getType());
-                List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
-                CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
-                BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
-                cpsrcdVO2s.add(cpsrcdVO2);
-                o.put("corpus_list", cpsrcdVO2s);
-                list.add(o);
-            }
-
-        }
-        cpsgrpVO.setCpsrcdList(list);
-        return cpsgrpVO;
-    }
+//    @Override
+//    public Object getCorpusesByGroupId(String cpsgrpId) {
+//        List<CpsrcdDO> cpsrcdDOS = cpsrcdManager.listByCpsgrpId(cpsgrpId);
+//        CpsgrpDO cpsgrp = cpsgrpMapper.selectById(cpsgrpId);
+//        CpsgrpVO2 cpsgrpVO = new CpsgrpVO2();
+//        BeanUtils.copyProperties(cpsgrp, cpsgrpVO);
+//        List<JSONObject> list = new ArrayList<>();
+//        for (CpsrcdDO cpsrcd : cpsrcdDOS) {
+//            JSONObject o = new JSONObject();
+//            //如果list为空则创建list的第一项
+//            if (cpsrcd.getType() == 1) {
+//                boolean exist = false;
+//                //否则遍历list，查看是否已经存在对应type的项
+//                for (JSONObject jsonObject : list) {
+//                    if ((int) jsonObject.get("type") == 1)
+//                        exist = true;
+//                }
+//                //如果list为空,或者list中不存在对应type的项则新建cpsrcdVO加入corpus_list
+//                if (!exist || list.isEmpty()) {
+//                    o.put("type", cpsrcd.getType());
+//                    List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
+//                    CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
+//                    BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
+//                    cpsrcdVO2s.add(cpsrcdVO2);
+//                    o.put("corpus_list", cpsrcdVO2s);
+//                    list.add(o);
+//                } else {
+//                    //找到list中对应的项并插入
+//                    for (JSONObject jsonObject : list) {
+//                        List<CpsrcdVO2> temp_list = (List<CpsrcdVO2>) jsonObject.get("corpus_list");
+//                        if ((int) jsonObject.get("type") == 1) {
+//                            CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
+//                            BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
+//                            temp_list.add(cpsrcdVO2);
+//                        }
+//                    }
+//                }
+//            } else if (cpsrcd.getType() == 2) {
+//                boolean exist = false;
+//                for (JSONObject jsonObject : list) {
+//                    if ((int) jsonObject.get("type") == 2)
+//                        exist = true;
+//                }
+//                if (!exist || list.isEmpty()) {
+//                    o.put("type", cpsrcd.getType());
+//                    List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
+//                    CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
+//                    BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
+//                    cpsrcdVO2s.add(cpsrcdVO2);
+//                    o.put("corpus_list", cpsrcdVO2s);
+//                    list.add(o);
+//                } else {
+//                    //找到list中对应的项并插入
+//                    for (JSONObject jsonObject : list) {
+//                        List<CpsrcdVO2> temp_list = (List<CpsrcdVO2>) jsonObject.get("corpus_list");
+//                        if ((int) jsonObject.get("type") == 2) {
+//                            CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
+//                            BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
+//                            temp_list.add(cpsrcdVO2);
+//                        }
+//                    }
+//                }
+//            } else {
+//                o.put("type", cpsrcd.getType());
+//                List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
+//                CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
+//                BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
+//                cpsrcdVO2s.add(cpsrcdVO2);
+//                o.put("corpus_list", cpsrcdVO2s);
+//                list.add(o);
+//            }
+//
+//        }
+//        cpsgrpVO.setCpsrcdList(list);
+//        return cpsgrpVO;
+//    }
 
     /**
      * 讯飞鉴权

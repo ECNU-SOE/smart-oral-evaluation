@@ -25,14 +25,14 @@ public class CpsgrpVO implements Serializable {
     private String id;
 
     /**
-     * 语料组名称
+     * 所属课程id
      */
-    private String name;
+    private String courseId;
 
     /**
-     * 语料组类型
+     * 语料组名称
      */
-    private Integer type;
+    private String title;
 
     /**
      * 语料组描述
@@ -40,12 +40,22 @@ public class CpsgrpVO implements Serializable {
     private String description;
 
     /**
-     * 语料组题目数量
+     * 语料组类型
      */
-    private Integer cpsrcdNum;
+    private Integer type;
 
     /**
-     * 开始时间
+     * 难易程度
+     */
+    private Integer difficulty;
+
+    /**
+     * 公开类型
+     */
+    private Integer isPublic;
+
+    /**
+     * 起始时间
      */
     private Date startTime;
 
@@ -70,9 +80,9 @@ public class CpsgrpVO implements Serializable {
     private Date gmtModified;
 
     /**
-     * 题目列表
+     * topic大题列表
      */
-    private List<CpsrcdVO> cpsrcdList;
+    private List<TopicVO> topics;
 
 
 }

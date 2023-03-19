@@ -1,7 +1,8 @@
 package net.ecnu.controller;
 
 
-import net.ecnu.controller.request.CpsgrpCreateReq;
+import net.ecnu.controller.group.Create;
+import net.ecnu.controller.request.CpsgrpReq;
 import net.ecnu.controller.request.CpsgrpFilterReq;
 import net.ecnu.controller.request.TranscriptReq;
 import net.ecnu.model.common.PageData;
@@ -39,11 +40,11 @@ public class CpsgrpController {
     }
 
     /**
-     * 创建语料组（试卷，作业，测验等类型）
+     * 创建语料组cpsgrp
      */
     @PostMapping("create")
-    public JsonData create(@RequestBody CpsgrpCreateReq cpsgrpCreateReq) {
-        Object data = cpsgrpService.create(cpsgrpCreateReq);
+    public JsonData create(@RequestBody @Validated(Create.class) CpsgrpReq cpsgrpReq) {
+        Object data = cpsgrpService.create(cpsgrpReq);
         return JsonData.buildSuccess(data);
     }
 
@@ -59,6 +60,7 @@ public class CpsgrpController {
     /**
      * 生成语料组 答题报告transcript
      */
+    @Deprecated
     @PostMapping("transcript")
     public JsonData transcript(@RequestBody @Validated TranscriptReq transcriptReq) {
         Object data = cpsgrpService.genTranscript(transcriptReq);//生成报告

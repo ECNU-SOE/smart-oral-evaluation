@@ -24,8 +24,6 @@ public class CpsrcdManagerImpl implements CpsrcdManager {
     public List<CpsrcdDO> listByCpsgrpId(String cpsgrpId) {
         return cpsrcdMapper.selectList(new QueryWrapper<CpsrcdDO>()
                 .eq("cpsgrp_id", cpsgrpId)
-                .orderByAsc("type")
-                .orderByAsc("`order`")
         );
     }
 
