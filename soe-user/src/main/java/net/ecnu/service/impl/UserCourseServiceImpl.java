@@ -1,7 +1,7 @@
 package net.ecnu.service.impl;
 
-import net.ecnu.controller.request.UserCourseCreateReq;
-import net.ecnu.controller.request.UserCourseFilterReq;
+import net.ecnu.controller.request.UsrCourAddReq;
+import net.ecnu.controller.request.UsrCourFilterReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.manager.UserCourseManager;
@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -44,24 +43,24 @@ public class UserCourseServiceImpl extends ServiceImpl<UserCourseMapper, UserCou
     @Autowired
     private CourseMapper courseMapper;
     @Override
-    public Object create(UserCourseCreateReq userCourseCreateReq) {
-        System.out.println("userCourseCreateReq.getAccountNo() = " + userCourseCreateReq.getAccountNo());
-        System.out.println("userCourseCreateReq.getCourseId() = " + userCourseCreateReq.getCourseId());
+    public Object create(UsrCourAddReq usrCourAddReq) {
+        System.out.println("userCourseCreateReq.getAccountNo() = " + usrCourAddReq.getAccountNo());
+        System.out.println("userCourseCreateReq.getCourseId() = " + usrCourAddReq.getCourseId());
         //判断请求的用户正确性
-        UserDO userDO = userMapper.selectById(userCourseCreateReq.getAccountNo());
+        UserDO userDO = userMapper.selectById(usrCourAddReq.getAccountNo());
         if (userDO==null)
             throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
         //判断请求的班级正确性
-        CourseDO courseDO = courseMapper.selectById(userCourseCreateReq.getCourseId());
+        CourseDO courseDO = courseMapper.selectById(usrCourAddReq.getCourseId());
         if (courseDO==null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         //判断是否重复选课
-        UserCourseDO userCourseDO1 = userCourseManager.getByAccountNoAndCourseId(userCourseCreateReq.getAccountNo(),
-                userCourseCreateReq.getCourseId());
+        UserCourseDO userCourseDO1 = userCourseManager.getByAccountNoAndCourseId(usrCourAddReq.getAccountNo(),
+                usrCourAddReq.getCourseId());
         if (userCourseDO1!=null)
             throw new BizException(BizCodeEnum.REPEAT_CHOOSE);
         UserCourseDO userCourseDO = new UserCourseDO();
-        BeanUtils.copyProperties(userCourseCreateReq,userCourseDO);
+        BeanUtils.copyProperties(usrCourAddReq,userCourseDO);
         userCourseDO.setRType(userDO.getRoleId());
         int rows = userCourseMapper.insert(userCourseDO);
         return rows;
@@ -77,7 +76,7 @@ public class UserCourseServiceImpl extends ServiceImpl<UserCourseMapper, UserCou
     }
 
     @Override
-    public Object pageByFilter(UserCourseFilterReq userCourseFilter, PageData pageData) {
+    public Object pageByFilter(UsrCourFilterReq userCourseFilter, PageData pageData) {
         List<UserCourseDO> userCourseDOS = userCourseManager.pageByFilter(userCourseFilter, pageData);
         int total = userCourseManager.countByFilter(userCourseFilter);
         pageData.setTotal(total);

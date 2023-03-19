@@ -1,13 +1,11 @@
 package net.ecnu.controller.request;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-public class UserCourseFilterReq {
+public class UsrCourFilterReq {
 
     private Long id;
 

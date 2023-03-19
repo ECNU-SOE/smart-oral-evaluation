@@ -1,8 +1,7 @@
 package net.ecnu.service;
 
-import net.ecnu.controller.request.CourseFilterReq;
-import net.ecnu.controller.request.UserCourseCreateReq;
-import net.ecnu.controller.request.UserCourseFilterReq;
+import net.ecnu.controller.request.UsrCourAddReq;
+import net.ecnu.controller.request.UsrCourFilterReq;
 import net.ecnu.model.UserCourseDO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import net.ecnu.model.common.PageData;
@@ -17,7 +16,7 @@ import net.ecnu.model.common.PageData;
  */
 public interface UserCourseService extends IService<UserCourseDO> {
 
-    Object create(UserCourseCreateReq userCourseCreateReq);
+    Object create(UsrCourAddReq usrCourAddReq);
     Object delete(String id);
-    Object pageByFilter(UserCourseFilterReq userCourseFilter, PageData pageData);
+    Object pageByFilter(UsrCourFilterReq userCourseFilter, PageData pageData);
 }

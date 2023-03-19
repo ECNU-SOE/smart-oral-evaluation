@@ -1,20 +1,20 @@
 package net.ecnu.controller.request;
 
 import lombok.Data;
-import net.ecnu.controller.group.Create;
-import net.ecnu.controller.group.Update;
 
-import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
 @Data
-public class CourseUpdateReq {
+public class CourFilterReq {
     /**
      * 班级id
      */
-    @NotBlank(message = "必须指定班级id",groups = {Update.class})
     private String id;
 
+    /**
+     * 课程id
+     */
+    private String courseId;
 
     /**
      * 课程名
@@ -27,7 +27,7 @@ public class CourseUpdateReq {
     private String description;
 
     /**
-     * 班级分级
+     * 课程分级
      */
     private Integer level;
 
@@ -40,5 +40,11 @@ public class CourseUpdateReq {
      * 结束时间
      */
     private Date endTime;
+
+    /**
+     * 课程创建者
+     */
+    private String creator;
+
 
 }
