@@ -1,5 +1,7 @@
 package net.ecnu.model;
 
+import java.math.BigDecimal;
+
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -19,7 +21,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author LYW
- * @since 2022-11-03
+ * @since 2023-03-12
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -31,7 +33,7 @@ public class CpsrcdDO implements Serializable {
     /**
      * 主键id
      */
-    @TableId(value = "id", type = IdType.NONE)
+    @TableId(value = "id", type = IdType.AUTO)
     private String id;
 
     /**
@@ -53,7 +55,13 @@ public class CpsrcdDO implements Serializable {
     /**
      * 语料难度
      */
+    @TableField(value = "`level`")
     private Integer level;
+
+    /**
+     * 本题分值
+     */
+    private BigDecimal weight;
 
     /**
      * 语料内容拼音

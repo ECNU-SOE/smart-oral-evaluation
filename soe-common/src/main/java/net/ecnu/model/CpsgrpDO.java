@@ -18,7 +18,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author LYW
- * @since 2022-11-02
+ * @since 2023-03-03
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -30,13 +30,18 @@ public class CpsgrpDO implements Serializable {
     /**
      * 语料组id
      */
-    @TableId(value = "id", type = IdType.NONE)
+    @TableId(value = "id", type = IdType.AUTO)
     private String id;
 
     /**
      * 语料组类型
      */
     private Integer type;
+
+    /**
+     * 难易程度
+     */
+    private Integer level;
 
     /**
      * 语料组名称
@@ -47,16 +52,6 @@ public class CpsgrpDO implements Serializable {
      * 语料组描述
      */
     private String description;
-
-    /**
-     * 开始时间
-     */
-    private Date startTime;
-
-    /**
-     * 截止时间
-     */
-    private Date endTime;
 
     /**
      * 创建者账号id

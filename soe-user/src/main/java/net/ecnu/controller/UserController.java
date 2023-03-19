@@ -25,15 +25,6 @@ public class UserController {
     /**
      * 用户注册
      */
-    @GetMapping("test")
-    public JsonData test() {
-        return JsonData.buildSuccess("data");
-    }
-
-
-    /**
-     * 用户注册
-     */
     @ApiOperation("用户注册")
     @PostMapping("register")
     public JsonData register(@RequestBody @Validated(Create.class) UserReq userReq) {
@@ -90,11 +81,5 @@ public class UserController {
             return JsonData.buildSuccess();
         else
             return JsonData.buildError("短信发送错误");
-    }
-
-    @PostMapping("create")
-    public JsonData create(){
-
-        return null;
     }
 }

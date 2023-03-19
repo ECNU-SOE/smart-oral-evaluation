@@ -39,7 +39,7 @@ public class CourseDO implements Serializable {
     /**
      * 班级id
      */
-    private String classId;
+    private String courseId;
 
     /**
      * 课程描述

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -44,6 +45,11 @@ public class CpsrcdVO implements Serializable {
      * 语料难度
      */
     private Integer level;
+
+    /**
+     * 本题分值
+     */
+    private BigDecimal weight;
 
     /**
      * 语料内容拼音

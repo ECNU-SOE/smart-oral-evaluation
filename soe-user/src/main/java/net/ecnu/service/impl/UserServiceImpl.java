@@ -17,8 +17,8 @@ import net.ecnu.manager.UserManager;
 import net.ecnu.mapper.UserMapper;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.UserDO;
-import net.ecnu.model.vo.UserVO;
 import net.ecnu.model.dto.UserDTO;
+import net.ecnu.model.vo.UserVO;
 import net.ecnu.service.UserService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.JWTUtil;
@@ -29,10 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.List;
 
 
 @Service

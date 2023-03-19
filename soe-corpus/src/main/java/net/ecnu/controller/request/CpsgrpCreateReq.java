@@ -26,17 +26,17 @@ public class CpsgrpCreateReq {
      */
     private String description;
 
-    /**
-     * 开始时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date startTime;
-
-    /**
-     * 截止时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date endTime;
+//    /**
+//     * 开始时间
+//     */
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+//    private Date startTime;
+//
+//    /**
+//     * 截止时间
+//     */
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+//    private Date endTime;
 
     /**
      * 题目组包含的语料原型
