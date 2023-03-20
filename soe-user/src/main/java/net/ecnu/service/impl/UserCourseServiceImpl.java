@@ -39,13 +39,10 @@ public class UserCourseServiceImpl extends ServiceImpl<UserCourseMapper, UserCou
 
     @Autowired
     private UserMapper userMapper;
-
     @Autowired
     private CourseMapper courseMapper;
     @Override
-    public Object create(UsrCourAddReq usrCourAddReq) {
-        System.out.println("userCourseCreateReq.getAccountNo() = " + usrCourAddReq.getAccountNo());
-        System.out.println("userCourseCreateReq.getCourseId() = " + usrCourAddReq.getCourseId());
+    public Object add(UsrCourAddReq usrCourAddReq) {
         //判断请求的用户正确性
         UserDO userDO = userMapper.selectById(usrCourAddReq.getAccountNo());
         if (userDO==null)

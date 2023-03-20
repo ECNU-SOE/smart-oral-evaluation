@@ -23,18 +23,18 @@ public class CourseController {
 
     @PostMapping("add")
     public JsonData add(@RequestBody @Validated(Create.class) CourAddReq courAddReq){
-        Object data = courseService.create(courAddReq);
+        Object data = courseService.add(courAddReq);
         return JsonData.buildSuccess(data);
     }
 
     @PostMapping("add_user_cour")
-    public JsonData add_user_course(@RequestBody UsrCourAddReq usrCourAddReq){
-        Object data = userCourseService.create(usrCourAddReq);
+    public JsonData add_user_cour(@RequestBody UsrCourAddReq usrCourAddReq){
+        Object data = userCourseService.add(usrCourAddReq);
         return JsonData.buildSuccess(data);
     }
 
     @DeleteMapping("/del/{id}")
-    public JsonData delete(@PathVariable("id") String id){
+    public JsonData del(@PathVariable("id") String id){
         Object data = courseService.delete(id);
         return JsonData.buildSuccess(data);
     }
@@ -53,7 +53,7 @@ public class CourseController {
 
 
     @PostMapping("list")
-    public JsonData getCourses(
+    public JsonData list(
             @RequestParam(value = "cur",defaultValue = "1") int cur,
             @RequestParam(value = "size",defaultValue = "50") int size,
             @RequestBody CourFilterReq courseFilter){
