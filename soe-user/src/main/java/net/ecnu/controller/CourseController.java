@@ -33,19 +33,19 @@ public class CourseController {
         return JsonData.buildSuccess(data);
     }
 
-    @DeleteMapping("/del/{id}")
+    @GetMapping("/del/{id}")
     public JsonData del(@PathVariable("id") String id){
         Object data = courseService.delete(id);
         return JsonData.buildSuccess(data);
     }
 
-    @DeleteMapping("/del_user_cour/{id}")
+    @GetMapping("/del_user_cour/{id}")
     public JsonData del_user_cour(@PathVariable("id") String id){
         Object data = userCourseService.delete(id);
         return JsonData.buildSuccess(data);
     }
 
-    @PutMapping("update")
+    @PostMapping("update")
     public JsonData update(@RequestBody CourUpdateReq courUpdateReq){
         Object data = courseService.update(courUpdateReq);
         return JsonData.buildSuccess(data);
