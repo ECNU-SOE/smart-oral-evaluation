@@ -19,4 +19,5 @@ public interface UserCourseService extends IService<UserCourseDO> {
     Object add(UsrCourAddReq usrCourAddReq);
     Object delete(String id);
     Object pageByFilter(UsrCourFilterReq userCourseFilter, PageData pageData);
+    Object list_user_cour();
 }

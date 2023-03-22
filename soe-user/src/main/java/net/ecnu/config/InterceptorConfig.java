@@ -19,7 +19,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/course/v1/add")
                 .addPathPatterns("/api/course/v1/del/{id}")
                 .addPathPatterns("/api/course/v1/update")
-
+                .addPathPatterns("/api/course/v1/list_user_cour")
                 //排除不拦截
                 .excludePathPatterns();
     }

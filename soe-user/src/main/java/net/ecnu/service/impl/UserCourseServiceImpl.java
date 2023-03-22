@@ -1,9 +1,11 @@
 package net.ecnu.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import net.ecnu.controller.request.UsrCourAddReq;
 import net.ecnu.controller.request.UsrCourFilterReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
+import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.manager.UserCourseManager;
 import net.ecnu.mapper.CourseMapper;
 import net.ecnu.mapper.UserMapper;
@@ -11,6 +13,7 @@ import net.ecnu.model.CourseDO;
 import net.ecnu.model.UserCourseDO;
 import net.ecnu.mapper.UserCourseMapper;
 import net.ecnu.model.UserDO;
+import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.common.PageData;
 import net.ecnu.service.UserCourseService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -79,5 +82,16 @@ public class UserCourseServiceImpl extends ServiceImpl<UserCourseMapper, UserCou
         pageData.setTotal(total);
         pageData.setRecords(userCourseDOS);
         return pageData;
+    }
+
+    @Override
+    public Object list_user_cour() {
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        if (loginUser==null)
+            throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+        QueryWrapper<UserCourseDO> qw = new QueryWrapper<>();
+        qw.eq("account_no",loginUser.getAccountNo());
+        List<UserCourseDO> userCourseDOS = userCourseMapper.selectList(qw);
+        return userCourseDOS;
     }
 }

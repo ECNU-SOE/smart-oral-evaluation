@@ -13,8 +13,6 @@ public interface UserService {
 
     Object login(UserReq userReq);
 
-    Object info(HttpServletRequest req);
-
     int update(UserDO user);
 
     boolean send(String phoneNum);

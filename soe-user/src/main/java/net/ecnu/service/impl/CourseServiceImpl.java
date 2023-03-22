@@ -89,16 +89,6 @@ public class CourseServiceImpl implements CourseService {
         return pageData;
     }
 
-    @Override
-    public Object getById(String id) {
-        CourseDO courseDO = courseMapper.selectById(id);
-        if (courseDO==null)
-            throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
-        CourseVO courseVO = new CourseVO();
-        BeanUtils.copyProperties(courseDO,courseVO);
-        return courseVO;
-    }
-
     private CourseVO beanProcess(CourseDO courseDO) {
         CourseVO courseVO = new CourseVO();
         BeanUtils.copyProperties(courseDO,courseVO);

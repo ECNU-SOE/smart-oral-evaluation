@@ -61,18 +61,9 @@ public class CourseController {
         return JsonData.buildSuccess(data);
     }
 
-    @PostMapping("list_user_cour")
-    public JsonData list_user_cour(
-            @RequestParam(value = "cur",defaultValue = "1") int cur,
-            @RequestParam(value = "size",defaultValue = "50") int size,
-            @RequestBody UsrCourFilterReq userCourseFilter){
-        Object data = userCourseService.pageByFilter(userCourseFilter,new PageData(cur,size));
-        return JsonData.buildSuccess(data);
-    }
-
-    @GetMapping("/info/{id}")
-    public JsonData getCourse(@PathVariable("id") String id){
-        Object data = courseService.getById(id);
+    @GetMapping("list_user_cour")
+    public JsonData list_user_cour(){
+        Object data = userCourseService.list_user_cour();
         return JsonData.buildSuccess(data);
     }
 

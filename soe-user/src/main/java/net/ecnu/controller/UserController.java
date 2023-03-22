@@ -48,20 +48,9 @@ public class UserController {
     }
 
     /**
-     * 查询用户详情
-     */
-    @PostMapping("info")
-    public JsonData info(HttpServletRequest req) {
-        Object data = userService.info(req);
-        if (data == null)
-            return JsonData.buildError("查询用户信息错误");
-        return JsonData.buildSuccess(data);
-    }
-
-    /**
      * 查询登陆用户详情（需要携带token）
      */
-    @GetMapping("info2")
+    @GetMapping("info")
     public JsonData info2() {
         Object data = userService.getUserInfo();
         return JsonData.buildSuccess(data);
