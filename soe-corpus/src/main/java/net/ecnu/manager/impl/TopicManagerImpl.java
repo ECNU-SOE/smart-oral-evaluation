@@ -28,4 +28,13 @@ public class TopicManagerImpl implements TopicManager {
     public List<TopicDO> listByTopicIds(List<String> topicIds) {
         return topicMapper.selectBatchIds(topicIds);
     }
+
+    @Override
+    public List<TopicDO> listByCpsgrpId(String id) {
+        return topicMapper.selectList(new QueryWrapper<TopicDO>()
+                .eq("cpsgrp_id", id)
+                .orderByAsc("t_num")
+        );
+
+    }
 }

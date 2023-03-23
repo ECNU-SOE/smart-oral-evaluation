@@ -1,63 +1,63 @@
 package net.ecnu.model;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import java.util.Date;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 语料原型
+ * 
  * </p>
  *
- * @author TGX
- * @since 2023-03-17
+ * @author LYW
+ * @since 2023-03-22
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("corpus")
-public class CorpusDO implements Serializable {
+@TableName("eval_record")
+public class EvalRecordDO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 语料id
+     * 评测记录id
      */
-      @TableId(value = "id", type = IdType.AUTO)
-    private String id;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
 
     /**
-     * 汉语拼音
+     * 音频id
      */
-    private String pinyin;
+    private String audioId;
 
     /**
-     * 参考文本
+     * 评测题目id
      */
-    private String refText;
+    private String cpsrcdId;
 
     /**
-     * 评测模式：1字、2词、3句、4章
+     * 人工打分json结果
      */
-    private Integer evalMode;
+    private String manRes;
 
     /**
-     * 难易程度
+     * 算法打分json结果
      */
-    private Integer difficulty;
+    private String algRes;
 
     /**
-     * 创建者id
+     * 人工打分者
+     */
+    private String grader;
+
+    /**
+     * 评测创建者
      */
     private String creator;
-
-    /**
-     * 逻辑删除标识位
-     */
-    private Boolean del;
 
     /**
      * 创建时间

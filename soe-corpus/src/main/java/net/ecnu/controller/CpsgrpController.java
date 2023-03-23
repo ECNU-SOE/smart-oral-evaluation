@@ -20,11 +20,11 @@ public class CpsgrpController {
     private CpsgrpService cpsgrpService;
 
     /**
-     * 获取题目组列表
+     * 查询语料组列表
      */
     @PostMapping("list")
     public JsonData list(@RequestParam(value = "cur", defaultValue = "1") int cur,
-                         @RequestParam(value = "size", defaultValue = "50") int size,
+                         @RequestParam(value = "size", defaultValue = "10") int size,
                          @RequestBody CpsgrpFilterReq cpsgrpFilter) {
         Object data = cpsgrpService.pageByFilter(cpsgrpFilter, new PageData(cur, size));
         return JsonData.buildSuccess(data);

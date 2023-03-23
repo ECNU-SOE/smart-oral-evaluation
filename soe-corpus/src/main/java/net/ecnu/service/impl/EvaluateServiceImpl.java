@@ -1,6 +1,6 @@
 package net.ecnu.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
+import cn.hutool.json.JSONObject;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.soe.v20180724.SoeClient;
 import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitRequest;
@@ -9,9 +9,11 @@ import com.tencentcloudapi.soe.v20180724.models.WordRsp;
 import net.ecnu.constant.SOEConst;
 import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.mapper.CpsgrpMapper;
+import net.ecnu.mapper.EvalRecordMapper;
 import net.ecnu.model.CpsgrpDO;
 import net.ecnu.model.CpsrcdDO;
 import net.ecnu.model.EvalListener;
+import net.ecnu.model.EvalRecordDO;
 import net.ecnu.model.vo.EvalResultVO;
 import net.ecnu.service.EvaluateService;
 import net.ecnu.util.CommonUtil;
@@ -84,6 +86,9 @@ public class EvaluateServiceImpl implements EvaluateService {
 
     @Autowired
     private CpsgrpMapper cpsgrpMapper;
+
+    @Autowired
+    private EvalRecordMapper evalRecordMapper;
 
     @Override
     public Object evaluate(File file, String refText, String pinyin, long evalMode) {
@@ -232,7 +237,7 @@ public class EvaluateServiceImpl implements EvaluateService {
         evalListener.setText(refText);
         evalListener.setCategory(category);//category校验
         WebSocket webSocket = client.newWebSocket(request, evalListener);
-
+        //循环等待结果
         while (evalListener.getEvalRes() == null) {
             try {
                 Thread.sleep(50);
@@ -240,7 +245,13 @@ public class EvaluateServiceImpl implements EvaluateService {
                 e.printStackTrace();
             }
         }
-        return ((cn.hutool.json.JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
+        //新增评测记录evalRecord
+        Object evalJsonRes = ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
+        EvalRecordDO evalRecordDO = new EvalRecordDO();
+        evalRecordDO.setAlgRes(evalJsonRes.toString());
+        evalRecordMapper.insert(evalRecordDO);
+        //返回结果
+        return evalJsonRes;
 
     }
 

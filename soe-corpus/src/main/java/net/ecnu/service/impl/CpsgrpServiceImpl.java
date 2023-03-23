@@ -113,20 +113,21 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         //生成cpsgrpVO语料组对象
         CpsgrpVO cpsgrpVO = new CpsgrpVO();
         BeanUtils.copyProperties(cpsgrpDO, cpsgrpVO);
+        //获取topic大题列表
+        List<TopicDO> topicDOS = topicManager.listByCpsgrpId(cpsgrpDO.getId());
+        if (CollectionUtils.isEmpty(topicDOS)) return cpsgrpVO;    //没有大题，返回cpsgrp
+        List<TopicVO> topicVOS = topicDOS.stream().map(this::beanProcess).collect(Collectors.toList());
+        cpsgrpVO.setTopics(topicVOS);
         //获取cpsrcd子题列表
         List<CpsrcdDO> cpsrcdDOS = cpsrcdManager.listByCpsgrpId(cpsgrpId);
+        if (CollectionUtils.isEmpty(cpsrcdDOS)) return cpsgrpVO;    //没有子题，返回cpsgrp
         List<CpsrcdVO> cpsrcdVOS = cpsrcdDOS.stream().map(this::beanProcess).collect(Collectors.toList());
-        //获取topic大题列表
-        List<String> topicIds = cpsrcdDOS.stream().map(CpsrcdDO::getTopicId).distinct().collect(Collectors.toList());
-        List<TopicDO> topicDOS = topicManager.listByTopicIds(topicIds);
-        List<TopicVO> topicVOS = topicDOS.stream().map(this::beanProcess).collect(Collectors.toList());
         //聚合cpsrcd子题到topic大题中
         topicVOS.forEach(topicVO -> {
             List<CpsrcdVO> subCpsrcdVOs = cpsrcdVOS.stream().filter(
                     cpsrcdVO -> cpsrcdVO.getTopicId().equals(topicVO.getId())).collect(Collectors.toList());
             topicVO.setSubCpsrcds(subCpsrcdVOs);
         });
-        cpsgrpVO.setTopics(topicVOS);
         return cpsgrpVO;
     }
 

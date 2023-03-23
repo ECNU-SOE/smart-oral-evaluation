@@ -11,4 +11,6 @@ import java.util.List;
 
 public interface TopicManager {
     List<TopicDO> listByTopicIds(List<String> topicIds);
+
+    List<TopicDO> listByCpsgrpId(String id);
 }
