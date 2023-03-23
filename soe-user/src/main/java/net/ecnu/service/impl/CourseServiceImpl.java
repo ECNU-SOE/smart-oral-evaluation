@@ -29,12 +29,11 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private CourseManager courseManager;
     @Override
-    public Object create(CourAddReq courAddReq) {
+    public Object add(CourAddReq courAddReq) {
         //检验数据库唯一性
         CourseDO  courseDO= courseMapper.selectById(courAddReq.getId());
         if (courseDO!=null)
-            throw new BizException(BizCodeEnum.CLASS_RPEAT);
-
+            throw new BizException(BizCodeEnum.CLASS_REPEAT);
         //判断用户权限
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
         if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
@@ -43,7 +42,6 @@ public class CourseServiceImpl implements CourseService {
         CourseDO csDO = new CourseDO();
         BeanUtils.copyProperties(courAddReq,csDO);
         csDO.setCreator(loginUser.getAccountNo());
-        csDO.setId(courAddReq.getId());
         csDO.setDel(false);
         int rows = courseMapper.insert(csDO);
         return rows;
@@ -55,9 +53,8 @@ public class CourseServiceImpl implements CourseService {
         CourseDO courseDO = courseMapper.selectById(id);
         if (courseDO==null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-
         //判断用户权限
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
         if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
         if(loginUser.getRoleId()==null||loginUser.getRoleId()>3)
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
@@ -71,7 +68,6 @@ public class CourseServiceImpl implements CourseService {
         CourseDO courseDO = courseMapper.selectById(courUpdateReq.getId());
         if (courseDO==null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
-
         //判断用户权限
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
         if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
@@ -91,16 +87,6 @@ public class CourseServiceImpl implements CourseService {
         List<CourseVO> courseVOS = courseDOS.stream().map(this::beanProcess).collect(Collectors.toList());
         pageData.setRecords(courseVOS);
         return pageData;
-    }
-
-    @Override
-    public Object getById(String id) {
-        CourseDO courseDO = courseMapper.selectById(id);
-        if (courseDO==null)
-            throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
-        CourseVO courseVO = new CourseVO();
-        BeanUtils.copyProperties(courseDO,courseVO);
-        return courseVO;
     }
 
     private CourseVO beanProcess(CourseDO courseDO) {
