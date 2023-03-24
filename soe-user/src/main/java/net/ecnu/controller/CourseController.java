@@ -2,6 +2,7 @@ package net.ecnu.controller;
 
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.request.*;
+import net.ecnu.model.UserCourseDO;
 import net.ecnu.model.common.PageData;
 import net.ecnu.service.CourseService;
 import net.ecnu.service.UserCourseService;
@@ -28,7 +29,7 @@ public class CourseController {
     }
 
     @PostMapping("add_user_cour")
-    public JsonData add_user_cour(@RequestBody UsrCourAddReq usrCourAddReq){
+    public JsonData add_user_cour(@RequestBody @Validated(Create.class) UsrCourAddReq usrCourAddReq){
         Object data = userCourseService.add(usrCourAddReq);
         return JsonData.buildSuccess(data);
     }
@@ -61,11 +62,13 @@ public class CourseController {
         return JsonData.buildSuccess(data);
     }
 
-    @GetMapping("list_user_cour")
-    public JsonData list_user_cour(){
-        Object data = userCourseService.list_user_cour();
+    @PostMapping("list_user_cour")
+    public JsonData list_user_cour(@RequestBody UserCourseDO userCourseDO){
+        Object data = userCourseService.list_user_cour(userCourseDO);
         return JsonData.buildSuccess(data);
     }
+
+
 
 
 
