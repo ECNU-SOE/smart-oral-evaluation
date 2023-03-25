@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import net.ecnu.enums.BizCodeEnum;
+import net.ecnu.exception.BizException;
 import net.ecnu.mapper.UserMapper;
 import net.ecnu.model.UserDO;
 import net.ecnu.model.authentication.SysUserOrg;
@@ -138,9 +139,11 @@ public class SysUserController {
     //用户管理：更新用户激活状态
     @ApiOperation("用户管理：更新用户激活状态")
     @PostMapping(value = "/enabled/change")
-    public JsonData update(@RequestParam Boolean enabled) {
-        String currentAccountNo = RequestParamUtil.currentAccountNo();
-        sysuserService.updateEnabled(currentAccountNo, enabled);
+    public JsonData update(@RequestParam Boolean enabled,@RequestParam String accountNo) {
+        if(StringUtils.isEmpty(accountNo)){
+            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getMessage());
+        }
+        sysuserService.updateEnabled(accountNo, enabled);
         return JsonData.buildSuccess("用户状态更新成功！");
     }
 }

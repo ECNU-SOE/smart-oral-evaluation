@@ -1,5 +1,6 @@
 package net.ecnu.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import net.ecnu.controller.request.UsrCourAddReq;
 import net.ecnu.controller.request.UsrCourFilterReq;
 import net.ecnu.enums.BizCodeEnum;

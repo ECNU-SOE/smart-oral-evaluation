@@ -5,14 +5,16 @@ import net.ecnu.controller.request.CourAddReq;
 import net.ecnu.controller.request.CourUpdateReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
-import net.ecnu.interceptor.LoginInterceptor;
+//import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.manager.CourseManager;
 import net.ecnu.mapper.CourseMapper;
+import net.ecnu.mapper.UserMapper;
 import net.ecnu.model.CourseDO;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.common.PageData;
 import net.ecnu.model.vo.CourseVO;
 import net.ecnu.service.CourseService;
+import net.ecnu.utils.RequestParamUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,10 @@ public class CourseServiceImpl implements CourseService {
 
     @Autowired
     private CourseManager courseManager;
+
+    @Autowired
+    private UserMapper userMapper;
+
     @Override
     public Object create(CourAddReq courAddReq) {
         //检验数据库唯一性
@@ -36,13 +42,17 @@ public class CourseServiceImpl implements CourseService {
             throw new BizException(BizCodeEnum.CLASS_RPEAT);
 
         //判断用户权限
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
-        if(loginUser.getRoleId()==null||loginUser.getRoleId()>3)
-            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        //if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
+        /*if(loginUser.getRoleId()==null||loginUser.getRoleId()>3)
+            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);*/
+        List<Integer> roleIds = userMapper.selectRolesByAccountNo(currentAccountNo);
+        //TODO 角色校验
+
         CourseDO csDO = new CourseDO();
         BeanUtils.copyProperties(courAddReq,csDO);
-        csDO.setCreator(loginUser.getAccountNo());
+        csDO.setCreator(currentAccountNo);
         csDO.setId(courAddReq.getId());
         csDO.setDel(false);
         int rows = courseMapper.insert(csDO);
@@ -55,12 +65,12 @@ public class CourseServiceImpl implements CourseService {
         CourseDO courseDO = courseMapper.selectById(id);
         if (courseDO==null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-
+        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         //判断用户权限
-        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
-        if(loginUser.getRoleId()==null||loginUser.getRoleId()>3)
-            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+        //if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
+        /*if(loginUser.getRoleId()==null||loginUser.getRoleId()>3)
+            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);*/
         int i = courseMapper.deleteById(id);
         return i;
     }
@@ -72,11 +82,13 @@ public class CourseServiceImpl implements CourseService {
         if (courseDO==null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
 
-        //判断用户权限
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        /*LoginUser loginUser = LoginInterceptor.threadLocal.get();
         if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
         if(loginUser.getRoleId()==null||loginUser.getRoleId()>3)
-            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);*/
+        //判断用户权限
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+
         CourseDO csDO = new CourseDO();
         BeanUtils.copyProperties(courUpdateReq,csDO);
         int rows = courseMapper.updateById(csDO);

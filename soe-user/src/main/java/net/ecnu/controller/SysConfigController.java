@@ -1,7 +1,6 @@
 package net.ecnu.controller;
 
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import net.ecnu.config.DbLoadSysConfig;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.model.authentication.SysConfig;

@@ -27,4 +27,7 @@
         account_no, identify_id, role_id, nick_name, real_name, first_language, sex, birth, sign, phone, mail, pwd, secret, del, gmt_create, gmt_modified
     </sql>
 
+    <select id="selectRolesByAccountNo" resultType="java.lang.Integer">
+        select role_id from user where account = #{accountNo}
+    </select>
 </mapper>

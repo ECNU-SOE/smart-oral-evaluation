@@ -203,16 +203,6 @@
     <orderEntry type="library" name="Maven: javax.activation:javax.activation-api:1.2.0" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okhttp:logging-interceptor:2.7.5" level="project" />
     <orderEntry type="library" name="Maven: org.ini4j:ini4j:0.5.4" level="project" />
-    <orderEntry type="library" name="Maven: ws.schild:jave-all-deps:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: ws.schild:jave-core:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: ws.schild:jave-nativebin-win32:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: ws.schild:jave-nativebin-win64:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: ws.schild:jave-nativebin-linux32:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: ws.schild:jave-nativebin-linux64:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: ws.schild:jave-nativebin-osx64:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: ws.schild:jave-nativebin-osxm1:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: ws.schild:jave-nativebin-linux-arm32:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: ws.schild:jave-nativebin-linux-arm64:3.3.1" level="project" />
     <orderEntry type="module" module-name="soe-security" />
     <orderEntry type="library" name="Maven: org.springframework:spring-web:5.3.10" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-beans:5.3.10" level="project" />
@@ -232,5 +222,13 @@
     <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.15.0" level="project" />
     <orderEntry type="library" name="Maven: cn.hutool:hutool-all:5.8.3" level="project" />
     <orderEntry type="library" name="Maven: com.alibaba:fastjson:1.2.68" level="project" />
+    <orderEntry type="library" name="Maven: ws.schild:jave-all-deps:2.4.2" level="project" />
+    <orderEntry type="library" name="Maven: ws.schild:jave-core:2.4.2" level="project" />
+    <orderEntry type="library" name="Maven: commons-logging:commons-logging-api:1.1" level="project" />
+    <orderEntry type="library" name="Maven: ws.schild:jave-native-win64:2.4.2" level="project" />
+    <orderEntry type="library" name="Maven: ws.schild:jave-native-osx64:2.4.2" level="project" />
+    <orderEntry type="library" name="Maven: ws.schild:jave-native-linux64:2.4.2" level="project" />
+    <orderEntry type="library" name="Maven: ws.schild:jave-native-win32:2.4.2" level="project" />
+    <orderEntry type="library" name="Maven: ws.schild:jave-native-linux32:2.4.2" level="project" />
   </component>
 </module>
