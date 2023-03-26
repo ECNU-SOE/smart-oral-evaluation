@@ -1,6 +1,7 @@
 package net.ecnu.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import net.ecnu.constant.RolesConst;
 import net.ecnu.controller.request.*;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
@@ -22,6 +23,7 @@ import net.ecnu.model.vo.CpsgrpVO;
 import net.ecnu.service.CourseService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.utils.RequestParamUtil;
+import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,16 +60,22 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Object add(CourAddReq courAddReq) {
         //判断用户权限
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
-        if (loginUser.getRoleId() == null || loginUser.getRoleId() > 3)
+        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        //if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
+        /*if (loginUser.getRoleId() == null || loginUser.getRoleId() > 3)
+            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);*/
+        List<String> roles = userRoleMapper.getRoles(currentAccountNo);
+        if(roles.contains(RolesConst.ROLE_SUPER_ADMIN) || roles.contains(RolesConst.ROLE_SYSTEM_ADMIN) || roles.contains(RolesConst.ROLE_ADMIN)){
+            CourseDO csDO = new CourseDO();
+            BeanUtils.copyProperties(courAddReq, csDO);
+            csDO.setId(IDUtil.nextCourseId());
+            csDO.setCreator(currentAccountNo);
+            csDO.setDel(false);
+            return courseMapper.insert(csDO);
+        }else{
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
-        CourseDO csDO = new CourseDO();
-        BeanUtils.copyProperties(courAddReq, csDO);
-        csDO.setId(IDUtil.nextCourseId());
-        csDO.setCreator(loginUser.getAccountNo());
-        csDO.setDel(false);
-        return courseMapper.insert(csDO);
+        }
     }
 
     @Override
@@ -77,11 +85,16 @@ public class CourseServiceImpl implements CourseService {
         if (courseDO == null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         //判断用户权限
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        /*if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
         if (loginUser.getRoleId() == null || loginUser.getRoleId() > 3)
+            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);*/
+        List<String> roles = userRoleMapper.getRoles(currentAccountNo);
+        if(roles.contains(RolesConst.ROLE_SUPER_ADMIN) || roles.contains(RolesConst.ROLE_SYSTEM_ADMIN) || roles.contains(RolesConst.ROLE_ADMIN)){
+            return courseMapper.deleteById(id);
+        }else{
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
-        return courseMapper.deleteById(id);
+        }
     }
 
     @Override
@@ -91,13 +104,19 @@ public class CourseServiceImpl implements CourseService {
         if (courseDO == null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         //判断用户权限
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
+        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        /*if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
         if (loginUser.getRoleId() == null || loginUser.getRoleId() > 3)
+            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);*/
+        List<String> roles = userRoleMapper.getRoles(currentAccountNo);
+        if(roles.contains(RolesConst.ROLE_SUPER_ADMIN) || roles.contains(RolesConst.ROLE_SYSTEM_ADMIN) || roles.contains(RolesConst.ROLE_ADMIN)){
+            CourseDO csDO = new CourseDO();
+            BeanUtils.copyProperties(courUpdateReq, csDO);
+            return courseMapper.updateById(csDO);
+        }else{
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
-        CourseDO csDO = new CourseDO();
-        BeanUtils.copyProperties(courUpdateReq, csDO);
-        return courseMapper.updateById(csDO);
+        }
     }
 
     @Override
@@ -112,9 +131,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Object addTest(TestAddReq testAddReq) {
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null)
-            throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         //判断班级是否存在
         CourseDO courseDO = courseMapper.selectById(testAddReq.getCourseId());
         if (courseDO == null)
@@ -124,15 +142,16 @@ public class CourseServiceImpl implements CourseService {
         if (cpsgrpDO == null || cpsgrpDO.getCourseId() != null)
             throw new BizException(BizCodeEnum.CPSGRP_ERROR);
         //身份校验,管理员可以直接发布，教师需要自己选了这门课程才能发布
-        if (getTopRole(loginUser.getAccountNo()) <= 3) {
+        Integer topRole = getTopRole(currentAccountNo);
+        if (topRole <= 3) {
             CpsgrpDO cpsgrpDO1 = new CpsgrpDO();
             BeanUtils.copyProperties(cpsgrpDO, cpsgrpDO1);
             cpsgrpDO1.setType(testAddReq.getType());
             cpsgrpDO1.setCourseId(testAddReq.getCourseId());
             return cpsgrpMapper.updateById(cpsgrpDO1);
-        } else if (getTopRole(loginUser.getAccountNo()) > 3 && getTopRole(loginUser.getAccountNo()) <= 6) {
+        } else if (topRole > 3 && topRole <= 6) {
             UserCourseDO userCourseDO = userCourseMapper.selectOne(new QueryWrapper<UserCourseDO>()
-                    .eq("account_no", loginUser.getAccountNo())
+                    .eq("account_no", currentAccountNo)
                     .eq("course_id", testAddReq.getCourseId()));
             if (userCourseDO == null)
                 throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
@@ -149,9 +168,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Object updateTest(TestUpdateReq testUpdateReq) {
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null)
-            throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         CourseDO courseDO = courseMapper.selectById(testUpdateReq.getCourseId());
         if (courseDO == null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
@@ -160,13 +178,14 @@ public class CourseServiceImpl implements CourseService {
         if (cpsgrpDO == null)
             throw new BizException(BizCodeEnum.CPSGRP_ERROR);
         //身份校验,管理员可以直接修改，教师需要自己选了这门课程才能修改
-        if (getTopRole(loginUser.getAccountNo()) <= 3) {
+        Integer topRole = getTopRole(currentAccountNo);
+        if (topRole <= 3) {
             CpsgrpDO cpsgrpDO1 = new CpsgrpDO();
             BeanUtils.copyProperties(testUpdateReq,cpsgrpDO1);
             return cpsgrpMapper.updateById(cpsgrpDO1);
-        } else if (getTopRole(loginUser.getAccountNo()) > 3 && getTopRole(loginUser.getAccountNo()) <= 6) {
+        } else if (topRole > 3 && topRole <= 6) {
             UserCourseDO userCourseDO = userCourseMapper.selectOne(new QueryWrapper<UserCourseDO>()
-                    .eq("account_no", loginUser.getAccountNo())
+                    .eq("account_no", currentAccountNo)
                     .eq("course_id", testUpdateReq.getCourseId()));
             if (userCourseDO == null)
                 throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
@@ -179,20 +198,20 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Object delTest(String id) {
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null)
-            throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(id);
         if (cpsgrpDO == null)
             throw new BizException(BizCodeEnum.CPSGRP_ERROR);
         //语料组被加入课程才可删除
         if (cpsgrpDO.getCourseId()==null)
             throw new BizException(BizCodeEnum.CPSGRP_ERROR);
-        if (getTopRole(loginUser.getAccountNo()) <= 3) {
+        Integer topRole = getTopRole(currentAccountNo);
+        if (topRole <= 3) {
             return cpsgrpMapper.deleteById(id);
-        } else if (getTopRole(loginUser.getAccountNo()) > 3 && getTopRole(loginUser.getAccountNo()) <= 6) {
+        } else if (topRole > 3 && topRole <= 6) {
             UserCourseDO userCourseDO = userCourseMapper.selectOne(new QueryWrapper<UserCourseDO>()
-                    .eq("account_no", loginUser.getAccountNo())
+                    .eq("account_no", currentAccountNo)
                     .eq("course_id", cpsgrpDO.getCourseId()));
             if (userCourseDO == null)
                 throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);

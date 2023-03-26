@@ -1,24 +1,20 @@
 package net.ecnu.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import lombok.extern.slf4j.Slf4j;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.controller.request.UsrCourAddReq;
-import net.ecnu.controller.request.UsrCourFilterReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
-import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.manager.UserCourseManager;
 import net.ecnu.mapper.CourseMapper;
+import net.ecnu.mapper.UserCourseMapper;
 import net.ecnu.mapper.UserMapper;
 import net.ecnu.mapper.UserRoleMapper;
 import net.ecnu.model.CourseDO;
 import net.ecnu.model.UserCourseDO;
-import net.ecnu.mapper.UserCourseMapper;
 import net.ecnu.model.UserDO;
-import net.ecnu.model.common.LoginUser;
-import net.ecnu.model.common.PageData;
 import net.ecnu.service.UserCourseService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import net.ecnu.utils.RequestParamUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+//import net.ecnu.interceptor.LoginInterceptor;
 
 /**
  * <p>
@@ -52,9 +50,7 @@ public class UserCourseServiceImpl extends ServiceImpl<UserCourseMapper, UserCou
 
     @Override
     public Object add(UsrCourAddReq usrCourAddReq) {
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null)
-            throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         //判断请求的用户正确性
         UserDO userDO = userMapper.selectById(usrCourAddReq.getAccountNo());
         if (userDO == null)
@@ -69,7 +65,7 @@ public class UserCourseServiceImpl extends ServiceImpl<UserCourseMapper, UserCou
         if (userCourseDO1 != null)
             throw new BizException(BizCodeEnum.REPEAT_CHOOSE);
         //权限判断
-        if (Objects.equals(loginUser.getAccountNo(), usrCourAddReq.getAccountNo())) {
+        if (Objects.equals(currentAccountNo, usrCourAddReq.getAccountNo())) {
             //登录用户选择自己的课程
             UserCourseDO userCourseDO = new UserCourseDO();
             BeanUtils.copyProperties(usrCourAddReq, userCourseDO);
@@ -77,7 +73,7 @@ public class UserCourseServiceImpl extends ServiceImpl<UserCourseMapper, UserCou
             return userCourseMapper.insert(userCourseDO);
         } else {
             //登录用户帮别人添加课程
-            Integer role_A = getTopRole(loginUser.getAccountNo());
+            Integer role_A = getTopRole(currentAccountNo);
             Integer role_B = getTopRole(usrCourAddReq.getAccountNo());
             if (hasAddOrDelRight(role_A, role_B)) {
                 UserCourseDO userCourseDO = new UserCourseDO();
@@ -92,20 +88,18 @@ public class UserCourseServiceImpl extends ServiceImpl<UserCourseMapper, UserCou
 
     @Override
     public Object delete(String id) {
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null)
-            throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         //判断选课信息是否存在
         UserCourseDO userCourseDO = userCourseMapper.selectById(id);
         if (userCourseDO == null)
             throw new BizException(BizCodeEnum.USER_COURSE_UNEXISTS);
         //存在则权限校验
-        if (Objects.equals(loginUser.getAccountNo(), userCourseDO.getAccountNo())) {
+        if (Objects.equals(currentAccountNo, userCourseDO.getAccountNo())) {
             //登录用户删除本人选课信息
             return userCourseMapper.deleteById(id);
         } else {
             //登录用户删除别人选课信息
-            Integer role_A = getTopRole(loginUser.getAccountNo());
+            Integer role_A = getTopRole(currentAccountNo);
             Integer role_B = getTopRole(userCourseDO.getAccountNo());
             if (hasAddOrDelRight(role_A, role_B)) {
                 return userCourseMapper.deleteById(id);
@@ -117,17 +111,15 @@ public class UserCourseServiceImpl extends ServiceImpl<UserCourseMapper, UserCou
 
     @Override
     public Object list_user_cour(UserCourseDO userCourseDO) {
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null)
-            throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
-        if (Objects.equals(loginUser.getAccountNo(), userCourseDO.getAccountNo())) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (Objects.equals(currentAccountNo, userCourseDO.getAccountNo())) {
             //登录用户查看自己的选课列表
             QueryWrapper<UserCourseDO> qw = new QueryWrapper<>();
             qw.eq("account_no", userCourseDO.getAccountNo());
             return userCourseMapper.selectList(qw);
         } else {
             //登录用户查看别人的选课列表
-            Integer top_role1 = getTopRole(loginUser.getAccountNo());
+            Integer top_role1 = getTopRole(currentAccountNo);
             Integer top_role2 = getTopRole(userCourseDO.getAccountNo());
             if (hasListRight(top_role1, top_role2)) {
                 QueryWrapper<UserCourseDO> qw = new QueryWrapper<>();
