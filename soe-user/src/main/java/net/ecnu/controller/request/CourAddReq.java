@@ -8,11 +8,6 @@ import java.util.Date;
 
 @Data
 public class CourAddReq {
-    /**
-     * 班级id
-     */
-    @NotBlank(message = "必须指定班级id",groups = {Create.class})
-    private String id;
 
     /**
      * 课程id

@@ -17,10 +17,10 @@ public enum BizCodeEnum {
     USER_INPUT_ERROR(250008,"您输入的数据格式错误或您没有权限访问资源"),
 
 
-    CLASS_RPEAT(25006,"班级已存在"),
+    CLASS_REPEAT(25006,"班级已存在"),
     CLASS_UNEXISTS(250007, "班级不存在"),
     REPEAT_CHOOSE(250008,"重复选课"),
-    USER_COURSE_UNEXISTS(250009,"该用户已退课"),
+    USER_COURSE_UNEXISTS(250009,"选课信息不存在"),
 
     /**
      * 语料组相关

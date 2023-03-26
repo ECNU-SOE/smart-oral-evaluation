@@ -2,7 +2,6 @@ package net.ecnu.model;
 
 import java.math.BigDecimal;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 
@@ -12,6 +11,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -20,8 +20,8 @@ import lombok.EqualsAndHashCode;
  * corpus快照
  * </p>
  *
- * @author LYW
- * @since 2023-03-12
+ * @author TGX
+ * @since 2023-03-17
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -33,35 +33,44 @@ public class CpsrcdDO implements Serializable {
     /**
      * 主键id
      */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.NONE)
     private String id;
 
     /**
-     * 关联语料组id
+     * 语料原型id
+     */
+    private String corpusId;
+
+    /**
+     * 所属语料组id
      */
     private String cpsgrpId;
 
     /**
-     * 组内次序
+     * 所属大题id
      */
-    @TableField(value = "`order`")
-    private Integer order;
+    private String topicId;
 
     /**
-     * 语料类型
+     * cpsrcd次序
      */
-    private Integer type;
+    @JsonProperty("cNum")
+    private Integer cNum;
+
+    /**
+     * 评测模式
+     */
+    private Integer evalMode;
 
     /**
      * 语料难度
      */
-    @TableField(value = "`level`")
-    private Integer level;
+    private Integer difficulty;
 
     /**
-     * 本题分值
+     * 每字分值
      */
-    private BigDecimal weight;
+    private BigDecimal wordWeight;
 
     /**
      * 语料内容拼音

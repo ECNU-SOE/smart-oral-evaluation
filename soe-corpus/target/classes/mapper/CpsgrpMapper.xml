@@ -6,8 +6,8 @@
     <resultMap id="BaseResultMap" type="net.ecnu.model.CpsgrpDO">
         <id column="id" property="id" />
         <result column="type" property="type" />
-        <result column="level" property="level" />
-        <result column="name" property="name" />
+        <result column="difficulty" property="difficulty" />
+        <result column="title" property="title" />
         <result column="description" property="description" />
         <result column="creator" property="creator" />
         <result column="gmt_create" property="gmtCreate" />
@@ -16,7 +16,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, type, level, name, description, creator, gmt_create, gmt_modified
+        id, type, difficulty, title, description, creator, gmt_create, gmt_modified
     </sql>
 
 </mapper>

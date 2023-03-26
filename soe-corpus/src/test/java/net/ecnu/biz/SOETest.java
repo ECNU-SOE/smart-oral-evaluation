@@ -10,7 +10,6 @@ import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitReque
 import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitResponse;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.CorpusApplication;
-import net.ecnu.model.vo.CpsgrpVO2;
 import net.ecnu.service.EvaluateService;
 import org.junit.Test;
 import org.junit.runner.RunWith;

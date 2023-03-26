@@ -77,27 +77,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Object info(HttpServletRequest req) {
-        String token = req.getHeader("token");
-        if (StringUtils.isBlank(token)) {
-            token = req.getParameter("token");
-        }
-        if (StringUtils.isBlank(token)) {
-            throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
-        }
-        LoginUser loginUser = JWTUtil.checkJWT(token);
-//        UserDO userDO = userManager.selectOneByPhone(loginUser.getPhone());
-        UserDO userDO = userMapper.selectById(loginUser.getAccountNo());
-        if (userDO == null) {
-            throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
-        }
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(userDO, userVO);
-
-        return userVO;
-    }
-
-    @Override
     public Object getUserInfo() {
         //LoginUser loginUser = LoginInterceptor.threadLocal.get();
         String currentAccountNo = RequestParamUtil.currentAccountNo();

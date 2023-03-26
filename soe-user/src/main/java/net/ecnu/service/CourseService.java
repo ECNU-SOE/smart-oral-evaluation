@@ -1,14 +1,16 @@
 package net.ecnu.service;
 
-import net.ecnu.controller.request.CourFilterReq;
-import net.ecnu.controller.request.CourAddReq;
-import net.ecnu.controller.request.CourUpdateReq;
+import net.ecnu.controller.request.*;
+import net.ecnu.model.CpsgrpDO;
 import net.ecnu.model.common.PageData;
 
 public interface CourseService {
-    Object create(CourAddReq courAddReq);
+    Object add(CourAddReq courAddReq);
     Object delete(String id);
     Object update(CourUpdateReq courUpdateReq);
     Object pageByFilter(CourFilterReq courseFilter, PageData pageData);
-    Object getById(String id);
+    Object addTest(TestAddReq testAddReq);
+    Object updateTest(TestUpdateReq testUpdateReq);
+    Object delTest(String id);
+    Object listTest(CpsgrpDO cpsgrpDO,PageData pageData);
 }

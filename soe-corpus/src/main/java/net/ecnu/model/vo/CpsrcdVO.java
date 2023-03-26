@@ -1,5 +1,7 @@
 package net.ecnu.model.vo;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,30 +28,39 @@ public class CpsrcdVO implements Serializable {
     private String id;
 
     /**
-     * 关联语料组id
+     * 语料原型id
      */
-    @JsonIgnore
+    private String corpusId;
+
+    /**
+     * 所属语料组id
+     */
     private String cpsgrpId;
 
     /**
-     * 组内次序
+     * 所属大题id
      */
-    private Integer order;
+    private String topicId;
 
     /**
-     * 语料类型
+     * cpsrcd次序
      */
-    private Integer type;
+    private Integer cNum;
+
+    /**
+     * 评测模式
+     */
+    private Integer evalMode;
 
     /**
      * 语料难度
      */
-    private Integer level;
+    private Integer difficulty;
 
     /**
-     * 本题分值
+     * 每字分值
      */
-    private BigDecimal weight;
+    private BigDecimal wordWeight;
 
     /**
      * 语料内容拼音
@@ -64,13 +75,11 @@ public class CpsrcdVO implements Serializable {
     /**
      * 创建时间
      */
-    @JsonIgnore
     private Date gmtCreate;
 
     /**
      * 更新时间
      */
-    @JsonIgnore
     private Date gmtModified;
 
 

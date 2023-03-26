@@ -1,17 +1,18 @@
 package net.ecnu.db;
 
 
-import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.UserApplication;
-import net.ecnu.controller.request.UserReq;
-import net.ecnu.service.UserService;
-import net.ecnu.util.JsonUtil;
+import net.ecnu.mapper.UserRoleMapper;
+import net.ecnu.model.UserRoleDO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.List;
 
 
 @RunWith(SpringRunner.class)
@@ -20,11 +21,20 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class SOETest {
 
     @Autowired
-    UserService userService;
+    private UserRoleMapper userRoleMapper;
 
     @Test
     public void userTest(){
-        String s = RandomUtil.randomNumbers(6);
-        System.out.println(s);
+        Integer role = 2;
+        switch (role){
+            case 1:
+                System.out.println("你");
+                break;
+            case 2:
+                System.out.println("你好");
+                break;
+            case 3:
+                System.out.println("你好呀");
+        }
     }
 }

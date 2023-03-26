@@ -17,6 +17,7 @@ import net.ecnu.model.vo.CpsrcdVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,13 +41,22 @@ public class CpsgrpManagerImpl implements CpsgrpManager {
     @Override
     public List<CpsgrpDO> listByFilter(CpsgrpFilterReq cpsgrpFilter, PageData pageData) {
         Page<CpsgrpDO> cpsgrpDOPage = cpsgrpMapper.selectPage(
-                new Page<CpsgrpDO>(pageData.getCurrent(), pageData.getSize()), new QueryWrapper<>());
+                new Page<CpsgrpDO>(pageData.getCurrent(), pageData.getSize()),
+                new QueryWrapper<CpsgrpDO>()
+                        .like(!StringUtils.isEmpty(cpsgrpFilter.getTitle()), "title", cpsgrpFilter.getTitle())
+                        .eq(!StringUtils.isEmpty(cpsgrpFilter.getCourseId()), "course_id", cpsgrpFilter.getCourseId())
+                        .eq(cpsgrpFilter.getType() != null, "type", cpsgrpFilter.getType())
+        );
         return cpsgrpDOPage.getRecords();
     }
 
     @Override
     public int countByFilter(CpsgrpFilterReq cpsgrpFilter) {
-        return cpsgrpMapper.selectCount(new QueryWrapper<CpsgrpDO>());
+        return cpsgrpMapper.selectCount(new QueryWrapper<CpsgrpDO>()
+                .like(!StringUtils.isEmpty(cpsgrpFilter.getTitle()), "title", cpsgrpFilter.getTitle())
+                .eq(!StringUtils.isEmpty(cpsgrpFilter.getCourseId()), "course_id", cpsgrpFilter.getCourseId())
+                .eq(cpsgrpFilter.getType() != null, "type", cpsgrpFilter.getType())
+        );
     }
 
     @Override
@@ -59,7 +69,7 @@ public class CpsgrpManagerImpl implements CpsgrpManager {
         //处理cpsrcdVOS题目列表
         List<CpsrcdDO> cpsrcdDOS = cpsrcdManager.listByCpsgrpId(cpsgrpId);
         List<CpsrcdVO> cpsrcdVOS = cpsrcdDOS.stream().map(this::beanProcess).collect(Collectors.toList());
-        cpsgrpVO.setCpsrcdList(cpsrcdVOS);
+//        cpsgrpVO.setCpsrcdList(cpsrcdVOS);
         return cpsgrpVO;
     }
 

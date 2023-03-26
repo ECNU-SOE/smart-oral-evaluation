@@ -16,7 +16,7 @@ import net.ecnu.model.common.PageData;
  */
 public interface UserCourseService extends IService<UserCourseDO> {
 
-    Object create(UsrCourAddReq usrCourAddReq);
+    Object add(UsrCourAddReq usrCourAddReq);
     Object delete(String id);
-    Object pageByFilter(UsrCourFilterReq userCourseFilter, PageData pageData);
+    Object list_user_cour(UserCourseDO userCourseDO);
 }

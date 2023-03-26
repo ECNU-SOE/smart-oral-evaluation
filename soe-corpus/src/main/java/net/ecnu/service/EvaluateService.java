@@ -10,7 +10,7 @@ public interface EvaluateService {
 
 //    Result evaluate(MultipartFile file, String text, String pinyin, String mode);
 
-    Object getCorpusesByGroupId(String cpsgrpId);
+//    Object getCorpusesByGroupId(String cpsgrpId);
 
     File convert_lyw(MultipartFile audio);
 

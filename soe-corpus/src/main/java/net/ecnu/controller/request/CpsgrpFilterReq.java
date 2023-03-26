@@ -3,9 +3,7 @@ package net.ecnu.controller.request;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
 import java.util.Date;
-import java.util.List;
 
 @Data
 public class CpsgrpFilterReq {
@@ -13,10 +11,15 @@ public class CpsgrpFilterReq {
     /**
      * 语料组名称
      */
-    private String name;
+    private String title;
 
     /**
-     * 语料组类型
+     * 课程id
+     */
+    private String courseId;
+
+    /**
+     * 语料组类型 1：考试、2：作业、3：测验
      */
     private Integer type;
 
