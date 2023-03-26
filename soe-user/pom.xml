@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>soe-user</artifactId>
+    <artifactId>soe-user-security</artifactId>
 
     <dependencies>
         <dependency>
