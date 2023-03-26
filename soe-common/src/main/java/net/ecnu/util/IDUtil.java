@@ -26,4 +26,6 @@ public class IDUtil {
     public static String nextCpsgrpId() {
         return "cpsgrp_" + getSnowflakeId();
     }
+
+    public static String nextCourseId() { return "course_" + getSnowflakeId(); }
 }

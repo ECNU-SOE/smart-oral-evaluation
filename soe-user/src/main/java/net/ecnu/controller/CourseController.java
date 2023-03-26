@@ -1,7 +1,9 @@
 package net.ecnu.controller;
 
 import net.ecnu.controller.group.Create;
+import net.ecnu.controller.group.Update;
 import net.ecnu.controller.request.*;
+import net.ecnu.model.CpsgrpDO;
 import net.ecnu.model.UserCourseDO;
 import net.ecnu.model.common.PageData;
 import net.ecnu.service.CourseService;
@@ -68,8 +70,29 @@ public class CourseController {
         return JsonData.buildSuccess(data);
     }
 
+    //发布考试/作业
+    @PostMapping("add_test")
+    public JsonData add_test(@RequestBody @Validated(Create.class) TestAddReq testAddReq){
+        Object data = courseService.addTest(testAddReq);
+        return JsonData.buildSuccess(data);
+    }
 
+    @PostMapping("update_test")
+    public JsonData update_test(@RequestBody @Validated(Update.class) TestUpdateReq testUpdateReq){
+        Object data = courseService.updateTest(testUpdateReq);
+        return JsonData.buildSuccess(data);
+    }
 
-
-
+    @GetMapping("/del_test/{id}")
+    public JsonData del_test(@PathVariable String id){
+        Object data = courseService.delTest(id);
+        return JsonData.buildSuccess(data);
+    }
+    @PostMapping("list_test")
+    public JsonData list_test(@RequestParam(value = "cur",defaultValue = "1") int cur,
+                                   @RequestParam(value = "size",defaultValue = "50") int size,
+                                   @RequestBody CpsgrpDO cpsgrpDO){
+        Object data = courseService.listTest(cpsgrpDO,new PageData(cur,size));
+        return JsonData.buildSuccess(data);
+    }
 }
