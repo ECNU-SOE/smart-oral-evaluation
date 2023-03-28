@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.ecnu.mapper.TranscriptMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="net.ecnu.model.TranscriptDO">
+        <id column="id" property="id" />
+        <result column="cpsgrp_id" property="cpsgrpId" />
+        <result column="respondent" property="respondent" />
+        <result column="pron_completion" property="pronCompletion" />
+        <result column="pron_accuracy" property="pronAccuracy" />
+        <result column="pron_fluency" property="pronFluency" />
+        <result column="suggested_score" property="suggestedScore" />
+        <result column="manual_score" property="manualScore" />
+        <result column="res_json" property="resJson" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, cpsgrp_id, respondent, pron_completion, pron_accuracy, pron_fluency, suggested_score, manual_score, res_json, gmt_create, gmt_modified
+    </sql>
+
+</mapper>

@@ -5,6 +5,7 @@ import net.ecnu.model.dto.ScoreDTO;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
@@ -13,9 +14,10 @@ public class TranscriptReq {
     @NotEmpty
     private String cpsgrpId;
 
-    @Valid
-    @NotEmpty
-    private List<ScoreDTO> scores;
+    @NotNull
+    private Double suggestedScore;
 
+    @NotEmpty
+    private String resJson;
 
 }

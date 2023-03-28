@@ -1,16 +1,11 @@
 package net.ecnu.model;
 
 import java.math.BigDecimal;
-
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-
 import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableId;
-
 import java.io.Serializable;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -19,7 +14,7 @@ import lombok.EqualsAndHashCode;
  * 成绩单
  * </p>
  *
- * @author LYW
+ * @author TGX
  * @since 2023-03-28
  */
 @Data
@@ -32,7 +27,7 @@ public class TranscriptDO implements Serializable {
     /**
      * 评测报告id
      */
-    @TableId(value = "id", type = IdType.NONE)
+      @TableId(value = "id", type = IdType.AUTO)
     private String id;
 
     /**
