@@ -5,10 +5,13 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="net.ecnu.model.CpsrcdDO">
         <id column="id" property="id" />
+        <result column="corpus_id" property="corpusId" />
         <result column="cpsgrp_id" property="cpsgrpId" />
-        <result column="order" property="order" />
-        <result column="type" property="type" />
-        <result column="level" property="level" />
+        <result column="topic_id" property="topicId" />
+        <result column="c_num" property="cNum" />
+        <result column="eval_mode" property="evalMode" />
+        <result column="difficulty" property="difficulty" />
+        <result column="word_weight" property="wordWeight" />
         <result column="pinyin" property="pinyin" />
         <result column="ref_text" property="refText" />
         <result column="gmt_create" property="gmtCreate" />
@@ -17,7 +20,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, cpsgrp_id, `order`, `type`, `level`, pinyin, ref_text, gmt_create, gmt_modified
+        id, corpus_id, cpsgrp_id, topic_id, c_num, eval_mode, difficulty, word_weight, pinyin, ref_text, gmt_create, gmt_modified
     </sql>
 
 </mapper>

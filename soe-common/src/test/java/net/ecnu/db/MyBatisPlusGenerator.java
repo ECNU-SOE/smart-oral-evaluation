@@ -18,9 +18,10 @@ public class MyBatisPlusGenerator {
         // 是否支持AR模式
         config.setActiveRecord(true)
                 // 作者
-                .setAuthor("LYW")
+                .setAuthor("TGX")
                 // 生成路径，最好使用绝对路径，window路径是不一样的
                 //TODO  TODO  TODO  TODO
+//                .setOutputDir("C:\\Users\\tgx\\Desktop")
                 .setOutputDir("/Users/lyw/Desktop/demo/src/main/java")
                 // 文件覆盖
                 .setFileOverride(true)

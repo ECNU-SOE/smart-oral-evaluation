@@ -20,7 +20,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author LYW
- * @since 2022-11-19
+ * @since 2023-03-28
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -69,6 +69,11 @@ public class TranscriptDO implements Serializable {
      * 人工评测得分
      */
     private BigDecimal manualScore;
+
+    /**
+     * json格式报告
+     */
+    private String resJson;
 
     /**
      * 创建时间

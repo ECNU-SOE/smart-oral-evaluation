@@ -32,15 +32,6 @@ public class UserController {
     /**
      * 用户注册
      */
-    @GetMapping("test")
-    public JsonData test() {
-        return JsonData.buildSuccess("data");
-    }
-
-
-    /**
-     * 用户注册
-     */
     @PostMapping("register")
     public JsonData register(@RequestBody @Validated(Create.class) UserReq userReq) {
         Object data = userService.register(userReq);
@@ -57,20 +48,9 @@ public class UserController {
     }
 
     /**
-     * 查询用户详情
-     */
-    @PostMapping("info")
-    public JsonData info(HttpServletRequest req) {
-        Object data = userService.info(req);
-        if (data == null)
-            return JsonData.buildError("查询用户信息错误");
-        return JsonData.buildSuccess(data);
-    }
-
-    /**
      * 查询登陆用户详情（需要携带token）
      */
-    @GetMapping("info2")
+    @GetMapping("info")
     public JsonData info2() {
         Object data = userService.getUserInfo();
         return JsonData.buildSuccess(data);
@@ -92,11 +72,5 @@ public class UserController {
             return JsonData.buildSuccess();
         else
             return JsonData.buildError("短信发送错误");
-    }
-
-    @PostMapping("create")
-    public JsonData create(){
-
-        return null;
     }
 }

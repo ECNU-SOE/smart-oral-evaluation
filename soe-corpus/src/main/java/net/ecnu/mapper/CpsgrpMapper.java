@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
  * </p>
  *
  * @author LYW
- * @since 2022-11-02
+ * @since 2023-03-03
  */
 @Mapper
 public interface CpsgrpMapper extends BaseMapper<CpsgrpDO> {

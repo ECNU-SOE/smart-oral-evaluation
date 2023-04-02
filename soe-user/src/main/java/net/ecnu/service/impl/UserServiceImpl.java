@@ -1,6 +1,5 @@
 package net.ecnu.service.impl;
 
-import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.CommonRequest;
@@ -19,8 +18,8 @@ import net.ecnu.manager.UserManager;
 import net.ecnu.mapper.UserMapper;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.UserDO;
-import net.ecnu.model.vo.UserVO;
 import net.ecnu.model.dto.UserDTO;
+import net.ecnu.model.vo.UserVO;
 import net.ecnu.service.UserService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.JWTUtil;
@@ -30,10 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.List;
 
 
 @Service
@@ -77,27 +74,6 @@ public class UserServiceImpl implements UserService {
         LoginUser loginUser = new LoginUser();
         BeanUtils.copyProperties(userDO, loginUser);
         return JWTUtil.geneJsonWebToken(loginUser);
-    }
-
-    @Override
-    public Object info(HttpServletRequest req) {
-        String token = req.getHeader("token");
-        if (StringUtils.isBlank(token)) {
-            token = req.getParameter("token");
-        }
-        if (StringUtils.isBlank(token)) {
-            throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
-        }
-        LoginUser loginUser = JWTUtil.checkJWT(token);
-//        UserDO userDO = userManager.selectOneByPhone(loginUser.getPhone());
-        UserDO userDO = userMapper.selectById(loginUser.getAccountNo());
-        if (userDO == null) {
-            throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
-        }
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(userDO, userVO);
-
-        return userVO;
     }
 
     @Override

@@ -25,6 +25,8 @@ import java.util.*;
 public class EvalListener extends WebSocketListener {
     private long t = 0;
 
+    private boolean sidFlag = Boolean.FALSE;
+
     private String category;//题型
 
     private File file;//待评测音频
@@ -60,8 +62,7 @@ public class EvalListener extends WebSocketListener {
 
     //    private static final String hostUrl = "https://ise-api.xfyun.cn/v2/open-ise";//开放评测地址
     private static final String appid = "3adf0a1e";//控制台获取
-//    private static final String apiSecret = "MGEzZjQ1YTc2MzU3NDZjM2RkZmJkOWYy";//控制台获取
-//    private static final String apiKey = "3dc67c7ea181adb9a6c6df0f3ec5d751";//控制台获取
+
 
     private static final String sub = "ise";//服务类型sub,开放评测值为ise
     private static final String ent = "cn_vip";//语言标记参数 ent(cn_vip中文,en_vip英文)
@@ -93,7 +94,7 @@ public class EvalListener extends WebSocketListener {
         super.onOpen(webSocket, response);
         new Thread(() -> {
             //连接成功，开始发送数据
-            int frameSize = 19000; //每一帧音频的大小,建议每 40ms 发送 1280B，大小可调整，但是不要超过19200B，即base64压缩后能超过26000B，否则会报错10163数据过长错误
+            int frameSize = 1280; //每一帧音频的大小,建议每 40ms 发送 1280B，大小可调整，但是不要超过19200B，即base64压缩后能超过26000B，否则会报错10163数据过长错误
             int intervel = 40;
             int status = 0;  // 音频的状态
             //FileInputStream fs = new FileInputStream("0.pcm");
@@ -175,7 +176,7 @@ public class EvalListener extends WebSocketListener {
                                 .add("tte", "utf-8")
                                 .add("cmd", "ssb")
                                 .add("auf", "audio/L16;rate=16000")
-                                .add("aue", "raw")
+                                .add("aue", "lame") //raw、lame
                                 //评测文本(new String(new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF })+text)
                                 .add("text", '\uFEFF' + text)//Base64.getEncoder().encodeToString(text.getBytes())
                 ).add("data", new ParamBuilder()
@@ -191,7 +192,7 @@ public class EvalListener extends WebSocketListener {
         p.add("business", new ParamBuilder()
                 .add("cmd", "auw")
                 .add("aus", aus)
-                .add("aue", "raw")
+                .add("aue", "lame")
         ).add("data", new ParamBuilder()
                 .add("status", status)
                 .add("data", data)
@@ -210,6 +211,11 @@ public class EvalListener extends WebSocketListener {
         //System.out.println(text);
         IseNewResponseData resp = json.fromJson(text, IseNewResponseData.class);
         if (resp != null) {
+            if (sidFlag == Boolean.FALSE) {
+                System.out.println("sid:" + resp.getSid());
+                sidFlag = Boolean.TRUE;
+            }
+
             if (resp.getCode() != 0) {
                 System.out.println("code=>" + resp.getCode() + " error=>" + resp.getMessage() + " sid=" + resp.getSid());
                 System.out.println("错误码查询链接：https://www.xfyun.cn/document/error-code");
@@ -226,8 +232,6 @@ public class EvalListener extends WebSocketListener {
                         String res = new String(decoder.decode(resp.getData().getData()), StandardCharsets.UTF_8);
                         JSONObject xmlJSONObj = XML.toJSONObject(res);
                         System.out.println("onMessage方法耗时：" + ((new Date()).getTime() - t) + "ms");
-                        System.out.println("sid:" + resp.getSid());
-                        System.out.println("text:" + this.text);
                         setEvalRes(xmlJSONObj);
                     } catch (Exception e) {
                         e.printStackTrace();

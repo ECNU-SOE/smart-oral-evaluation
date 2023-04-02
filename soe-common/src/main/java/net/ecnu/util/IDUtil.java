@@ -14,4 +14,24 @@ public class IDUtil {
     public static long getSnowflakeId() {
         return snowflake.nextId();
     }
+
+    public static String nextTopicId() {
+        return "topic_" + getSnowflakeId();
+    }
+
+    public static String nextCpsrcdId() {
+        return "cpsrcd_" + getSnowflakeId();
+    }
+
+    public static String nextCpsgrpId() {
+        return "cpsgrp_" + getSnowflakeId();
+    }
+
+    public static String nextCourseId() {
+        return "course_" + getSnowflakeId();
+    }
+
+    public static String nextTranscriptId() {
+        return "transcript_" + getSnowflakeId();
+    }
 }

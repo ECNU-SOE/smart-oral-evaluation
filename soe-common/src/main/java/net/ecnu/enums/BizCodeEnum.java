@@ -13,10 +13,18 @@ public enum BizCodeEnum {
     ACCOUNT_UNLOGIN(250004, "账号未登录"),
     UNAUTHORIZED_OPERATION(250005, "未授权的操作 或 资源不存在"),
 
+
+    CLASS_REPEAT(25006,"班级已存在"),
+    CLASS_UNEXISTS(250007, "班级不存在"),
+    REPEAT_CHOOSE(250008,"重复选课"),
+    USER_COURSE_UNEXISTS(250009,"选课信息不存在"),
+
     /**
      * 语料组相关
      */
     CPSGRP_ERROR(260001, "语料组异常"),
+    CPSGRP_NOT_EXIST(260002, "语料组不存在"),
+
 
 
     ;

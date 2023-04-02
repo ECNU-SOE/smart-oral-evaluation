@@ -2,6 +2,7 @@ package net.ecnu.mapper;
 
 import net.ecnu.model.CorpusDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * <p>
@@ -11,6 +12,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author LYW
  * @since 2022-10-20
  */
+@Mapper
 public interface CorpusMapper extends BaseMapper<CorpusDO> {
 
 }

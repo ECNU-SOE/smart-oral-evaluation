@@ -1,11 +1,13 @@
 package net.ecnu.controller;
 
 
-import net.ecnu.controller.request.CpsgrpCreateReq;
+import net.ecnu.controller.group.Create;
+import net.ecnu.controller.request.CpsgrpReq;
 import net.ecnu.controller.request.CpsgrpFilterReq;
 import net.ecnu.controller.request.TranscriptReq;
 import net.ecnu.model.common.PageData;
 import net.ecnu.service.CpsgrpService;
+import net.ecnu.service.TranscriptService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -18,12 +20,15 @@ public class CpsgrpController {
     @Autowired
     private CpsgrpService cpsgrpService;
 
+    @Autowired
+    private TranscriptService transcriptService;
+
     /**
-     * 获取题目组列表
+     * 查询语料组列表
      */
     @PostMapping("list")
     public JsonData list(@RequestParam(value = "cur", defaultValue = "1") int cur,
-                         @RequestParam(value = "size", defaultValue = "50") int size,
+                         @RequestParam(value = "size", defaultValue = "10") int size,
                          @RequestBody CpsgrpFilterReq cpsgrpFilter) {
         Object data = cpsgrpService.pageByFilter(cpsgrpFilter, new PageData(cur, size));
         return JsonData.buildSuccess(data);
@@ -39,11 +44,11 @@ public class CpsgrpController {
     }
 
     /**
-     * 创建语料组（试卷，作业，测验等类型）
+     * 创建语料组cpsgrp
      */
     @PostMapping("create")
-    public JsonData create(@RequestBody CpsgrpCreateReq cpsgrpCreateReq) {
-        Object data = cpsgrpService.create(cpsgrpCreateReq);
+    public JsonData create(@RequestBody @Validated(Create.class) CpsgrpReq cpsgrpReq) {
+        Object data = cpsgrpService.create(cpsgrpReq);
         return JsonData.buildSuccess(data);
     }
 
@@ -56,12 +61,31 @@ public class CpsgrpController {
         return JsonData.buildSuccess(data);
     }
 
+//    /**
+//     * 生成语料组 答题报告transcript
+//     */
+//    @Deprecated
+//    @PostMapping("transcript")
+//    public JsonData transcript(@RequestBody @Validated TranscriptReq transcriptReq) {
+//        Object data = cpsgrpService.genTranscript(transcriptReq);//生成报告
+//        return JsonData.buildSuccess(data);
+//    }
+
     /**
-     * 生成语料组 答题报告transcript
+     * 存储答题题报告
      */
-    @PostMapping("transcript")
-    public JsonData transcript(@RequestBody @Validated TranscriptReq transcriptReq) {
-        Object data = cpsgrpService.genTranscript(transcriptReq);//生成报告
+    @PostMapping("save_transcript")
+    public JsonData saveTranscript(@RequestBody @Validated TranscriptReq transcriptReq) {
+        Object data = transcriptService.save(transcriptReq);//生成报告
+        return JsonData.buildSuccess(data);
+    }
+
+    /**
+     * 查询答题报告
+     */
+    @PostMapping("transcripts")
+    public JsonData transcript(@RequestBody TranscriptReq transcriptReq) {
+        Object data = transcriptService.getTranscript(transcriptReq);//生成报告
         return JsonData.buildSuccess(data);
     }
 

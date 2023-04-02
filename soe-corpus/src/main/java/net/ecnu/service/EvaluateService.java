@@ -1,6 +1,5 @@
 package net.ecnu.service;
 
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -11,9 +10,13 @@ public interface EvaluateService {
 
 //    Result evaluate(MultipartFile file, String text, String pinyin, String mode);
 
-    Object getCorpusesByGroupId(String cpsgrpId);
+//    Object getCorpusesByGroupId(String cpsgrpId);
 
-    File convert(MultipartFile audio);
+    File convert_lyw(MultipartFile audio);
+
+//    File convert_tgx(MultipartFile audio);
 
     Object evaluateByXF(File audio, String refText, String pinyin, String evalMode);
+
+    Object evaluateByXF2(File convertAudio, String refText, String pinyin, String category);
 }

@@ -1,6 +1,6 @@
 package net.ecnu.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
+import cn.hutool.json.JSONObject;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.soe.v20180724.SoeClient;
 import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitRequest;
@@ -9,11 +9,11 @@ import com.tencentcloudapi.soe.v20180724.models.WordRsp;
 import net.ecnu.constant.SOEConst;
 import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.mapper.CpsgrpMapper;
+import net.ecnu.mapper.EvalRecordMapper;
 import net.ecnu.model.CpsgrpDO;
 import net.ecnu.model.CpsrcdDO;
 import net.ecnu.model.EvalListener;
-import net.ecnu.model.vo.CpsgrpVO2;
-import net.ecnu.model.vo.CpsrcdVO2;
+import net.ecnu.model.EvalRecordDO;
 import net.ecnu.model.vo.EvalResultVO;
 import net.ecnu.service.EvaluateService;
 import net.ecnu.util.CommonUtil;
@@ -28,8 +28,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ws.schild.jave.*;
-import ws.schild.jave.encode.AudioAttributes;
-import ws.schild.jave.encode.EncodingAttributes;
+//import ws.schild.jave.encode.AudioAttributes;
+//import ws.schild.jave.encode.EncodingAttributes;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -41,6 +41,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+
+import ws.schild.jave.AudioAttributes;
+import ws.schild.jave.Encoder;
+import ws.schild.jave.EncodingAttributes;
+import ws.schild.jave.MultimediaObject;
+
+import java.io.File;
+
 
 /**
  * <p>
@@ -77,6 +86,9 @@ public class EvaluateServiceImpl implements EvaluateService {
 
     @Autowired
     private CpsgrpMapper cpsgrpMapper;
+
+    @Autowired
+    private EvalRecordMapper evalRecordMapper;
 
     @Override
     public Object evaluate(File file, String refText, String pinyin, long evalMode) {
@@ -118,14 +130,14 @@ public class EvaluateServiceImpl implements EvaluateService {
 
 
     @Override
-    public File convert(MultipartFile file) {
+    public File convert_lyw(MultipartFile file) {
         File source = FileUtil.transferToFile(file);
-        File target = new File("/Users/lyw/Desktop/tmp.wav");
+        File target = new File("eval_audio.mp3");
         target.deleteOnExit();// 在虚拟机终止时，请求删除此抽象路径名表示的文件或目录。
         // 创建音频属性实例
         AudioAttributes audio = new AudioAttributes();
         // 设置编码 libmp3lame pcm_s16le
-        audio.setCodec("pcm_s16le");
+        audio.setCodec("libmp3lame");
         // 音频比特率
         audio.setBitRate(16000);
         // 声道 1 =单声道，2 =立体声
@@ -135,9 +147,9 @@ public class EvaluateServiceImpl implements EvaluateService {
         // 转码属性实例
         EncodingAttributes attrs = new EncodingAttributes();
         // 转码格式
-        attrs.setOutputFormat("wav");
+//        attrs.setOutputFormat("wav");
+        attrs.setFormat("mp3");
         attrs.setAudioAttributes(audio);
-
         MultimediaObject sourceObj = new MultimediaObject(source);
         try {
             Encoder encoder = new Encoder();
@@ -148,11 +160,39 @@ public class EvaluateServiceImpl implements EvaluateService {
         return target;
     }
 
+//    @Override
+//    public File convert_tgx(MultipartFile file) {
+//        File source = FileUtil.transferToFile(file);
+//        File target = new File("C:\\Users\\tgx\\Desktop\\tmp.mp3");
+//
+//        try {
+//            AudioAttributes audio = new AudioAttributes();
+//            audio.setCodec("libmp3lame");
+//            audio.setBitRate(128000);
+//            audio.setChannels(2);
+//            audio.setSamplingRate(44100);
+//            audio.setVolume(256);
+//
+//            EncodingAttributes attrs = new EncodingAttributes();
+//            attrs.setFormat("mp3");
+//            attrs.setAudioAttributes(audio);
+//            // attrs.setOffset(5F);
+//            // attrs.setDuration(30F);
+//            Encoder encoder = new Encoder();
+//            encoder.encode(new MultimediaObject(source), target, attrs);
+//
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+//        return target;
+//    }
+
+
     /**
-     * 语音评测（讯飞版）
+     * 语音评测（讯飞版）——异步
      */
     @Override
-    public Object evaluateByXF(File audio, String refText, String pinyin, String category) {
+    public Object evaluateByXF2(File audio, String refText, String pinyin, String category) {
 
         String authUrl = getAuthUrl(hostUrl, apiKey, apiSecret);// 构建鉴权url
         //将url中的 schema http://和https://分别替换为ws:// 和 wss://
@@ -164,8 +204,40 @@ public class EvaluateServiceImpl implements EvaluateService {
         evalListener.setText(refText);
         evalListener.setCategory(category);//category校验
         WebSocket webSocket = client.newWebSocket(request, evalListener);
-        long beginTime = (new Date()).getTime();
+//        long beginTime = (new Date()).getTime();
+//
+//        while (evalListener.getEvalRes() == null) {
+//            try {
+//                Thread.sleep(50);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        long endTime = (new Date()).getTime();
+//        System.out.println("等待评测结果耗时：" + (endTime - beginTime) + "ms");
+//        return ((cn.hutool.json.JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
+        System.out.println("return message");
+        return "message";
+    }
 
+    /**
+     * 语音评测（讯飞版）
+     */
+    @Override
+    public Object evaluateByXF(File audio, String refText, String pinyin, String category) {
+        System.out.println("text:" + refText);
+
+        String authUrl = getAuthUrl(hostUrl, apiKey, apiSecret);// 构建鉴权url
+        //将url中的 schema http://和https://分别替换为ws:// 和 wss://
+        String url = authUrl.replace("http://", "ws://").replace("https://", "wss://");
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        Request request = new Request.Builder().url(url).build();
+        EvalListener evalListener = new EvalListener();
+        evalListener.setFile(audio);
+        evalListener.setText(refText);
+        evalListener.setCategory(category);//category校验
+        WebSocket webSocket = client.newWebSocket(request, evalListener);
+        //循环等待结果
         while (evalListener.getEvalRes() == null) {
             try {
                 Thread.sleep(50);
@@ -173,11 +245,14 @@ public class EvaluateServiceImpl implements EvaluateService {
                 e.printStackTrace();
             }
         }
-        long endTime = (new Date()).getTime();
-        System.out.println("等待评测结果耗时：" + (endTime - beginTime) + "ms");
-        return ((cn.hutool.json.JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
-//        System.out.println("return message");
-//        return "message";
+        //新增评测记录evalRecord
+        Object evalJsonRes = ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
+        EvalRecordDO evalRecordDO = new EvalRecordDO();
+        evalRecordDO.setAlgRes(evalJsonRes.toString());
+        evalRecordMapper.insert(evalRecordDO);
+        //返回结果
+        return evalJsonRes;
+
     }
 
     /**
@@ -233,82 +308,82 @@ public class EvaluateServiceImpl implements EvaluateService {
     }
 
 
-    @Override
-    public Object getCorpusesByGroupId(String cpsgrpId) {
-        List<CpsrcdDO> cpsrcdDOS = cpsrcdManager.listByCpsgrpId(cpsgrpId);
-        CpsgrpDO cpsgrp = cpsgrpMapper.selectById(cpsgrpId);
-        CpsgrpVO2 cpsgrpVO = new CpsgrpVO2();
-        BeanUtils.copyProperties(cpsgrp, cpsgrpVO);
-        List<JSONObject> list = new ArrayList<>();
-        for (CpsrcdDO cpsrcd : cpsrcdDOS) {
-            JSONObject o = new JSONObject();
-            //如果list为空则创建list的第一项
-            if (cpsrcd.getType() == 1) {
-                boolean exist = false;
-                //否则遍历list，查看是否已经存在对应type的项
-                for (JSONObject jsonObject : list) {
-                    if ((int) jsonObject.get("type") == 1)
-                        exist = true;
-                }
-                //如果list为空,或者list中不存在对应type的项则新建cpsrcdVO加入corpus_list
-                if (!exist || list.isEmpty()) {
-                    o.put("type", cpsrcd.getType());
-                    List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
-                    CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
-                    BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
-                    cpsrcdVO2s.add(cpsrcdVO2);
-                    o.put("corpus_list", cpsrcdVO2s);
-                    list.add(o);
-                } else {
-                    //找到list中对应的项并插入
-                    for (JSONObject jsonObject : list) {
-                        List<CpsrcdVO2> temp_list = (List<CpsrcdVO2>) jsonObject.get("corpus_list");
-                        if ((int) jsonObject.get("type") == 1) {
-                            CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
-                            BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
-                            temp_list.add(cpsrcdVO2);
-                        }
-                    }
-                }
-            } else if (cpsrcd.getType() == 2) {
-                boolean exist = false;
-                for (JSONObject jsonObject : list) {
-                    if ((int) jsonObject.get("type") == 2)
-                        exist = true;
-                }
-                if (!exist || list.isEmpty()) {
-                    o.put("type", cpsrcd.getType());
-                    List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
-                    CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
-                    BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
-                    cpsrcdVO2s.add(cpsrcdVO2);
-                    o.put("corpus_list", cpsrcdVO2s);
-                    list.add(o);
-                } else {
-                    //找到list中对应的项并插入
-                    for (JSONObject jsonObject : list) {
-                        List<CpsrcdVO2> temp_list = (List<CpsrcdVO2>) jsonObject.get("corpus_list");
-                        if ((int) jsonObject.get("type") == 2) {
-                            CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
-                            BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
-                            temp_list.add(cpsrcdVO2);
-                        }
-                    }
-                }
-            } else {
-                o.put("type", cpsrcd.getType());
-                List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
-                CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
-                BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
-                cpsrcdVO2s.add(cpsrcdVO2);
-                o.put("corpus_list", cpsrcdVO2s);
-                list.add(o);
-            }
-
-        }
-        cpsgrpVO.setCpsrcdList(list);
-        return cpsgrpVO;
-    }
+//    @Override
+//    public Object getCorpusesByGroupId(String cpsgrpId) {
+//        List<CpsrcdDO> cpsrcdDOS = cpsrcdManager.listByCpsgrpId(cpsgrpId);
+//        CpsgrpDO cpsgrp = cpsgrpMapper.selectById(cpsgrpId);
+//        CpsgrpVO2 cpsgrpVO = new CpsgrpVO2();
+//        BeanUtils.copyProperties(cpsgrp, cpsgrpVO);
+//        List<JSONObject> list = new ArrayList<>();
+//        for (CpsrcdDO cpsrcd : cpsrcdDOS) {
+//            JSONObject o = new JSONObject();
+//            //如果list为空则创建list的第一项
+//            if (cpsrcd.getType() == 1) {
+//                boolean exist = false;
+//                //否则遍历list，查看是否已经存在对应type的项
+//                for (JSONObject jsonObject : list) {
+//                    if ((int) jsonObject.get("type") == 1)
+//                        exist = true;
+//                }
+//                //如果list为空,或者list中不存在对应type的项则新建cpsrcdVO加入corpus_list
+//                if (!exist || list.isEmpty()) {
+//                    o.put("type", cpsrcd.getType());
+//                    List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
+//                    CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
+//                    BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
+//                    cpsrcdVO2s.add(cpsrcdVO2);
+//                    o.put("corpus_list", cpsrcdVO2s);
+//                    list.add(o);
+//                } else {
+//                    //找到list中对应的项并插入
+//                    for (JSONObject jsonObject : list) {
+//                        List<CpsrcdVO2> temp_list = (List<CpsrcdVO2>) jsonObject.get("corpus_list");
+//                        if ((int) jsonObject.get("type") == 1) {
+//                            CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
+//                            BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
+//                            temp_list.add(cpsrcdVO2);
+//                        }
+//                    }
+//                }
+//            } else if (cpsrcd.getType() == 2) {
+//                boolean exist = false;
+//                for (JSONObject jsonObject : list) {
+//                    if ((int) jsonObject.get("type") == 2)
+//                        exist = true;
+//                }
+//                if (!exist || list.isEmpty()) {
+//                    o.put("type", cpsrcd.getType());
+//                    List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
+//                    CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
+//                    BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
+//                    cpsrcdVO2s.add(cpsrcdVO2);
+//                    o.put("corpus_list", cpsrcdVO2s);
+//                    list.add(o);
+//                } else {
+//                    //找到list中对应的项并插入
+//                    for (JSONObject jsonObject : list) {
+//                        List<CpsrcdVO2> temp_list = (List<CpsrcdVO2>) jsonObject.get("corpus_list");
+//                        if ((int) jsonObject.get("type") == 2) {
+//                            CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
+//                            BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
+//                            temp_list.add(cpsrcdVO2);
+//                        }
+//                    }
+//                }
+//            } else {
+//                o.put("type", cpsrcd.getType());
+//                List<CpsrcdVO2> cpsrcdVO2s = new ArrayList<>();
+//                CpsrcdVO2 cpsrcdVO2 = new CpsrcdVO2();
+//                BeanUtils.copyProperties(cpsrcd, cpsrcdVO2);
+//                cpsrcdVO2s.add(cpsrcdVO2);
+//                o.put("corpus_list", cpsrcdVO2s);
+//                list.add(o);
+//            }
+//
+//        }
+//        cpsgrpVO.setCpsrcdList(list);
+//        return cpsgrpVO;
+//    }
 
     /**
      * 讯飞鉴权
