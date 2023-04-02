@@ -26,6 +26,8 @@ public enum BizCodeEnum {
      * 语料组相关
      */
     CPSGRP_ERROR(260001, "语料组异常"),
+    CPSGRP_NOT_EXIST(260002, "语料组不存在"),
+
 
     /**
      * 参数异常

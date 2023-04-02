@@ -27,5 +27,11 @@ public class IDUtil {
         return "cpsgrp_" + getSnowflakeId();
     }
 
-    public static String nextCourseId() { return "course_" + getSnowflakeId(); }
+    public static String nextCourseId() {
+        return "course_" + getSnowflakeId();
+    }
+
+    public static String nextTranscriptId() {
+        return "transcript_" + getSnowflakeId();
+    }
 }

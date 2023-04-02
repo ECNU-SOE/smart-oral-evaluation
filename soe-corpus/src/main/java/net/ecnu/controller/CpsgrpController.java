@@ -7,6 +7,7 @@ import net.ecnu.controller.request.CpsgrpFilterReq;
 import net.ecnu.controller.request.TranscriptReq;
 import net.ecnu.model.common.PageData;
 import net.ecnu.service.CpsgrpService;
+import net.ecnu.service.TranscriptService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -18,6 +19,9 @@ public class CpsgrpController {
 
     @Autowired
     private CpsgrpService cpsgrpService;
+
+    @Autowired
+    private TranscriptService transcriptService;
 
     /**
      * 查询语料组列表
@@ -57,17 +61,33 @@ public class CpsgrpController {
         return JsonData.buildSuccess(data);
     }
 
+//    /**
+//     * 生成语料组 答题报告transcript
+//     */
+//    @Deprecated
+//    @PostMapping("transcript")
+//    public JsonData transcript(@RequestBody @Validated TranscriptReq transcriptReq) {
+//        Object data = cpsgrpService.genTranscript(transcriptReq);//生成报告
+//        return JsonData.buildSuccess(data);
+//    }
+
     /**
-     * 生成语料组 答题报告transcript
+     * 存储答题题报告
      */
-    @Deprecated
-    @PostMapping("transcript")
-    public JsonData transcript(@RequestBody @Validated TranscriptReq transcriptReq) {
-        Object data = cpsgrpService.genTranscript(transcriptReq);//生成报告
+    @PostMapping("save_transcript")
+    public JsonData saveTranscript(@RequestBody @Validated TranscriptReq transcriptReq) {
+        Object data = transcriptService.save(transcriptReq);//生成报告
         return JsonData.buildSuccess(data);
     }
 
-
+    /**
+     * 查询答题报告
+     */
+    @PostMapping("transcripts")
+    public JsonData transcript(@RequestBody TranscriptReq transcriptReq) {
+        Object data = transcriptService.getTranscript(transcriptReq);//生成报告
+        return JsonData.buildSuccess(data);
+    }
 
 
 }

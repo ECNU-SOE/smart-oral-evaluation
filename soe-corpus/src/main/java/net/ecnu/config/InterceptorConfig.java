@@ -17,7 +17,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 //添加拦截的路径
                 .addPathPatterns(
                         "/api/corpus/v1/add",
-                        "/api/cpsgrp/v1/create", "/api/cpsgrp/v1/del",
+                        "/api/cpsgrp/v1/create", "/api/cpsgrp/v1/del","/api/cpsgrp/v1/save_transcript","/api/cpsgrp/v1/transcripts",
                         "/api/cpsgrp/v1/transcript")
 
                 //排除不拦截
