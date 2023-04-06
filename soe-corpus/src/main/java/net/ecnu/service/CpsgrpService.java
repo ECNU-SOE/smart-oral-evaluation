@@ -30,4 +30,6 @@ public interface CpsgrpService extends IService<CpsgrpDO> {
     Object genTranscript(TranscriptReq transcriptReq);
 
     Object pageByFilter(CpsgrpFilterReq cpsgrpFilter, PageData pageData);
+
+    Object update(CpsgrpReq cpsgrpReq);
 }
