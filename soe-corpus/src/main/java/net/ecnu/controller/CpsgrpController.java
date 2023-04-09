@@ -2,6 +2,7 @@ package net.ecnu.controller;
 
 
 import net.ecnu.controller.group.Create;
+import net.ecnu.controller.group.Update;
 import net.ecnu.controller.request.CpsgrpReq;
 import net.ecnu.controller.request.CpsgrpFilterReq;
 import net.ecnu.controller.request.TranscriptReq;
@@ -49,6 +50,15 @@ public class CpsgrpController {
     @PostMapping("create")
     public JsonData create(@RequestBody @Validated(Create.class) CpsgrpReq cpsgrpReq) {
         Object data = cpsgrpService.create(cpsgrpReq);
+        return JsonData.buildSuccess(data);
+    }
+
+    /**
+     * 更新语料组cpsgrp
+     */
+    @PostMapping("update")
+    public JsonData update(@RequestBody @Validated(Update.class) CpsgrpReq cpsgrpReq) {
+        Object data = cpsgrpService.update(cpsgrpReq);
         return JsonData.buildSuccess(data);
     }
 

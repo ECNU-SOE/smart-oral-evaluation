@@ -155,6 +155,21 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     }
 
     @Override
+    public Object update(CpsgrpReq cpsgrpReq) {
+        //获取登录用户信息
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+        //更新语料组
+        CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(cpsgrpReq.getId());
+        if (cpsgrpDO == null) throw new BizException(BizCodeEnum.CPSGRP_NOT_EXIST);
+        //全量更新cpsgrp,不更新：id,courseId
+        BeanUtils.copyProperties(cpsgrpReq, cpsgrpDO, "id", "courseId");
+        int i = cpsgrpMapper.updateById(cpsgrpDO);
+        cpsgrpDO = cpsgrpMapper.selectById(cpsgrpDO.getId());
+        return cpsgrpDO;
+    }
+
+    @Override
     public Object genTranscript(TranscriptReq transcriptReq) {
 //        //获取登录用户信息
 //        LoginUser loginUser = LoginInterceptor.threadLocal.get();

@@ -51,7 +51,7 @@ public class UserController {
      * 查询登陆用户详情（需要携带token）
      */
     @GetMapping("info")
-    public JsonData info2() {
+    public JsonData info() {
         Object data = userService.getUserInfo();
         return JsonData.buildSuccess(data);
     }
@@ -73,4 +73,5 @@ public class UserController {
         else
             return JsonData.buildError("短信发送错误");
     }
+
 }

@@ -18,6 +18,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 public class CpsgrpVO implements Serializable {
 
+    private String id;
     private String courseId;
     private String title;
     private String description;
