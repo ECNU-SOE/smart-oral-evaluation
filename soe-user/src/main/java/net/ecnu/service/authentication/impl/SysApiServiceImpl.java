@@ -55,13 +55,11 @@ public class SysApiServiceImpl implements SysApiService {
                 BeanUtils.copyProperties(item, bean);
                 return bean;
             }).collect(Collectors.toList());
-
-            if (StringUtils.isNotEmpty(apiNameLike) || apiStatus != null) {
+            if (StringUtils.isNotEmpty(apiNameLike) && apiStatus != null) {
                 return sysApiNodes;//根据api名称等查询会破坏树形结构，返回平面列表
             } else {//否则返回树型结构列表
                 return DataTreeUtil.buildTree(sysApiNodes, rootApiId);
             }
-
         } else {
             throw new BizException(BizCodeEnum.USER_INPUT_ERROR.getCode(),
                     "请先在数据库内为API配置一个分类的根节点，level=1");
