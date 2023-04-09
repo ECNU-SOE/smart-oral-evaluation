@@ -38,7 +38,7 @@
             <artifactId>jave-all-deps</artifactId>
             <version>3.3.1</version>
         </dependency>-->
-
+        <!--权限依赖-->
         <dependency>
             <groupId>net.ecnu</groupId>
             <artifactId>soe-security</artifactId>
