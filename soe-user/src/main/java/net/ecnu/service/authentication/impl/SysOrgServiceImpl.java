@@ -9,9 +9,8 @@ import net.ecnu.model.authentication.SysOrg;
 import net.ecnu.model.authentication.SysOrgNode;
 import net.ecnu.model.authentication.tree.DataTreeUtil;
 import net.ecnu.service.authentication.SysOrgService;
-import net.ecnu.utils.RequestParamUtil;
+import net.ecnu.util.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.cert.ocsp.Req;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 

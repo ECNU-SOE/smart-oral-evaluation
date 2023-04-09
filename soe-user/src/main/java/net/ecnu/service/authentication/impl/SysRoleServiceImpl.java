@@ -10,7 +10,7 @@ import net.ecnu.mapper.SystemMapper;
 import net.ecnu.model.authentication.SysRole;
 import net.ecnu.model.authentication.SysUserRole;
 import net.ecnu.service.authentication.SysRoleService;
-import net.ecnu.utils.RequestParamUtil;
+import net.ecnu.util.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

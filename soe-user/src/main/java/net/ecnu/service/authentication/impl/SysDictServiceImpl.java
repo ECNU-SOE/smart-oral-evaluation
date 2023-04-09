@@ -7,7 +7,7 @@ import net.ecnu.exception.BizException;
 import net.ecnu.mapper.SysDictMapper;
 import net.ecnu.model.authentication.SysDict;
 import net.ecnu.service.authentication.SysDictService;
-import net.ecnu.utils.RequestParamUtil;
+import net.ecnu.util.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 

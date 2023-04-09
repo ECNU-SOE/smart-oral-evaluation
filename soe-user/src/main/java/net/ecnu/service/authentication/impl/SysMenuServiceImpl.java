@@ -12,7 +12,7 @@ import net.ecnu.model.authentication.SysMenuNode;
 import net.ecnu.model.authentication.SysRoleMenu;
 import net.ecnu.model.authentication.tree.DataTreeUtil;
 import net.ecnu.service.authentication.SysMenuService;
-import net.ecnu.utils.RequestParamUtil;
+import net.ecnu.util.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;

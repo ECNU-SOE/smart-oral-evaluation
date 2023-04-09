@@ -15,7 +15,7 @@ import net.ecnu.model.authentication.SysUserOrg;
 import net.ecnu.model.dto.UserDTO;
 import net.ecnu.service.authentication.SysUserService;
 import net.ecnu.util.JsonData;
-import net.ecnu.utils.RequestParamUtil;
+import net.ecnu.util.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

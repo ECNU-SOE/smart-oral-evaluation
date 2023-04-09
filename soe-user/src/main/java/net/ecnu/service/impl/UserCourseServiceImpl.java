@@ -14,7 +14,7 @@ import net.ecnu.model.CourseDO;
 import net.ecnu.model.UserCourseDO;
 import net.ecnu.model.UserDO;
 import net.ecnu.service.UserCourseService;
-import net.ecnu.utils.RequestParamUtil;
+import net.ecnu.util.RequestParamUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

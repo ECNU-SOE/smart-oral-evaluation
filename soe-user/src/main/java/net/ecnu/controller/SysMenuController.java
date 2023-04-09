@@ -1,15 +1,13 @@
 package net.ecnu.controller;
 
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import net.ecnu.model.authentication.RoleCheckedIds;
 import net.ecnu.model.authentication.SysMenu;
 import net.ecnu.model.authentication.SysMenuNode;
 import net.ecnu.service.authentication.SysMenuService;
 import net.ecnu.util.JsonData;
-import net.ecnu.utils.RequestParamUtil;
+import net.ecnu.util.RequestParamUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

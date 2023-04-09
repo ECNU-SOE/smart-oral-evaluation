@@ -13,7 +13,7 @@ import net.ecnu.model.vo.UserVO;
 import net.ecnu.service.authentication.SysUserService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.JsonData;
-import net.ecnu.utils.RequestParamUtil;
+import net.ecnu.util.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
