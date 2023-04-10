@@ -10,12 +10,6 @@ import java.util.Date;
 public class CourAddReq {
 
     /**
-     * 课程id
-     */
-    @NotBlank(message = "必须指定课程id",groups = {Create.class})
-    private String courseId;
-
-    /**
      * 课程名
      */
     @NotBlank(message = "班级名字不能为空",groups = {Create.class})
@@ -26,10 +20,6 @@ public class CourAddReq {
      */
     private String description;
 
-    /**
-     * 班级分级
-     */
-    private Integer level;
 
     /**
      * 开始时间

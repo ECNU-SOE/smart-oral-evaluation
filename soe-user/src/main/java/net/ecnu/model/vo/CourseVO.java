@@ -24,11 +24,6 @@ public class CourseVO implements Serializable {
     private String id;
 
     /**
-     * 课程id
-     */
-    private String courseId;
-
-    /**
      * 班级名
      */
     private String name;
@@ -39,24 +34,13 @@ public class CourseVO implements Serializable {
     private String description;
 
     /**
-     * 班级层级
-     */
-    private Integer level;
-
-    /**
-     * 课程开始时间
-     */
-    private Date startTime;
-
-    /**
-     * 课程结束时间
-     */
-    private Date endTime;
-
-    /**
      * 课程创建者
      */
     private String creator;
+
+    private Date gmtCreate;
+
+    private Date gmtModified;
 
 
 }

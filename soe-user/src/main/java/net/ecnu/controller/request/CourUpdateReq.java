@@ -25,19 +25,4 @@ public class CourUpdateReq {
      */
     private String description;
 
-    /**
-     * 班级分级
-     */
-    private Integer level;
-
-    /**
-     * 开始时间
-     */
-    private Date startTime;
-
-    /**
-     * 结束时间
-     */
-    private Date endTime;
-
 }

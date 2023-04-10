@@ -5,12 +5,8 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="net.ecnu.model.CourseDO">
         <id column="id" property="id" />
-        <result column="course_id" property="courseId" />
         <result column="name" property="name" />
         <result column="description" property="description" />
-        <result column="level" property="level" />
-        <result column="start_time" property="startTime" />
-        <result column="end_time" property="endTime" />
         <result column="creator" property="creator" />
         <result column="del" property="del" />
         <result column="gmt_create" property="gmtCreate" />
@@ -19,7 +15,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, course_id, name, description, level, start_time, end_time, creator, del, gmt_create, gmt_modified
+        id, name, description, creator, del, gmt_create, gmt_modified
     </sql>
 
 </mapper>
