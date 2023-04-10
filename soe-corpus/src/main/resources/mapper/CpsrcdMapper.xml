@@ -14,13 +14,15 @@
         <result column="word_weight" property="wordWeight" />
         <result column="pinyin" property="pinyin" />
         <result column="ref_text" property="refText" />
+        <result column="audio_url" property="audioUrl" />
+        <result column="tags" property="tags" />
         <result column="gmt_create" property="gmtCreate" />
         <result column="gmt_modified" property="gmtModified" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, corpus_id, cpsgrp_id, topic_id, c_num, eval_mode, difficulty, word_weight, pinyin, ref_text, gmt_create, gmt_modified
+        id, corpus_id, cpsgrp_id, topic_id, c_num, eval_mode, difficulty, word_weight, pinyin, ref_text, audio_url, tags, gmt_create, gmt_modified
     </sql>
 
 </mapper>

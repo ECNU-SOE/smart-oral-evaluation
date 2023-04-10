@@ -12,6 +12,7 @@ import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/cpsrcd/v1")
@@ -21,7 +22,7 @@ public class CpsrcdController {
     private CpsrcdService cpsrcdService;
 
     /**
-     * 向语料组cpsgrp中添加子题cpsrcd
+     * 添加子题cpsrcd
      */
     @PostMapping("add")
     public JsonData add(@RequestBody @Validated(Create.class) CpsrcdReq cpsrcdReq) {
@@ -30,7 +31,7 @@ public class CpsrcdController {
     }
 
     /**
-     * 更新语料组cpsgrp中的子题cpsrcd
+     * 更新子题cpsrcd
      */
     @PostMapping("mod")
     public JsonData mod(@RequestBody @Validated(Update.class) CpsrcdReq cpsrcdReq) {
@@ -46,6 +47,5 @@ public class CpsrcdController {
         Object data = cpsrcdService.del(cpsrcdId);
         return JsonData.buildSuccess(data);
     }
-
 }
 

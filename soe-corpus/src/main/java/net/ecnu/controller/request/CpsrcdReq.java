@@ -66,5 +66,15 @@ public class CpsrcdReq {
      */
     private String refText;
 
+    /**
+     * 示范音频播放url
+     */
+    private String audioUrl;
+
+    /**
+     * 题目标签
+     */
+    private String tags;
+
 
 }

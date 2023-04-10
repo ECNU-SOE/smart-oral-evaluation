@@ -21,8 +21,8 @@ public class MyBatisPlusGenerator {
                 .setAuthor("TGX")
                 // 生成路径，最好使用绝对路径，window路径是不一样的
                 //TODO  TODO  TODO  TODO
-                .setOutputDir("C:\\Users\\tgx\\Desktop")
-//                .setOutputDir("/Users/lyw/Desktop/demo/src/main/java")
+//                .setOutputDir("C:\\Users\\tgx\\Desktop")
+                .setOutputDir("/Users/lyw/Desktop/demo/src/main/java")
                 // 文件覆盖
                 .setFileOverride(true)
                 // 主键策略
@@ -67,12 +67,12 @@ public class MyBatisPlusGenerator {
                 //使用lombok
                 .setEntityLombokModel(true)
 
-                //使用restcontroller注解
+                //使用restController注解
                 .setRestControllerStyle(true)
 
                 // 生成的表, 支持多表一起生成，以数组形式填写
                 //TODO  TODO  TODO  TODO
-                .setInclude("user_class");
+                .setInclude("cpsrcd");
 
         //4. 包名策略配置
         PackageConfig pkConfig = new PackageConfig();
