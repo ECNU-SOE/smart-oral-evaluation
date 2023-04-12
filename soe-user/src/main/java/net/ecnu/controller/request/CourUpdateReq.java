@@ -11,7 +11,7 @@ public class CourUpdateReq {
     /**
      * 班级id
      */
-    @NotBlank(message = "必须指定班级id",groups = {Update.class})
+    @NotBlank(message = "必须指定课程id",groups = {Update.class})
     private String id;
 
 
@@ -24,5 +24,9 @@ public class CourUpdateReq {
      * 课程描述
      */
     private String description;
+
+    private Date startTime;
+
+    private Date endTime;
 
 }

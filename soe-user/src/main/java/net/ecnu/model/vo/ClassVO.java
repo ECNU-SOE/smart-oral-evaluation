@@ -16,12 +16,14 @@ import java.util.Date;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class CourseVO implements Serializable {
+public class ClassVO implements Serializable {
 
     /**
      * 班级id
      */
     private String id;
+
+    private String courseId;
 
     /**
      * 班级名
@@ -38,9 +40,7 @@ public class CourseVO implements Serializable {
      */
     private String creator;
 
-    private Date startTime;
-
-    private Date endTime;
+    private Integer level;
 
     private Date gmtCreate;
 

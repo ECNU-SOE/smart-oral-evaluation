@@ -14,7 +14,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author TGX
- * @since 2023-04-07
+ * @since 2023-04-10
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -26,7 +26,7 @@ public class ClassDO implements Serializable {
     /**
      * 班级id
      */
-      @TableId(value = "id", type = IdType.AUTO)
+      @TableId(value = "id", type = IdType.NONE)
     private String id;
 
     /**
@@ -35,9 +35,19 @@ public class ClassDO implements Serializable {
     private String courseId;
 
     /**
+     * 班级名字，例：1班，2班
+     */
+    private String name;
+
+    /**
      * 班级描述
      */
     private String description;
+
+    /**
+     * 班级创建者
+     */
+    private String creator;
 
     /**
      * 班级水平
@@ -45,19 +55,9 @@ public class ClassDO implements Serializable {
     private Integer level;
 
     /**
-     * 开课时间
-     */
-    private Date startTime;
-
-    /**
-     * 结束时间
-     */
-    private Date endTime;
-
-    /**
      * 删除标识位
      */
-    private Integer del;
+    private Boolean del;
 
     /**
      * 创建时间
