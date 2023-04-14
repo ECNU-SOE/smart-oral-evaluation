@@ -3,6 +3,7 @@ package net.ecnu.model.vo;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -45,6 +46,7 @@ public class CpsrcdVO implements Serializable {
     /**
      * cpsrcd次序
      */
+    @JsonProperty("cNum")
     private Integer cNum;
 
     /**
