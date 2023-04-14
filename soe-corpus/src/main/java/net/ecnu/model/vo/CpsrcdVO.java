@@ -75,6 +75,16 @@ public class CpsrcdVO implements Serializable {
     private String refText;
 
     /**
+     * 示范音频播放url
+     */
+    private String audioUrl;
+
+    /**
+     * 题目标签
+     */
+    private String tags;
+
+    /**
      * 创建时间
      */
     private Date gmtCreate;
