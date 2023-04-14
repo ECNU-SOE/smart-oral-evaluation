@@ -1,5 +1,6 @@
 package net.ecnu.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import net.ecnu.controller.request.CourAddReq;
 import net.ecnu.controller.request.CourFilterReq;
 import net.ecnu.controller.request.CourUpdateReq;
@@ -7,7 +8,9 @@ import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.manager.CourseManager;
+import net.ecnu.mapper.ClassMapper;
 import net.ecnu.mapper.CourseMapper;
+import net.ecnu.model.ClassDO;
 import net.ecnu.model.CourseDO;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.common.PageData;
@@ -19,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,9 +30,11 @@ public class CourseServiceImpl implements CourseService {
 
     @Autowired
     private CourseMapper courseMapper;
-
     @Autowired
     private CourseManager courseManager;
+    @Autowired
+    private ClassMapper classMapper;
+
 //
 //    @Autowired
 //    private UserCourseMapper userCourseMapper;
@@ -52,7 +58,7 @@ public class CourseServiceImpl implements CourseService {
         //插入数据
         CourseDO csDO = new CourseDO();
         BeanUtils.copyProperties(courAddReq,csDO);
-        csDO.setId(IDUtil.nextCpsgrpId());
+        csDO.setId(IDUtil.nextCourseId());
         csDO.setCreator(loginUser.getAccountNo());
         csDO.setDel(false);
         return courseMapper.insert(csDO);
@@ -63,6 +69,12 @@ public class CourseServiceImpl implements CourseService {
         CourseDO courseDO = courseMapper.selectById(id);
         if (courseDO == null)
             throw new BizException(BizCodeEnum.COURSE_UNEXISTS);
+        //判断该课程下是否有班级，如果有则不能删除
+        List<ClassDO> classDOS = classMapper.selectList(new QueryWrapper<ClassDO>()
+                .eq("course_id", courseDO.getId())
+        );
+        if (classDOS.size()!=0)
+            throw new BizException(BizCodeEnum.COURSE_USING);
         //判断用户权限
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
         if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);

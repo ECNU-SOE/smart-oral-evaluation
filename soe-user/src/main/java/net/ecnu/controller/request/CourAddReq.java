@@ -12,7 +12,7 @@ public class CourAddReq {
     /**
      * 课程名
      */
-    @NotBlank(message = "班级名字不能为空",groups = {Create.class})
+    @NotBlank(message = "课程名字不能为空",groups = {Create.class})
     private String name;
 
     /**
