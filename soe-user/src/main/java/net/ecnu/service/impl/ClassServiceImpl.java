@@ -8,10 +8,7 @@ import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.manager.ClassManager;
 import net.ecnu.manager.UserClassManager;
 import net.ecnu.mapper.*;
-import net.ecnu.model.ClassDO;
-import net.ecnu.model.CourseDO;
-import net.ecnu.model.UserClassDO;
-import net.ecnu.model.UserDO;
+import net.ecnu.model.*;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.common.PageData;
 import net.ecnu.model.vo.ClassVO;
@@ -52,6 +49,10 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     private UserClassMapper userClassMapper;
     @Autowired
     private UserRoleMapper userRoleMapper;
+    @Autowired
+    private CpsgrpMapper cpsgrpMapper;
+
+
 
     @Override
     public Object add(ClassAddReq classAddReq) {
@@ -136,7 +137,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             //请求体accountNo为空，用户选择自己的课程（根据token）
             UserClassDO userClassDO1 = new UserClassDO();
             BeanUtils.copyProperties(usrClassAddReq,userClassDO1);
-            userClassDO1.setRType(usrClassAddReq.getType());//bug,需要手动设定rtype
+            userClassDO1.setRType(usrClassAddReq.getRType());//bug,需要手动设定rtype
             return userClassMapper.insert(userClassDO1);
         }else {
             //请求体accountNo不为空
@@ -144,7 +145,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
                 //token的accountNo与请求体的accountNo相同，给自己选课
                 UserClassDO userClassDO1 = new UserClassDO();
                 BeanUtils.copyProperties(usrClassAddReq,userClassDO1);
-                userClassDO1.setRType(usrClassAddReq.getType());//bug,需要手动设定rtype
+                userClassDO1.setRType(usrClassAddReq.getRType());//bug,需要手动设定rtype
 //                System.out.println("req的值是："+usrClassAddReq);
 //                System.out.println("userClassDO1 的值是= " + userClassDO1);
                 return userClassMapper.insert(userClassDO1);
@@ -214,6 +215,75 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         }
     }
 
+    @Override
+    public Object addTest(TestAddReq testAddReq) {
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        if (loginUser == null)
+            throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+        //判断班级是否存在
+        ClassDO classDO = classMapper.selectById(testAddReq.getClassId());
+        if (classDO==null)
+            throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
+        //判断语料组是否异常
+        CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(testAddReq.getCpsgrpId());
+        if (cpsgrpDO == null || cpsgrpDO.getClassId() != null)
+            throw new BizException(BizCodeEnum.CPSGRP_ERROR);
+        //身份校验,管理员可以直接发布，教师需要自己选了这门课程才能发布
+        if (getTopRole(loginUser.getAccountNo()) <= 3) {
+            CpsgrpDO cpsgrpDO1 = new CpsgrpDO();
+            BeanUtils.copyProperties(cpsgrpDO, cpsgrpDO1);
+            cpsgrpDO1.setType(testAddReq.getType());
+            cpsgrpDO1.setClassId(testAddReq.getClassId());
+            return cpsgrpMapper.updateById(cpsgrpDO1);
+        } else if (getTopRole(loginUser.getAccountNo()) > 3 && getTopRole(loginUser.getAccountNo()) <= 6) {
+            UserClassDO userClassDO = userClassMapper.selectOne(new QueryWrapper<UserClassDO>()
+                    .eq("account_no", loginUser.getAccountNo())
+                    .eq("class_id", testAddReq.getClassId()));
+            if (userClassDO == null)
+                throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+            CpsgrpDO cpsgrpDO1 = new CpsgrpDO();
+            BeanUtils.copyProperties(cpsgrpDO, cpsgrpDO1);
+            cpsgrpDO1.setType(testAddReq.getType());
+            cpsgrpDO1.setClassId(testAddReq.getClassId());
+            return cpsgrpMapper.updateById(cpsgrpDO1);
+        } else
+            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+    }
+
+    //    @Override
+//    public Object addTest(TestAddReq testAddReq) {
+//        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+//        if (loginUser == null)
+//            throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+//        //判断班级是否存在
+//        CourseDO courseDO = courseMapper.selectById(testAddReq.getCourseId());
+//        if (courseDO == null)
+//            throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
+//        //判断语料组是否异常
+//        CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(testAddReq.getCpsgrpId());
+//        if (cpsgrpDO == null || cpsgrpDO.getCourseId() != null)
+//            throw new BizException(BizCodeEnum.CPSGRP_ERROR);
+        //身份校验,管理员可以直接发布，教师需要自己选了这门课程才能发布
+//        if (getTopRole(loginUser.getAccountNo()) <= 3) {
+//            CpsgrpDO cpsgrpDO1 = new CpsgrpDO();
+//            BeanUtils.copyProperties(cpsgrpDO, cpsgrpDO1);
+//            cpsgrpDO1.setType(testAddReq.getType());
+//            cpsgrpDO1.setCourseId(testAddReq.getCourseId());
+//            return cpsgrpMapper.updateById(cpsgrpDO1);
+//        } else if (getTopRole(loginUser.getAccountNo()) > 3 && getTopRole(loginUser.getAccountNo()) <= 6) {
+//            UserCourseDO userCourseDO = userCourseMapper.selectOne(new QueryWrapper<UserCourseDO>()
+//                    .eq("account_no", loginUser.getAccountNo())
+//                    .eq("course_id", testAddReq.getCourseId()));
+//            if (userCourseDO == null)
+//                throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+//            CpsgrpDO cpsgrpDO1 = new CpsgrpDO();
+//            BeanUtils.copyProperties(cpsgrpDO, cpsgrpDO1);
+//            cpsgrpDO1.setType(testAddReq.getType());
+//            cpsgrpDO1.setCourseId(testAddReq.getCourseId());
+//            return cpsgrpMapper.updateById(cpsgrpDO1);
+//        } else
+//            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+//    }
 
     private ClassVO beanProcess(ClassDO classDO) {
         ClassVO classVO = new ClassVO();

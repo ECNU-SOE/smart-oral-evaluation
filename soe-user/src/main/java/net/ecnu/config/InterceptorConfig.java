@@ -25,6 +25,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/class/v1/add_user_class")
                 .addPathPatterns("/api/class/v1/del_user_class/{id}")
                 .addPathPatterns("/api/class/v1/list_usr_class")
+                .addPathPatterns("/api/class/v1/add_test")
                 //排除不拦截
                 .excludePathPatterns();
     }
