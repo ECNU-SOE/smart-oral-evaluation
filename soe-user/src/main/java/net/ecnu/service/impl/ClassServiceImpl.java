@@ -53,7 +53,6 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     private CpsgrpMapper cpsgrpMapper;
 
 
-
     @Override
     public Object add(ClassAddReq classAddReq) {
         //判断用户权限
@@ -92,7 +91,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     public Object update(ClassUpdateReq classUpdateReq) {
         //判断班级是否存在
         ClassDO classDO = classMapper.selectById(classUpdateReq.getId());
-        if (classDO==null)
+        if (classDO == null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         //判断用户权限
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
@@ -100,7 +99,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         if (loginUser.getRoleId() == null || loginUser.getRoleId() > 3)
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         ClassDO csDO = new ClassDO();
-        BeanUtils.copyProperties(classUpdateReq,csDO);
+        BeanUtils.copyProperties(classUpdateReq, csDO);
         return classMapper.updateById(csDO);
     }
 
@@ -133,31 +132,29 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         if (userClassDO != null)
             throw new BizException(BizCodeEnum.REPEAT_CHOOSE);
         //权限判断
-        if (usrClassAddReq.getAccountNo()==null){
+        if (usrClassAddReq.getAccountNo() == null) {
             //请求体accountNo为空，用户选择自己的课程（根据token）
             UserClassDO userClassDO1 = new UserClassDO();
-            BeanUtils.copyProperties(usrClassAddReq,userClassDO1);
+            BeanUtils.copyProperties(usrClassAddReq, userClassDO1);
             userClassDO1.setRType(usrClassAddReq.getRType());//bug,需要手动设定rtype
             return userClassMapper.insert(userClassDO1);
-        }else {
+        } else {
             //请求体accountNo不为空
-            if (Objects.equals(loginUser.getAccountNo(), usrClassAddReq.getAccountNo())){
+            if (Objects.equals(loginUser.getAccountNo(), usrClassAddReq.getAccountNo())) {
                 //token的accountNo与请求体的accountNo相同，给自己选课
                 UserClassDO userClassDO1 = new UserClassDO();
-                BeanUtils.copyProperties(usrClassAddReq,userClassDO1);
+                BeanUtils.copyProperties(usrClassAddReq, userClassDO1);
                 userClassDO1.setRType(usrClassAddReq.getRType());//bug,需要手动设定rtype
-//                System.out.println("req的值是："+usrClassAddReq);
-//                System.out.println("userClassDO1 的值是= " + userClassDO1);
                 return userClassMapper.insert(userClassDO1);
-            }else {
+            } else {
                 //token的accountNo与请求体的accountNo不同，给别人选课
                 Integer roleA = getTopRole(loginUser.getAccountNo());
                 Integer roleB = getTopRole(usrClassAddReq.getAccountNo());
-                if (hasAddOrDelRight(roleA,roleB)){
+                if (hasAddOrDelRight(roleA, roleB)) {
                     UserClassDO userClassDO1 = new UserClassDO();
-                    BeanUtils.copyProperties(usrClassAddReq,userClassDO1);
+                    BeanUtils.copyProperties(usrClassAddReq, userClassDO1);
                     return userClassMapper.insert(userClassDO1);
-                }else {
+                } else {
                     throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
                 }
             }
@@ -171,12 +168,12 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
         //判断选课信息是否存在
         UserClassDO userClassDO = userClassMapper.selectById(id);
-        if (userClassDO==null)
+        if (userClassDO == null)
             throw new BizException(BizCodeEnum.USER_COURSE_UNEXISTS);
         //权限校验
-        if (Objects.equals(loginUser.getAccountNo(),userClassDO.getAccountNo())){
+        if (Objects.equals(loginUser.getAccountNo(), userClassDO.getAccountNo())) {
             return userClassMapper.deleteById(id);
-        }else {
+        } else {
             //删除别人选课信息
             Integer role_A = getTopRole(loginUser.getAccountNo());
             Integer role_B = getTopRole(userClassDO.getAccountNo());
@@ -193,15 +190,19 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
         if (loginUser == null)
             throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
-        if (userClassDO.getAccountNo()==null)
-            throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
-        if (Objects.equals(loginUser.getAccountNo(), userClassDO.getAccountNo())) {
+        if (userClassDO.getAccountNo() == null||"".equals(userClassDO.getAccountNo().trim()))
+        {
             //查看自己的选课列表
             QueryWrapper<UserClassDO> qw = new QueryWrapper<>();
             qw.eq("account_no", userClassDO.getAccountNo());
             return userClassMapper.selectList(qw);
         }
-        else {
+        if (Objects.equals(loginUser.getAccountNo(), userClassDO.getAccountNo())) {
+            //查看自己的选课列表
+            QueryWrapper<UserClassDO> qw = new QueryWrapper<>();
+            qw.eq("account_no", userClassDO.getAccountNo());
+            return userClassMapper.selectList(qw);
+        } else {
             //登录用户查看别人的选课列表
             Integer top_role1 = getTopRole(loginUser.getAccountNo());
             Integer top_role2 = getTopRole(userClassDO.getAccountNo());
@@ -222,7 +223,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
         //判断班级是否存在
         ClassDO classDO = classMapper.selectById(testAddReq.getClassId());
-        if (classDO==null)
+        if (classDO == null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         //判断语料组是否异常
         CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(testAddReq.getCpsgrpId());
@@ -259,7 +260,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         if (cpsgrpDO == null)
             throw new BizException(BizCodeEnum.CPSGRP_ERROR);
         //语料组被加入班级才可删除
-        if (cpsgrpDO.getClassId()==null)
+        if (cpsgrpDO.getClassId() == null)
             throw new BizException(BizCodeEnum.CPSGRP_ERROR);
         if (getTopRole(loginUser.getAccountNo()) <= 3) {
             return cpsgrpMapper.deleteById(id);
@@ -281,12 +282,12 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
         //判断语料组是否异常
         CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(testUpdateReq.getId());
-        if (cpsgrpDO == null||cpsgrpDO.getClassId()==null)
+        if (cpsgrpDO == null || cpsgrpDO.getClassId() == null)
             throw new BizException(BizCodeEnum.CPSGRP_ERROR);
         //身份校验,管理员可以直接修改，教师需要自己选了这门课程才能修改
         if (getTopRole(loginUser.getAccountNo()) <= 3) {
             CpsgrpDO cpsgrpDO1 = new CpsgrpDO();
-            BeanUtils.copyProperties(testUpdateReq,cpsgrpDO1);
+            BeanUtils.copyProperties(testUpdateReq, cpsgrpDO1);
             return cpsgrpMapper.updateById(cpsgrpDO1);
         } else if (getTopRole(loginUser.getAccountNo()) > 3 && getTopRole(loginUser.getAccountNo()) <= 6) {
             UserClassDO userClassDO = userClassMapper.selectOne(new QueryWrapper<UserClassDO>()
@@ -294,13 +295,11 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             if (userClassDO == null)
                 throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
             CpsgrpDO cpsgrpDO1 = new CpsgrpDO();
-            BeanUtils.copyProperties(testUpdateReq,cpsgrpDO1);
+            BeanUtils.copyProperties(testUpdateReq, cpsgrpDO1);
             return cpsgrpMapper.updateById(cpsgrpDO1);
         } else
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
     }
-
-
 
 
     private ClassVO beanProcess(ClassDO classDO) {
@@ -312,6 +311,8 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     //获取当前用户的最高权限id,并强转为Integer型
     private Integer getTopRole(String accountNo) {
         List<String> roles_temp = userRoleMapper.getRoles(accountNo);
+        if (roles_temp.size()==0)
+            return 8;//用户没有设置权限id，则默认返回8：游客
         List<Integer> roles = roles_temp.stream().map(Integer::parseInt).collect(Collectors.toList());
         return Collections.min(roles);
     }

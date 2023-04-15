@@ -20,74 +20,66 @@ public class ClassController {
     private ClassService classService;
 
     @PostMapping("add")
-    public JsonData add(@RequestBody @Validated(Create.class) ClassAddReq classAddReq){
+    public JsonData add(@RequestBody @Validated(Create.class) ClassAddReq classAddReq) {
         Object data = classService.add(classAddReq);
         return JsonData.buildSuccess(data);
     }
 
     @PostMapping("add_user_class")
-    public JsonData add_user_class(@RequestBody @Validated(Create.class) UsrClassAddReq usrClassAddReq){
-//        System.out.println("这里的值为："+usrClassAddReq);
+    public JsonData add_user_class(@RequestBody @Validated(Create.class) UsrClassAddReq usrClassAddReq) {
         Object data = classService.addUsrClass(usrClassAddReq);
         return JsonData.buildSuccess(data);
     }
 
     @GetMapping("/del/{id}")
-    public JsonData del(@PathVariable("id") String id){
+    public JsonData del(@PathVariable("id") String id) {
         Object data = classService.del(id);
         return JsonData.buildSuccess(data);
     }
 
     @GetMapping("/del_user_class/{id}")
-    public JsonData del_user_class(@PathVariable("id") String id){
+    public JsonData del_user_class(@PathVariable("id") String id) {
         Object data = classService.delUsrClass(id);
         return JsonData.buildSuccess(data);
     }
 
     @PostMapping("update")
-    public JsonData update(@RequestBody ClassUpdateReq classUpdateReq){
+    public JsonData update(@RequestBody ClassUpdateReq classUpdateReq) {
         Object data = classService.update(classUpdateReq);
         return JsonData.buildSuccess(data);
     }
 
     @PostMapping("list")
     public JsonData list(
-            @RequestParam(value = "cur",defaultValue = "1") int cur,
-            @RequestParam(value = "size",defaultValue = "50") int size,
-            @RequestBody ClassFilterReq classFilter){
-        Object data = classService.pageByFilter(classFilter,new PageData(cur,size));
+            @RequestParam(value = "cur", defaultValue = "1") int cur,
+            @RequestParam(value = "size", defaultValue = "50") int size,
+            @RequestBody ClassFilterReq classFilter) {
+        Object data = classService.pageByFilter(classFilter, new PageData(cur, size));
         return JsonData.buildSuccess(data);
     }
 
     @PostMapping("list_usr_class")
-    public JsonData list_usr_class(@RequestBody UserClassDO userClassDO){
+    public JsonData list_usr_class(@RequestBody UserClassDO userClassDO) {
         Object data = classService.listUsrClass(userClassDO);
         return JsonData.buildSuccess(data);
     }
 
     //发布考试/作业
     @PostMapping("add_test")
-    public JsonData add_test(@RequestBody @Validated(Create.class) TestAddReq testAddReq){
+    public JsonData add_test(@RequestBody @Validated(Create.class) TestAddReq testAddReq) {
         Object data = classService.addTest(testAddReq);
         return JsonData.buildSuccess(data);
     }
 
     @PostMapping("update_test")
-    public JsonData update_test(@RequestBody @Validated(Update.class) TestUpdateReq testUpdateReq){
+    public JsonData update_test(@RequestBody @Validated(Update.class) TestUpdateReq testUpdateReq) {
         Object data = classService.updateTest(testUpdateReq);
         return JsonData.buildSuccess(data);
     }
 
     @GetMapping("/del_test/{id}")
-    public JsonData del_test(@PathVariable String id){
+    public JsonData del_test(@PathVariable String id) {
         Object data = classService.delTest(id);
         return JsonData.buildSuccess(data);
     }
-//    @PostMapping("list_test")
-//    public JsonData list_test(@RequestParam(value = "cur",defaultValue = "1") int cur,
-//                                   @RequestParam(value = "size",defaultValue = "50") int size,
-//                                   @RequestBody CpsgrpDO cpsgrpDO){
-//        Object data = courseService.listTest(cpsgrpDO,new PageData(cur,size));
-//        return JsonData.buildSuccess(data);
-//    }
 }

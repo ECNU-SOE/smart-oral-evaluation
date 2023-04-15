@@ -57,12 +57,13 @@ public class CourseServiceImpl implements CourseService {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         //插入数据
         CourseDO csDO = new CourseDO();
-        BeanUtils.copyProperties(courAddReq,csDO);
+        BeanUtils.copyProperties(courAddReq, csDO);
         csDO.setId(IDUtil.nextCourseId());
         csDO.setCreator(loginUser.getAccountNo());
         csDO.setDel(false);
         return courseMapper.insert(csDO);
     }
+
     @Override
     public Object delete(String id) {
         //判断课程是否存在
@@ -73,7 +74,7 @@ public class CourseServiceImpl implements CourseService {
         List<ClassDO> classDOS = classMapper.selectList(new QueryWrapper<ClassDO>()
                 .eq("course_id", courseDO.getId())
         );
-        if (classDOS.size()!=0)
+        if (classDOS.size() != 0)
             throw new BizException(BizCodeEnum.COURSE_USING);
         //判断用户权限
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
@@ -82,6 +83,7 @@ public class CourseServiceImpl implements CourseService {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         return courseMapper.deleteById(id);
     }
+
     @Override
     public Object update(CourUpdateReq courUpdateReq) {
         //判断课程是否存在
@@ -107,7 +109,8 @@ public class CourseServiceImpl implements CourseService {
         pageData.setRecords(courseVOS);
         return pageData;
     }
-//
+
+    //
 //
 //
 //
