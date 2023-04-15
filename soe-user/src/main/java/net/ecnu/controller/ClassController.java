@@ -1,6 +1,7 @@
 package net.ecnu.controller;
 
 import net.ecnu.controller.group.Create;
+import net.ecnu.controller.group.Update;
 import net.ecnu.controller.request.*;
 import net.ecnu.model.UserClassDO;
 import net.ecnu.model.common.PageData;
@@ -70,18 +71,18 @@ public class ClassController {
         Object data = classService.addTest(testAddReq);
         return JsonData.buildSuccess(data);
     }
-//
-//    @PostMapping("update_test")
-//    public JsonData update_test(@RequestBody @Validated(Update.class) TestUpdateReq testUpdateReq){
-//        Object data = courseService.updateTest(testUpdateReq);
-//        return JsonData.buildSuccess(data);
-//    }
-//
-//    @GetMapping("/del_test/{id}")
-//    public JsonData del_test(@PathVariable String id){
-//        Object data = courseService.delTest(id);
-//        return JsonData.buildSuccess(data);
-//    }
+
+    @PostMapping("update_test")
+    public JsonData update_test(@RequestBody @Validated(Update.class) TestUpdateReq testUpdateReq){
+        Object data = classService.updateTest(testUpdateReq);
+        return JsonData.buildSuccess(data);
+    }
+
+    @GetMapping("/del_test/{id}")
+    public JsonData del_test(@PathVariable String id){
+        Object data = classService.delTest(id);
+        return JsonData.buildSuccess(data);
+    }
 //    @PostMapping("list_test")
 //    public JsonData list_test(@RequestParam(value = "cur",defaultValue = "1") int cur,
 //                                   @RequestParam(value = "size",defaultValue = "50") int size,
