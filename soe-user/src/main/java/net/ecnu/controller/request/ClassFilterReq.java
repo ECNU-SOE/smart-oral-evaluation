@@ -2,15 +2,14 @@ package net.ecnu.controller.request;
 
 import lombok.Data;
 
-import java.lang.ref.PhantomReference;
-import java.util.Date;
-
 @Data
-public class CourFilterReq {
+public class ClassFilterReq {
     /**
      * 班级id
      */
     private String id;
+
+    private String courseId;
 
     /**
      * 课程名
@@ -27,9 +26,7 @@ public class CourFilterReq {
      */
     private String creator;
 
-    private Date startTime;
-
-    private Date endTime;
+    private Integer level;
 
 
 }

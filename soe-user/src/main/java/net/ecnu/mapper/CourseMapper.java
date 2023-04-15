@@ -1,7 +1,8 @@
 package net.ecnu.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import net.ecnu.model.CourseDO;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -10,7 +11,7 @@ import org.apache.ibatis.annotations.Mapper;
  * </p>
  *
  * @author TGX
- * @since 2023-03-01
+ * @since 2023-04-07
  */
 @Mapper
 public interface CourseMapper extends BaseMapper<CourseDO> {

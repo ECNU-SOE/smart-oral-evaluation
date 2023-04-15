@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.ecnu.mapper.CpsrcdMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="net.ecnu.model.CpsrcdDO">
+        <id column="id" property="id" />
+        <result column="corpus_id" property="corpusId" />
+        <result column="cpsgrp_id" property="cpsgrpId" />
+        <result column="topic_id" property="topicId" />
+        <result column="c_num" property="cNum" />
+        <result column="eval_mode" property="evalMode" />
+        <result column="difficulty" property="difficulty" />
+        <result column="word_weight" property="wordWeight" />
+        <result column="pinyin" property="pinyin" />
+        <result column="ref_text" property="refText" />
+        <result column="audio_url" property="audioUrl" />
+        <result column="tags" property="tags" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, corpus_id, cpsgrp_id, topic_id, c_num, eval_mode, difficulty, word_weight, pinyin, ref_text, audio_url, tags, gmt_create, gmt_modified
+    </sql>
+
+</mapper>

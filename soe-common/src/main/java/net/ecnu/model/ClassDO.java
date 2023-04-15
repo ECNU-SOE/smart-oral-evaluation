@@ -10,39 +10,54 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 用户-课程 关系表
+ * 
  * </p>
  *
  * @author TGX
- * @since 2023-03-15
+ * @since 2023-04-10
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("user_course")
-public class UserCourseDO implements Serializable {
+@TableName("class")
+public class ClassDO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主键id
+     * 班级id
      */
-      @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+      @TableId(value = "id", type = IdType.NONE)
+    private String id;
 
     /**
-     * 用户账号id
-     */
-    private String accountNo;
-
-    /**
-     * 课程id
+     * 班级所属课程id
      */
     private String courseId;
 
     /**
-     * 关系类型
+     * 班级名字，例：1班，2班
      */
-    private Integer rType;
+    private String name;
+
+    /**
+     * 班级描述
+     */
+    private String description;
+
+    /**
+     * 班级创建者
+     */
+    private String creator;
+
+    /**
+     * 班级水平
+     */
+    private Integer level;
+
+    /**
+     * 删除标识位
+     */
+    private Boolean del;
 
     /**
      * 创建时间

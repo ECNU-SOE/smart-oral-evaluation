@@ -3,6 +3,7 @@ package net.ecnu.service;
 import net.ecnu.controller.request.CpsrcdReq;
 import net.ecnu.model.CpsrcdDO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * <p>
@@ -22,4 +23,5 @@ public interface CpsrcdService extends IService<CpsrcdDO> {
     Object add(CpsrcdReq cpsrcdReq);
 
     Object del(String cpsrcdId);
+
 }

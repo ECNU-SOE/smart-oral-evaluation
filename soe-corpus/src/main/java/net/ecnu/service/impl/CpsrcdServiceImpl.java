@@ -12,11 +12,13 @@ import net.ecnu.mapper.CpsrcdMapper;
 import net.ecnu.model.TopicDO;
 import net.ecnu.service.CpsrcdService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import net.ecnu.service.OssService;
 import net.ecnu.util.IDUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.commons.util.IdUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * <p>
@@ -41,6 +43,9 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     @Autowired
     private TopicMapper topicMapper;
 
+    @Autowired
+    private OssService ossService;
+
     @Override
     public Object add(CpsrcdReq cpsrcdReq) {
         //数据合法性校验
@@ -60,7 +65,9 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     public Object mod(CpsrcdReq cpsrcdReq) {
         CpsrcdDO cpsrcdDO = cpsrcdMapper.selectById(cpsrcdReq.getId());
         if (cpsrcdDO == null) throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
-        BeanUtils.copyProperties(cpsrcdReq, cpsrcdDO);
+        //全量更新
+        BeanUtils.copyProperties(cpsrcdReq, cpsrcdDO,"cpsgrpId");
+        cpsrcdDO.setGmtModified(null);//Mysql会自动更新时间
         int i = cpsrcdMapper.updateById(cpsrcdDO);
         cpsrcdDO = cpsrcdMapper.selectById(cpsrcdReq.getId());
         return cpsrcdDO;

@@ -25,9 +25,9 @@ public class CpsgrpVO implements Serializable {
     private String id;
 
     /**
-     * 所属课程id
+     * 所属班级id
      */
-    private String courseId;
+    private String classId;
 
     /**
      * 语料组名称
@@ -40,17 +40,17 @@ public class CpsgrpVO implements Serializable {
     private String description;
 
     /**
-     * 语料组类型
+     * 语料组类型：1-测验；2-试卷；3-作业
      */
     private Integer type;
 
     /**
-     * 难易程度
+     * 难易程度：-1-未知；1～10难度递增
      */
     private Integer difficulty;
 
     /**
-     * 公开类型
+     * 公开类型：0-公开；1-私有
      */
     private Integer isPublic;
 

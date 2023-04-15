@@ -1,17 +1,11 @@
 package net.ecnu.model;
 
 import java.math.BigDecimal;
-
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-
 import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableId;
-
 import java.io.Serializable;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -21,7 +15,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author TGX
- * @since 2023-03-17
+ * @since 2023-04-10
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -54,7 +48,6 @@ public class CpsrcdDO implements Serializable {
     /**
      * cpsrcd次序
      */
-    @JsonProperty("cNum")
     private Integer cNum;
 
     /**
@@ -81,6 +74,16 @@ public class CpsrcdDO implements Serializable {
      * 语料文本内容
      */
     private String refText;
+
+    /**
+     * 示范音频播放url
+     */
+    private String audioUrl;
+
+    /**
+     * 题目标签
+     */
+    private String tags;
 
     /**
      * 创建时间

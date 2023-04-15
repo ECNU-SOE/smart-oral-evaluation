@@ -24,6 +24,7 @@ public class EvaluateController {
     /**
      * 语音评测（讯飞版）——异步返回结果
      */
+    @Deprecated
     @PostMapping("eval_xf2")
     public JsonData eval_xf2(@RequestParam(value = "audio", required = true) MultipartFile audio,
                              @RequestParam(value = "refText", required = true) String refText,
@@ -54,6 +55,7 @@ public class EvaluateController {
     /**
      * 语音评测（腾讯版）
      */
+    @Deprecated
     @PostMapping("eval")
     public JsonData evaluate(@RequestParam(value = "audio", required = true) MultipartFile audio,
                              @RequestParam(value = "refText", required = true) String refText,

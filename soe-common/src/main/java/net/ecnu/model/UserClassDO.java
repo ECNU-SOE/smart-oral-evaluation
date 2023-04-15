@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 课程信息
+ * 用户-课程 关系表
  * </p>
  *
  * @author TGX
@@ -18,48 +18,39 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("course")
-public class CourseDO implements Serializable {
+@TableName("user_class")
+public class UserClassDO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * id
+     * 主键id
      */
-      @TableId(value = "id", type = IdType.NONE)
-    private String id;
+      @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
 
     /**
-     * 课程名称
+     * 用户账号id
      */
-    private String name;
+    private String accountNo;
 
     /**
-     * 课程描述
+     * 课程id
      */
-    private String description;
+    private String classId;
 
     /**
-     * 创建者id
+     * 关系类型	1：学生	2：助教	3：老师	4：管理员
      */
-    private String creator;
-
-    private Date startTime;
-
-    private Date endTime;
+    private Integer rType;
 
     /**
-     * 逻辑删除标识位
-     */
-    private Boolean del;
-
-    /**
-     * 课程创建时间
+     * 创建时间
      */
     private Date gmtCreate;
 
     /**
-     * 课程更新时间
+     * 更新时间
      */
     private Date gmtModified;
 

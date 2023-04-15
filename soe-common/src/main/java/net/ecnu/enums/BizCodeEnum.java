@@ -18,6 +18,9 @@ public enum BizCodeEnum {
     CLASS_UNEXISTS(250007, "班级不存在"),
     REPEAT_CHOOSE(250008,"重复选课"),
     USER_COURSE_UNEXISTS(250009,"选课信息不存在"),
+    COURSE_UNEXISTS(250010,"课程不存在"),
+    COURSE_REPEAT(250011,"课程重复"),
+    COURSE_USING(250012,"该课程被班级关联"),
 
     /**
      * 语料组相关

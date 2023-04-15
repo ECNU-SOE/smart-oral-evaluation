@@ -1,6 +1,6 @@
 package net.ecnu.mapper;
 
-import net.ecnu.model.UserCourseDO;
+import net.ecnu.model.UserClassDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -10,9 +10,9 @@ import org.apache.ibatis.annotations.Mapper;
  * </p>
  *
  * @author TGX
- * @since 2023-03-15
+ * @since 2023-04-10
  */
 @Mapper
-public interface UserCourseMapper extends BaseMapper<UserCourseDO> {
+public interface UserClassMapper extends BaseMapper<UserClassDO> {
 
 }
