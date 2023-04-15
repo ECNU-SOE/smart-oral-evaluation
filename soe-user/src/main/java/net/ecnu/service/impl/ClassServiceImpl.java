@@ -206,6 +206,92 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         }
     }
 
+    @Override
+    public Object addTest(TestAddReq testAddReq) {
+        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        //判断班级是否存在
+        ClassDO classDO = classMapper.selectById(testAddReq.getClassId());
+        if (classDO == null)
+            throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
+        //判断语料组是否异常
+        CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(testAddReq.getCpsgrpId());
+        if (cpsgrpDO == null || cpsgrpDO.getClassId() != null)
+            throw new BizException(BizCodeEnum.CPSGRP_ERROR);
+        //身份校验,管理员可以直接发布，教师需要自己选了这门课程才能发布
+        Integer topRole = getTopRole(currentAccountNo);
+        if (topRole <= RolesConst.ROLE_ADMIN) {
+            CpsgrpDO cpsgrpDO1 = new CpsgrpDO();
+            BeanUtils.copyProperties(cpsgrpDO, cpsgrpDO1);
+            cpsgrpDO1.setType(testAddReq.getType());
+            cpsgrpDO1.setClassId(testAddReq.getClassId());
+            return cpsgrpMapper.updateById(cpsgrpDO1);
+        } else if (topRole > RolesConst.ROLE_ADMIN && topRole <= RolesConst.TRAINER_C) {
+            UserClassDO userClassDO = userClassMapper.selectOne(new QueryWrapper<UserClassDO>()
+                    .eq("account_no", currentAccountNo)
+                    .eq("class_id", testAddReq.getClassId()));
+            if (userClassDO == null)
+                throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+            CpsgrpDO cpsgrpDO1 = new CpsgrpDO();
+            BeanUtils.copyProperties(cpsgrpDO, cpsgrpDO1);
+            cpsgrpDO1.setType(testAddReq.getType());
+            cpsgrpDO1.setClassId(testAddReq.getClassId());
+            return cpsgrpMapper.updateById(cpsgrpDO1);
+        } else
+            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+    }
+
+    @Override
+    public Object delTest(String id) {
+        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(id);
+        if (cpsgrpDO == null)
+            throw new BizException(BizCodeEnum.CPSGRP_ERROR);
+        //语料组被加入班级才可删除
+        if (cpsgrpDO.getClassId() == null)
+            throw new BizException(BizCodeEnum.CPSGRP_ERROR);
+        Integer topRole = getTopRole(currentAccountNo);
+        if (topRole <= RolesConst.ROLE_ADMIN) {
+            return cpsgrpMapper.deleteById(id);
+        } else if (topRole > RolesConst.ROLE_ADMIN && topRole <= RolesConst.TRAINER_C) {
+            UserClassDO userClassDO = userClassMapper.selectOne(new QueryWrapper<UserClassDO>()
+                    .eq("account_no", currentAccountNo)
+                    .eq("class_id", cpsgrpDO.getClassId()));
+            if (userClassDO == null)
+                throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+            return cpsgrpMapper.deleteById(id);
+        } else
+            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+    }
+
+    @Override
+    public Object updateTest(TestUpdateReq testUpdateReq) {
+        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        //判断语料组是否异常
+        CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(testUpdateReq.getId());
+        if (cpsgrpDO == null || cpsgrpDO.getClassId() == null)
+            throw new BizException(BizCodeEnum.CPSGRP_ERROR);
+        //身份校验,管理员可以直接修改，教师需要自己选了这门课程才能修改
+        Integer topRole = getTopRole(currentAccountNo);
+        if (topRole <= RolesConst.ROLE_ADMIN) {
+            CpsgrpDO cpsgrpDO1 = new CpsgrpDO();
+            BeanUtils.copyProperties(testUpdateReq, cpsgrpDO1);
+            return cpsgrpMapper.updateById(cpsgrpDO1);
+        } else if (topRole > RolesConst.ROLE_ADMIN && topRole <= RolesConst.TRAINER_C) {
+            UserClassDO userClassDO = userClassMapper.selectOne(new QueryWrapper<UserClassDO>()
+                    .eq("account_no", currentAccountNo));
+            if (userClassDO == null)
+                throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+            CpsgrpDO cpsgrpDO1 = new CpsgrpDO();
+            BeanUtils.copyProperties(testUpdateReq, cpsgrpDO1);
+            return cpsgrpMapper.updateById(cpsgrpDO1);
+        } else
+            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+    }
+
+
     private Boolean checkPermission(String accountNo){
         Integer topRole = getTopRole(accountNo);
         if(topRole > RolesConst.ROLE_ADMIN){
