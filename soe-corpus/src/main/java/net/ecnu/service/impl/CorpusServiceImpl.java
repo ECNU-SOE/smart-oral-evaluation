@@ -2,22 +2,21 @@ package net.ecnu.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.controller.request.CorpusFilterReq;
 import net.ecnu.controller.request.CorpusReq;
-import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.manager.CorpusManager;
-import net.ecnu.model.CorpusDO;
 import net.ecnu.mapper.CorpusMapper;
-import net.ecnu.model.common.LoginUser;
+import net.ecnu.model.CorpusDO;
 import net.ecnu.model.common.PageData;
 import net.ecnu.service.CorpusService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.util.IDUtil;
+import net.ecnu.util.RequestParamUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+//import net.ecnu.interceptor.LoginInterceptor;
 
 /**
  * <p>
@@ -45,12 +44,14 @@ public class CorpusServiceImpl extends ServiceImpl<CorpusMapper, CorpusDO> imple
     @Override
     public Object add(CorpusReq corpusReq) {
         //获取登录用户信息
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         //生成语料DO对象并插入数据库
         CorpusDO corpusDO = new CorpusDO();
         BeanUtils.copyProperties(corpusReq, corpusDO);
         corpusDO.setId("corpus_" + IDUtil.getSnowflakeId());
-        corpusDO.setCreator(String.valueOf(loginUser.getAccountNo()));
+        //corpusDO.setCreator(String.valueOf(loginUser.getAccountNo()));
+        corpusDO.setCreator(String.valueOf(currentAccountNo));
         int rows = corpusManager.add(corpusDO);
         return rows;
     }

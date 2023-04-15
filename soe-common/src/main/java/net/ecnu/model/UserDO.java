@@ -108,5 +108,14 @@ public class UserDO implements Serializable {
      */
     private Date gmtModified;
 
+    /**
+     * 0无效用户，1有效用户
+     */
+    private Boolean enabled;
+
+    /**
+     * 用户所属组织id
+     */
+    private Integer orgId;
 
 }

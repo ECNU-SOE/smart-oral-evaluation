@@ -6,7 +6,7 @@ import net.ecnu.controller.request.CpsgrpFilterReq;
 import net.ecnu.controller.request.TranscriptReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
-import net.ecnu.interceptor.LoginInterceptor;
+//import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.manager.CpsgrpManager;
 import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.manager.TopicManager;
@@ -24,6 +24,7 @@ import net.ecnu.model.vo.TopicVO;
 import net.ecnu.service.CpsgrpService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.util.IDUtil;
+import net.ecnu.util.RequestParamUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,8 +76,9 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Object create(CpsgrpReq cpsgrpReq) {
         //获取登录用户信息
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+        /*LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);*/
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         //校验参数合法性
         if (!CollectionUtils.isEmpty(Collections.singleton(cpsgrpReq.getCourseId()))) {
             //判断课程是存在
@@ -85,7 +87,7 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         CpsgrpDO cpsgrpDO = new CpsgrpDO();
         BeanUtils.copyProperties(cpsgrpReq, cpsgrpDO, "id");
         cpsgrpDO.setId(IDUtil.nextCpsgrpId());
-        cpsgrpDO.setCreator(loginUser.getAccountNo());
+        cpsgrpDO.setCreator(currentAccountNo);
         int rows = cpsgrpMapper.insert(cpsgrpDO);
         //查询数据库返回创建的对象
         cpsgrpDO = cpsgrpMapper.selectById(cpsgrpDO.getId());
@@ -96,11 +98,12 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Object del(String cpsgrpId) {
         //获取登录用户信息,判断操作是否越权
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+        /*LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);*/
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         //判断操作cpsgrp是否存在
         CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(cpsgrpId);
-        if (cpsgrpDO == null || !loginUser.getAccountNo().equals(cpsgrpDO.getCreator())) {
+        if (cpsgrpDO == null || !currentAccountNo.equals(cpsgrpDO.getCreator())) {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
         //TODO 删除对应cpsgrp的 topics 与 cpsrcds

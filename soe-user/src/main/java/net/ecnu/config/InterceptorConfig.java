@@ -1,12 +1,12 @@
 package net.ecnu.config;
 
 import lombok.extern.slf4j.Slf4j;
-import net.ecnu.interceptor.LoginInterceptor;
+//import net.ecnu.interceptor.LoginInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Configuration
+/*@Configuration
 @Slf4j
 public class InterceptorConfig implements WebMvcConfigurer {
 
@@ -28,4 +28,4 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 //排除不拦截
                 .excludePathPatterns();
     }
-}
+}*/
