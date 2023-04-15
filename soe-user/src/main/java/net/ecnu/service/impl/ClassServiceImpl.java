@@ -1,10 +1,11 @@
 package net.ecnu.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import net.ecnu.constant.RolesConst;
 import net.ecnu.controller.request.*;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
-import net.ecnu.interceptor.LoginInterceptor;
+//import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.manager.ClassManager;
 import net.ecnu.manager.UserClassManager;
 import net.ecnu.mapper.*;
@@ -12,19 +13,17 @@ import net.ecnu.model.ClassDO;
 import net.ecnu.model.CourseDO;
 import net.ecnu.model.UserClassDO;
 import net.ecnu.model.UserDO;
-import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.common.PageData;
 import net.ecnu.model.vo.ClassVO;
 import net.ecnu.service.ClassService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.util.IDUtil;
+import net.ecnu.util.RequestParamUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -56,10 +55,10 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     @Override
     public Object add(ClassAddReq classAddReq) {
         //判断用户权限
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
-        if (loginUser.getRoleId() == null || loginUser.getRoleId() > 3)
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if(!checkPermission(currentAccountNo)){
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+        }
         //判断课程是否存在，存在才能插入
         CourseDO courseDO = courseMapper.selectById(classAddReq.getCourseId());
         if (courseDO == null)
@@ -68,7 +67,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         ClassDO classDO = new ClassDO();
         BeanUtils.copyProperties(classAddReq, classDO);
         classDO.setId("class_" + IDUtil.getSnowflakeId());
-        classDO.setCreator(loginUser.getAccountNo());
+        classDO.setCreator(currentAccountNo);
         classDO.setDel(false);
         return classMapper.insert(classDO);
     }
@@ -80,10 +79,10 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         if (classDO == null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         //判断用户权限
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
-        if (loginUser.getRoleId() == null || loginUser.getRoleId() > 3)
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if(!checkPermission(currentAccountNo)){
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+        }
         return classMapper.deleteById(id);
     }
 
@@ -94,10 +93,11 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         if (classDO==null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         //判断用户权限
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
-        if (loginUser.getRoleId() == null || loginUser.getRoleId() > 3)
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if(!checkPermission(currentAccountNo)){
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+        }
+
         ClassDO csDO = new ClassDO();
         BeanUtils.copyProperties(classUpdateReq,csDO);
         return classMapper.updateById(csDO);
@@ -115,9 +115,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
 
     @Override
     public Object addUsrClass(UsrClassAddReq usrClassAddReq) {
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null)
-            throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         //判断请求的用户正确性
         UserDO userDO = userMapper.selectById(usrClassAddReq.getAccountNo());
         if (userDO == null)
@@ -140,7 +138,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             return userClassMapper.insert(userClassDO1);
         }else {
             //请求体accountNo不为空
-            if (Objects.equals(loginUser.getAccountNo(), usrClassAddReq.getAccountNo())){
+            if (Objects.equals(currentAccountNo, usrClassAddReq.getAccountNo())){
                 //token的accountNo与请求体的accountNo相同，给自己选课
                 UserClassDO userClassDO1 = new UserClassDO();
                 BeanUtils.copyProperties(usrClassAddReq,userClassDO1);
@@ -150,7 +148,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
                 return userClassMapper.insert(userClassDO1);
             }else {
                 //token的accountNo与请求体的accountNo不同，给别人选课
-                Integer roleA = getTopRole(loginUser.getAccountNo());
+                Integer roleA = getTopRole(currentAccountNo);
                 Integer roleB = getTopRole(usrClassAddReq.getAccountNo());
                 if (hasAddOrDelRight(roleA,roleB)){
                     UserClassDO userClassDO1 = new UserClassDO();
@@ -165,19 +163,17 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
 
     @Override
     public Object delUsrClass(String id) {
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null)
-            throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         //判断选课信息是否存在
         UserClassDO userClassDO = userClassMapper.selectById(id);
         if (userClassDO==null)
             throw new BizException(BizCodeEnum.USER_COURSE_UNEXISTS);
         //权限校验
-        if (Objects.equals(loginUser.getAccountNo(),userClassDO.getAccountNo())){
+        if (Objects.equals(currentAccountNo,userClassDO.getAccountNo())){
             return userClassMapper.deleteById(id);
         }else {
             //删除别人选课信息
-            Integer role_A = getTopRole(loginUser.getAccountNo());
+            Integer role_A = getTopRole(currentAccountNo);
             Integer role_B = getTopRole(userClassDO.getAccountNo());
             if (hasAddOrDelRight(role_A, role_B)) {
                 return userClassMapper.deleteById(id);
@@ -189,12 +185,10 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
 
     @Override
     public Object listUsrClass(UserClassDO userClassDO) {
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null)
-            throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         if (userClassDO.getAccountNo()==null)
             throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
-        if (Objects.equals(loginUser.getAccountNo(), userClassDO.getAccountNo())) {
+        if (Objects.equals(currentAccountNo, userClassDO.getAccountNo())) {
             //查看自己的选课列表
             QueryWrapper<UserClassDO> qw = new QueryWrapper<>();
             qw.eq("account_no", userClassDO.getAccountNo());
@@ -202,7 +196,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         }
         else {
             //登录用户查看别人的选课列表
-            Integer top_role1 = getTopRole(loginUser.getAccountNo());
+            Integer top_role1 = getTopRole(currentAccountNo);
             Integer top_role2 = getTopRole(userClassDO.getAccountNo());
             if (hasListRight(top_role1, top_role2)) {
                 QueryWrapper<UserClassDO> qw = new QueryWrapper<>();
@@ -214,6 +208,13 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         }
     }
 
+    private Boolean checkPermission(String accountNo){
+        Integer topRole = getTopRole(accountNo);
+        if(topRole > RolesConst.ROLE_ADMIN){
+            return false;
+        }
+        return true;
+    }
 
     private ClassVO beanProcess(ClassDO classDO) {
         ClassVO classVO = new ClassVO();

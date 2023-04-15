@@ -2,19 +2,17 @@ package net.ecnu.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import net.ecnu.constant.RolesConst;
-import net.ecnu.controller.request.*;
 import net.ecnu.controller.request.CourAddReq;
 import net.ecnu.controller.request.CourFilterReq;
 import net.ecnu.controller.request.CourUpdateReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
-//import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.manager.CourseManager;
 import net.ecnu.mapper.ClassMapper;
 import net.ecnu.mapper.CourseMapper;
+import net.ecnu.mapper.UserRoleMapper;
 import net.ecnu.model.ClassDO;
 import net.ecnu.model.CourseDO;
-import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.common.PageData;
 import net.ecnu.model.vo.CourseVO;
 import net.ecnu.service.CourseService;
@@ -24,9 +22,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
+
+//import net.ecnu.interceptor.LoginInterceptor;
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -48,17 +48,13 @@ public class CourseServiceImpl implements CourseService {
 //    @Autowired
 //    private CpsgrpManager cpsgrpManager;
 //
-//    @Autowired
-//    private UserRoleMapper userRoleMapper;
+    @Autowired
+    private UserRoleMapper userRoleMapper;
 
     @Override
     public Object add(CourAddReq courAddReq) {
         //判断用户权限
-        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        //if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
-        /*if (loginUser.getRoleId() == null || loginUser.getRoleId() > 3)
-            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);*/
         List<String> roles = userRoleMapper.getRoles(currentAccountNo);
         if(roles.contains(RolesConst.ROLE_SUPER_ADMIN) || roles.contains(RolesConst.ROLE_SYSTEM_ADMIN) || roles.contains(RolesConst.ROLE_ADMIN)){
             CourseDO csDO = new CourseDO();
@@ -85,11 +81,8 @@ public class CourseServiceImpl implements CourseService {
             throw new BizException(BizCodeEnum.COURSE_USING);
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        /*if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
-        if (loginUser.getRoleId() == null || loginUser.getRoleId() > 3)
-            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);*/
-        List<String> roles = userRoleMapper.getRoles(currentAccountNo);
-        if(roles.contains(RolesConst.ROLE_SUPER_ADMIN) || roles.contains(RolesConst.ROLE_SYSTEM_ADMIN) || roles.contains(RolesConst.ROLE_ADMIN)){
+        Integer topRole = getTopRole(currentAccountNo);
+        if(topRole <= RolesConst.ROLE_ADMIN){
             return courseMapper.deleteById(id);
         }else{
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
@@ -104,11 +97,8 @@ public class CourseServiceImpl implements CourseService {
         //判断用户权限
         //LoginUser loginUser = LoginInterceptor.threadLocal.get();
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        /*if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
-        if (loginUser.getRoleId() == null || loginUser.getRoleId() > 3)
-            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);*/
-        List<String> roles = userRoleMapper.getRoles(currentAccountNo);
-        if(roles.contains(RolesConst.ROLE_SUPER_ADMIN) || roles.contains(RolesConst.ROLE_SYSTEM_ADMIN) || roles.contains(RolesConst.ROLE_ADMIN)){
+        Integer topRole = getTopRole(currentAccountNo);
+        if(topRole <= RolesConst.ROLE_ADMIN){
             CourseDO csDO = new CourseDO();
             BeanUtils.copyProperties(courUpdateReq, csDO);
             return courseMapper.updateById(csDO);
@@ -142,10 +132,10 @@ public class CourseServiceImpl implements CourseService {
 //            return cpsgrpVO;
 //    }
 //
-//    private Integer getTopRole(String accountNo) {
-//        List<String> roles_temp = userRoleMapper.getRoles(accountNo);
-//        List<Integer> roles = roles_temp.stream().map(Integer::parseInt).collect(Collectors.toList());
-//        return Collections.min(roles);
-//    }
+    private Integer getTopRole(String accountNo) {
+        List<String> roles_temp = userRoleMapper.getRoles(accountNo);
+        List<Integer> roles = roles_temp.stream().map(Integer::parseInt).collect(Collectors.toList());
+        return Collections.min(roles);
+    }
 
 }

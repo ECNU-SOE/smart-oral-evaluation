@@ -19,6 +19,13 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
+        <!--权限服务,暂时不开启-->
+        <!--<dependency>
+            <groupId>net.ecnu</groupId>
+            <artifactId>soe-security</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>-->
+
         <!--阿里云OSS 对象文件存储-->
         <dependency>
             <groupId>com.aliyun.oss</groupId>

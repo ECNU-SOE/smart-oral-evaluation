@@ -6,19 +6,18 @@ import com.aliyun.oss.model.PutObjectResult;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
-import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.service.OssService;
 import net.ecnu.util.CommonUtil;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
+//import net.ecnu.interceptor.LoginInterceptor;
 
 @Service
 @Slf4j
@@ -44,10 +43,10 @@ public class OssServiceImpl implements OssService {
         String bucketName = "soe-oss";
 
         //登录用户 且 有权限才能 上传文件
-        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        /*LoginUser loginUser = LoginInterceptor.threadLocal.get();
         if (loginUser == null) {
             throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
-        }
+        }*/
 
         //创建OSSClient实例。
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
