@@ -9,10 +9,8 @@ import net.ecnu.exception.BizException;
 import net.ecnu.manager.ClassManager;
 import net.ecnu.manager.UserClassManager;
 import net.ecnu.mapper.*;
-import net.ecnu.model.ClassDO;
-import net.ecnu.model.CourseDO;
-import net.ecnu.model.UserClassDO;
-import net.ecnu.model.UserDO;
+import net.ecnu.model.*;
+import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.common.PageData;
 import net.ecnu.model.vo.ClassVO;
 import net.ecnu.service.ClassService;
@@ -51,6 +49,9 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     private UserClassMapper userClassMapper;
     @Autowired
     private UserRoleMapper userRoleMapper;
+    @Autowired
+    private CpsgrpMapper cpsgrpMapper;
+
 
     @Override
     public Object add(ClassAddReq classAddReq) {
@@ -90,7 +91,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     public Object update(ClassUpdateReq classUpdateReq) {
         //判断班级是否存在
         ClassDO classDO = classMapper.selectById(classUpdateReq.getId());
-        if (classDO==null)
+        if (classDO == null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
@@ -99,7 +100,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         }
 
         ClassDO csDO = new ClassDO();
-        BeanUtils.copyProperties(classUpdateReq,csDO);
+        BeanUtils.copyProperties(classUpdateReq, csDO);
         return classMapper.updateById(csDO);
     }
 
@@ -130,31 +131,29 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         if (userClassDO != null)
             throw new BizException(BizCodeEnum.REPEAT_CHOOSE);
         //权限判断
-        if (usrClassAddReq.getAccountNo()==null){
+        if (usrClassAddReq.getAccountNo() == null) {
             //请求体accountNo为空，用户选择自己的课程（根据token）
             UserClassDO userClassDO1 = new UserClassDO();
-            BeanUtils.copyProperties(usrClassAddReq,userClassDO1);
-            userClassDO1.setRType(usrClassAddReq.getType());//bug,需要手动设定rtype
+            BeanUtils.copyProperties(usrClassAddReq, userClassDO1);
+            userClassDO1.setRType(usrClassAddReq.getRType());//bug,需要手动设定rtype
             return userClassMapper.insert(userClassDO1);
-        }else {
+        } else {
             //请求体accountNo不为空
             if (Objects.equals(currentAccountNo, usrClassAddReq.getAccountNo())){
                 //token的accountNo与请求体的accountNo相同，给自己选课
                 UserClassDO userClassDO1 = new UserClassDO();
-                BeanUtils.copyProperties(usrClassAddReq,userClassDO1);
-                userClassDO1.setRType(usrClassAddReq.getType());//bug,需要手动设定rtype
-//                System.out.println("req的值是："+usrClassAddReq);
-//                System.out.println("userClassDO1 的值是= " + userClassDO1);
+                BeanUtils.copyProperties(usrClassAddReq, userClassDO1);
+                userClassDO1.setRType(usrClassAddReq.getRType());//bug,需要手动设定rtype
                 return userClassMapper.insert(userClassDO1);
-            }else {
+            } else {
                 //token的accountNo与请求体的accountNo不同，给别人选课
                 Integer roleA = getTopRole(currentAccountNo);
                 Integer roleB = getTopRole(usrClassAddReq.getAccountNo());
-                if (hasAddOrDelRight(roleA,roleB)){
+                if (hasAddOrDelRight(roleA, roleB)) {
                     UserClassDO userClassDO1 = new UserClassDO();
-                    BeanUtils.copyProperties(usrClassAddReq,userClassDO1);
+                    BeanUtils.copyProperties(usrClassAddReq, userClassDO1);
                     return userClassMapper.insert(userClassDO1);
-                }else {
+                } else {
                     throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
                 }
             }
@@ -166,12 +165,12 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         //判断选课信息是否存在
         UserClassDO userClassDO = userClassMapper.selectById(id);
-        if (userClassDO==null)
+        if (userClassDO == null)
             throw new BizException(BizCodeEnum.USER_COURSE_UNEXISTS);
         //权限校验
         if (Objects.equals(currentAccountNo,userClassDO.getAccountNo())){
             return userClassMapper.deleteById(id);
-        }else {
+        } else {
             //删除别人选课信息
             Integer role_A = getTopRole(currentAccountNo);
             Integer role_B = getTopRole(userClassDO.getAccountNo());
@@ -193,8 +192,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             QueryWrapper<UserClassDO> qw = new QueryWrapper<>();
             qw.eq("account_no", userClassDO.getAccountNo());
             return userClassMapper.selectList(qw);
-        }
-        else {
+        } else {
             //登录用户查看别人的选课列表
             Integer top_role1 = getTopRole(currentAccountNo);
             Integer top_role2 = getTopRole(userClassDO.getAccountNo());
@@ -225,6 +223,8 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     //获取当前用户的最高权限id,并强转为Integer型
     private Integer getTopRole(String accountNo) {
         List<String> roles_temp = userRoleMapper.getRoles(accountNo);
+        if (roles_temp.size()==0)
+            return 8;//用户没有设置权限id，则默认返回8：游客
         List<Integer> roles = roles_temp.stream().map(Integer::parseInt).collect(Collectors.toList());
         return Collections.min(roles);
     }

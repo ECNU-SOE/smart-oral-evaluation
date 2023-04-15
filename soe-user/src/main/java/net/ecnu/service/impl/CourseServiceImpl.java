@@ -77,7 +77,7 @@ public class CourseServiceImpl implements CourseService {
         List<ClassDO> classDOS = classMapper.selectList(new QueryWrapper<ClassDO>()
                 .eq("course_id", courseDO.getId())
         );
-        if (classDOS.size()!=0)
+        if (classDOS.size() != 0)
             throw new BizException(BizCodeEnum.COURSE_USING);
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
@@ -88,6 +88,7 @@ public class CourseServiceImpl implements CourseService {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
     }
+
     @Override
     public Object update(CourUpdateReq courUpdateReq) {
         //判断课程是否存在
@@ -116,7 +117,8 @@ public class CourseServiceImpl implements CourseService {
         pageData.setRecords(courseVOS);
         return pageData;
     }
-//
+
+    //
 //
 //
 //
