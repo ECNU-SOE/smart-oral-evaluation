@@ -42,6 +42,8 @@ public class JwtWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapte
             JWTConstants.LOGIN,
             //端上用户登录
             JWTConstants.APP_LOGIN,
+            //端上用户注册
+            JWTConstants.APP_REGISTER,
             //注册
             JWTConstants.REGISTER,
             //刷新token

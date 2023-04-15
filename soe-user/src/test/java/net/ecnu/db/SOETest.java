@@ -12,8 +12,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 
@@ -28,6 +30,9 @@ public class SOETest {
     @Autowired
     private CourseMapper courseMapper;
 
+    @Resource
+    private PasswordEncoder passwordEncoder;
+
     @Test
     public void pinyinTest() {
         CourseDO courseDO = courseMapper.selectById("course_1645337883818725376");
@@ -39,4 +44,14 @@ public class SOETest {
         else
             System.out.println("为空");
     }
+
+    @Test
+    public void passwordEncodeTest(){
+        String encode = passwordEncoder.encode("123456");
+        System.out.println(encode);
+        //$2a$10$pyi3kjKpjNIqZ1AWccffqOHV9DIC/tFnlbN9QsCwhb3q8OXZkU3FS
+
+
+    }
+
 }

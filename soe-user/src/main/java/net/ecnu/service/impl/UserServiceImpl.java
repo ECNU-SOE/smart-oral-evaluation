@@ -14,6 +14,7 @@ import net.ecnu.controller.request.UserReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.manager.UserManager;
+import net.ecnu.mapper.MyUserDetailsServiceMapper;
 import net.ecnu.mapper.UserMapper;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.UserDO;
@@ -26,8 +27,15 @@ import net.ecnu.util.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
@@ -41,6 +49,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserManager userManager;
+
+    @Resource
+    private AuthenticationManager authenticationManager;
+
+    @Resource
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public Object register(UserReq userReq) {
@@ -56,22 +70,25 @@ public class UserServiceImpl implements UserService {
 //        //密码加密处理
 //        newUserDO.setSecret("$1$" + CommonUtil.getStringNumRandom(8));
 //        newUserDO.setPwd(Md5Crypt.md5Crypt(userRegisterReq.getPwd().getBytes(), newUserDO.getSecret()));
-
-        newUserDO.setPwd(userReq.getPwd());
+        newUserDO.setPwd(passwordEncoder.encode(userReq.getPwd()));
         int rows = userMapper.insert(newUserDO);
         return rows;
     }
 
     @Override
     public Object login(UserReq userReq) {
-        UserDO userDO = userManager.selectOneByPhone(userReq.getPhone());
-        //手机号不存在 || 密码错误
-        if (userDO == null || !userDO.getPwd().equals(userReq.getPwd())) {
-            throw new BizException(BizCodeEnum.ACCOUNT_PWD_ERROR);
+        LoginUser loginUser = new LoginUser();
+        try {
+            UsernamePasswordAuthenticationToken upToken =
+                    new UsernamePasswordAuthenticationToken(userReq.getPhone(),userReq.getPwd());
+            Authentication authentication = authenticationManager.authenticate(upToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            UserDO userInfoByPhone = userManager.selectOneByPhone(userReq.getPhone());
+            BeanUtils.copyProperties(userInfoByPhone,loginUser);
+        } catch (AuthenticationException e) {
+            throw new BizException(BizCodeEnum.USER_INPUT_ERROR.getCode(),BizCodeEnum.USER_INPUT_ERROR.getMessage());
         }
         //验证成功，生成token并返回
-        LoginUser loginUser = new LoginUser();
-        BeanUtils.copyProperties(userDO, loginUser);
         return JWTUtil.geneJsonWebToken(loginUser);
     }
 
