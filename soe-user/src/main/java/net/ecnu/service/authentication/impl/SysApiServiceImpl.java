@@ -39,9 +39,9 @@ public class SysApiServiceImpl implements SysApiService {
 
     @Override
     public List<SysApiNode> getApiTree(String apiNameLike, Boolean apiStatus) {
-        //查找level=1的API节点，即：根节点
+        //查找api_pid=0的API节点，即：根节点
         SysApi rootSysApi = sysApiMapper.selectOne(
-                new QueryWrapper<SysApi>().eq("level",1));
+                new QueryWrapper<SysApi>().eq("api_pid",0));
 
         if (rootSysApi != null) {
             Long rootApiId = rootSysApi.getId();
