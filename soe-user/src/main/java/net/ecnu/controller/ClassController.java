@@ -31,9 +31,15 @@ public class ClassController {
         return JsonData.buildSuccess(data);
     }
 
-    @GetMapping("/del/{id}")
-    public JsonData del(@PathVariable("id") String id) {
+    @GetMapping("/del")
+    public JsonData del(@RequestParam String id) {
         Object data = classService.del(id);
+        return JsonData.buildSuccess(data);
+    }
+
+    @GetMapping("detail")
+    public JsonData detail(@RequestParam String id) {
+        Object data = classService.detail(id);
         return JsonData.buildSuccess(data);
     }
 

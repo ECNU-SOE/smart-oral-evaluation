@@ -10,6 +10,8 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import lombok.extern.slf4j.Slf4j;
+import net.ecnu.constant.RolesConst;
+import net.ecnu.controller.request.UserFilterReq;
 import net.ecnu.controller.request.UserReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
@@ -18,6 +20,7 @@ import net.ecnu.mapper.MyUserDetailsServiceMapper;
 import net.ecnu.mapper.UserMapper;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.UserDO;
+import net.ecnu.model.common.PageData;
 import net.ecnu.model.dto.UserDTO;
 import net.ecnu.model.vo.UserVO;
 import net.ecnu.service.UserService;
@@ -52,6 +55,8 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private AuthenticationManager authenticationManager;
+    @Resource
+    private MyUserDetailsServiceMapper mapper;
 
     @Resource
     private PasswordEncoder passwordEncoder;
@@ -71,6 +76,7 @@ public class UserServiceImpl implements UserService {
 //        newUserDO.setSecret("$1$" + CommonUtil.getStringNumRandom(8));
 //        newUserDO.setPwd(Md5Crypt.md5Crypt(userRegisterReq.getPwd().getBytes(), newUserDO.getSecret()));
         newUserDO.setPwd(passwordEncoder.encode(userReq.getPwd()));
+        mapper.insertUserRole(RolesConst.DEFAULT_ROLE, newUserDO.getAccountNo());
         int rows = userMapper.insert(newUserDO);
         return rows;
     }
@@ -105,6 +111,11 @@ public class UserServiceImpl implements UserService {
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(userDO, userVO);
         return userVO;
+    }
+
+    @Override
+    public Object pageByFilter(UserFilterReq userFilterReq, PageData pageData) {
+        return null;
     }
 
 

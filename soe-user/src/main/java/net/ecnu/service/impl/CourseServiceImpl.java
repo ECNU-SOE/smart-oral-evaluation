@@ -14,6 +14,7 @@ import net.ecnu.mapper.UserRoleMapper;
 import net.ecnu.model.ClassDO;
 import net.ecnu.model.CourseDO;
 import net.ecnu.model.common.PageData;
+import net.ecnu.model.vo.ClassVO;
 import net.ecnu.model.vo.CourseVO;
 import net.ecnu.service.CourseService;
 import net.ecnu.util.IDUtil;
@@ -116,6 +117,19 @@ public class CourseServiceImpl implements CourseService {
         List<CourseVO> courseVOS = courseDOS.stream().map(this::beanProcess).collect(Collectors.toList());
         pageData.setRecords(courseVOS);
         return pageData;
+    }
+
+    @Override
+    public Object detail(String courseId) {
+        CourseDO courseDO = courseMapper.selectOne(new QueryWrapper<CourseDO>()
+                .eq("id",courseId)
+                .eq("del",0)
+        );
+        if (courseDO == null)
+            throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
+        CourseVO courseVO =new CourseVO();
+        BeanUtils.copyProperties(courseDO,courseVO);
+        return courseVO;
     }
 
     //

@@ -32,6 +32,12 @@ public class CourseController {
         return JsonData.buildSuccess(data);
     }
 
+    @GetMapping("detail")
+    public JsonData detail(@RequestParam String id) {
+        Object data = courseService.detail(id);
+        return JsonData.buildSuccess(data);
+    }
+
     @PostMapping("update")
     public JsonData update(@RequestBody @Validated(Update.class) CourUpdateReq courUpdateReq) {
         Object data = courseService.update(courUpdateReq);

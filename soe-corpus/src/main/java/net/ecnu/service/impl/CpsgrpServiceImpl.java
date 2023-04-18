@@ -107,8 +107,7 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
         //TODO 删除对应cpsgrp的 topics 与 cpsrcds
-        int rows = cpsgrpMapper.deleteById(cpsgrpId);
-        return rows;
+        return cpsgrpMapper.deleteById(cpsgrpId);
     }
 
     @Override

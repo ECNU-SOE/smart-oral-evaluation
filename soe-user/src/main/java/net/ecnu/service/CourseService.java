@@ -10,5 +10,5 @@ public interface CourseService {
     Object delete(String id);
     Object update(CourUpdateReq courUpdateReq);
     Object pageByFilter(CourFilterReq courseFilter, PageData pageData);
-
+    Object detail(String classId);
 }

@@ -17,6 +17,7 @@ import net.ecnu.service.ClassService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.RequestParamUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,6 +58,9 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     public Object add(ClassAddReq classAddReq) {
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if(StringUtils.isBlank(currentAccountNo)){
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
         if(!checkPermission(currentAccountNo)){
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
@@ -81,9 +85,14 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if(StringUtils.isBlank(currentAccountNo)){
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
         if(!checkPermission(currentAccountNo)){
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
+        //判断该班级是否存在选课信息
+
         return classMapper.deleteById(id);
     }
 
@@ -95,6 +104,9 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if(StringUtils.isBlank(currentAccountNo)){
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
         if(!checkPermission(currentAccountNo)){
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
@@ -117,6 +129,9 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     @Override
     public Object addUsrClass(UsrClassAddReq usrClassAddReq) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if(StringUtils.isBlank(currentAccountNo)){
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
         //判断请求的用户正确性
         UserDO userDO = userMapper.selectById(usrClassAddReq.getAccountNo());
         if (userDO == null)
@@ -163,6 +178,9 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     @Override
     public Object delUsrClass(String id) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if(StringUtils.isBlank(currentAccountNo)){
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
         //判断选课信息是否存在
         UserClassDO userClassDO = userClassMapper.selectById(id);
         if (userClassDO == null)
@@ -185,8 +203,16 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     @Override
     public Object listUsrClass(UserClassDO userClassDO) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if (userClassDO.getAccountNo()==null)
-            throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
+        if(StringUtils.isBlank(currentAccountNo)){
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+        if (userClassDO.getAccountNo()==null||StringUtils.isBlank(userClassDO.getAccountNo())){
+            //查看自己的选课列表
+            QueryWrapper<UserClassDO> qw = new QueryWrapper<>();
+            qw.eq("account_no", currentAccountNo);
+            return userClassMapper.selectList(qw);
+        }
+
         if (Objects.equals(currentAccountNo, userClassDO.getAccountNo())) {
             //查看自己的选课列表
             QueryWrapper<UserClassDO> qw = new QueryWrapper<>();
@@ -208,8 +234,10 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
 
     @Override
     public Object addTest(TestAddReq testAddReq) {
-        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
         String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if(StringUtils.isBlank(currentAccountNo)){
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
         //判断班级是否存在
         ClassDO classDO = classMapper.selectById(testAddReq.getClassId());
         if (classDO == null)
@@ -226,7 +254,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             cpsgrpDO1.setType(testAddReq.getType());
             cpsgrpDO1.setClassId(testAddReq.getClassId());
             return cpsgrpMapper.updateById(cpsgrpDO1);
-        } else if (topRole > RolesConst.ROLE_ADMIN && topRole <= RolesConst.TRAINER_C) {
+        } else if (topRole <= RolesConst.TRAINER_C) {
             UserClassDO userClassDO = userClassMapper.selectOne(new QueryWrapper<UserClassDO>()
                     .eq("account_no", currentAccountNo)
                     .eq("class_id", testAddReq.getClassId()));
@@ -243,8 +271,10 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
 
     @Override
     public Object delTest(String id) {
-        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
         String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if(StringUtils.isBlank(currentAccountNo)){
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
         CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(id);
         if (cpsgrpDO == null)
             throw new BizException(BizCodeEnum.CPSGRP_ERROR);
@@ -254,7 +284,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         Integer topRole = getTopRole(currentAccountNo);
         if (topRole <= RolesConst.ROLE_ADMIN) {
             return cpsgrpMapper.deleteById(id);
-        } else if (topRole > RolesConst.ROLE_ADMIN && topRole <= RolesConst.TRAINER_C) {
+        } else if (topRole <= RolesConst.TRAINER_C) {
             UserClassDO userClassDO = userClassMapper.selectOne(new QueryWrapper<UserClassDO>()
                     .eq("account_no", currentAccountNo)
                     .eq("class_id", cpsgrpDO.getClassId()));
@@ -267,8 +297,10 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
 
     @Override
     public Object updateTest(TestUpdateReq testUpdateReq) {
-        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
         String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if(StringUtils.isBlank(currentAccountNo)){
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
         //判断语料组是否异常
         CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(testUpdateReq.getId());
         if (cpsgrpDO == null || cpsgrpDO.getClassId() == null)
@@ -279,7 +311,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             CpsgrpDO cpsgrpDO1 = new CpsgrpDO();
             BeanUtils.copyProperties(testUpdateReq, cpsgrpDO1);
             return cpsgrpMapper.updateById(cpsgrpDO1);
-        } else if (topRole > RolesConst.ROLE_ADMIN && topRole <= RolesConst.TRAINER_C) {
+        } else if (topRole <= RolesConst.TRAINER_C) {
             UserClassDO userClassDO = userClassMapper.selectOne(new QueryWrapper<UserClassDO>()
                     .eq("account_no", currentAccountNo));
             if (userClassDO == null)
@@ -289,6 +321,19 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             return cpsgrpMapper.updateById(cpsgrpDO1);
         } else
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+    }
+
+    @Override
+    public Object detail(String classId) {
+        ClassDO classDO = classMapper.selectOne(new QueryWrapper<ClassDO>()
+                .eq("id",classId)
+                .eq("del",0)
+        );
+        if (classDO == null)
+            throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
+        ClassVO classVO = new ClassVO();
+        BeanUtils.copyProperties(classDO,classVO);
+        return classVO;
     }
 
 

@@ -26,4 +26,5 @@ public interface ClassService extends IService<ClassDO> {
     Object addTest(TestAddReq testAddReq);
     Object delTest(String id);
     Object updateTest(TestUpdateReq testUpdateReq);
+    Object detail(String classId);
 }
