@@ -55,8 +55,8 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private AuthenticationManager authenticationManager;
-    @Resource
-    private MyUserDetailsServiceMapper mapper;
+//    @Resource
+//    private MyUserDetailsServiceMapper mapper;
 
     @Resource
     private PasswordEncoder passwordEncoder;
@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
 //        newUserDO.setSecret("$1$" + CommonUtil.getStringNumRandom(8));
 //        newUserDO.setPwd(Md5Crypt.md5Crypt(userRegisterReq.getPwd().getBytes(), newUserDO.getSecret()));
         newUserDO.setPwd(passwordEncoder.encode(userReq.getPwd()));
-        mapper.insertUserRole(RolesConst.DEFAULT_ROLE, newUserDO.getAccountNo());
+//        mapper.insertUserRole(RolesConst.DEFAULT_ROLE, newUserDO.getAccountNo());
         int rows = userMapper.insert(newUserDO);
         return rows;
     }

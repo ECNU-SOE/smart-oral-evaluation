@@ -43,8 +43,8 @@ public class ClassController {
         return JsonData.buildSuccess(data);
     }
 
-    @GetMapping("/del_user_class/{id}")
-    public JsonData del_user_class(@PathVariable("id") String id) {
+    @GetMapping("/del_user_class")
+    public JsonData del_user_class(@RequestParam String id) {
         Object data = classService.delUsrClass(id);
         return JsonData.buildSuccess(data);
     }
@@ -83,8 +83,8 @@ public class ClassController {
         return JsonData.buildSuccess(data);
     }
 
-    @GetMapping("/del_test/{id}")
-    public JsonData del_test(@PathVariable String id) {
+    @GetMapping("/del_test")
+    public JsonData del_test(@RequestParam String id) {
         Object data = classService.delTest(id);
         return JsonData.buildSuccess(data);
     }

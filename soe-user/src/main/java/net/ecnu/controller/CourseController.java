@@ -26,8 +26,8 @@ public class CourseController {
         return JsonData.buildSuccess(data);
     }
 
-    @GetMapping("/del/{id}")
-    public JsonData del(@PathVariable("id") String id) {
+    @GetMapping("/del")
+    public JsonData del(@RequestParam String id) {
         Object data = courseService.delete(id);
         return JsonData.buildSuccess(data);
     }
