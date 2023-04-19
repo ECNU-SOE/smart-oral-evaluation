@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 //import net.ecnu.interceptor.LoginInterceptor;
@@ -56,8 +57,8 @@ public class CourseServiceImpl implements CourseService {
     public Object add(CourAddReq courAddReq) {
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        List<String> roles = userRoleMapper.getRoles(currentAccountNo);
-        if(roles.contains(RolesConst.ROLE_SUPER_ADMIN) || roles.contains(RolesConst.ROLE_SYSTEM_ADMIN) || roles.contains(RolesConst.ROLE_ADMIN)){
+        Integer topRole = getTopRole(currentAccountNo);
+        if(Objects.equals(topRole, RolesConst.ROLE_SUPER_ADMIN) || Objects.equals(topRole, RolesConst.ROLE_SYSTEM_ADMIN) || Objects.equals(topRole, RolesConst.ROLE_ADMIN)){
             CourseDO csDO = new CourseDO();
             BeanUtils.copyProperties(courAddReq, csDO);
             csDO.setId(IDUtil.nextCourseId());
