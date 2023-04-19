@@ -31,10 +31,6 @@ public class UserVO implements Serializable {
      */
     private String identifyId;
 
-    /**
-     * 用户角色
-     */
-    private Integer roleId;
 
     /**
      * 用户昵称
