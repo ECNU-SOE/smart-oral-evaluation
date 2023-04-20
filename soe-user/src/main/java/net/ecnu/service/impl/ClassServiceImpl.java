@@ -1,6 +1,8 @@
 package net.ecnu.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import net.ecnu.constant.RolesConst;
 import net.ecnu.controller.request.*;
 import net.ecnu.enums.BizCodeEnum;
@@ -13,6 +15,7 @@ import net.ecnu.model.*;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.common.PageData;
 import net.ecnu.model.vo.ClassVO;
+import net.ecnu.model.vo.ClassVO_LYW;
 import net.ecnu.service.ClassService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.util.IDUtil;
@@ -58,10 +61,10 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     public Object add(ClassAddReq classAddReq) {
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if(StringUtils.isBlank(currentAccountNo)){
+        if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
-        if(!checkPermission(currentAccountNo)){
+        if (!checkPermission(currentAccountNo)) {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
         //判断课程是否存在，存在才能插入
@@ -85,10 +88,10 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if(StringUtils.isBlank(currentAccountNo)){
+        if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
-        if(!checkPermission(currentAccountNo)){
+        if (!checkPermission(currentAccountNo)) {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
         //判断该班级是否存在选课信息
@@ -104,10 +107,10 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if(StringUtils.isBlank(currentAccountNo)){
+        if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
-        if(!checkPermission(currentAccountNo)){
+        if (!checkPermission(currentAccountNo)) {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
 
@@ -129,7 +132,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     @Override
     public Object addUsrClass(UsrClassAddReq usrClassAddReq) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if(StringUtils.isBlank(currentAccountNo)){
+        if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
         //判断请求的用户正确性
@@ -154,7 +157,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             return userClassMapper.insert(userClassDO1);
         } else {
             //请求体accountNo不为空
-            if (Objects.equals(currentAccountNo, usrClassAddReq.getAccountNo())){
+            if (Objects.equals(currentAccountNo, usrClassAddReq.getAccountNo())) {
                 //token的accountNo与请求体的accountNo相同，给自己选课
                 UserClassDO userClassDO1 = new UserClassDO();
                 BeanUtils.copyProperties(usrClassAddReq, userClassDO1);
@@ -178,7 +181,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     @Override
     public Object delUsrClass(String id) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if(StringUtils.isBlank(currentAccountNo)){
+        if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
         //判断选课信息是否存在
@@ -186,7 +189,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         if (userClassDO == null)
             throw new BizException(BizCodeEnum.USER_COURSE_UNEXISTS);
         //权限校验
-        if (Objects.equals(currentAccountNo,userClassDO.getAccountNo())){
+        if (Objects.equals(currentAccountNo, userClassDO.getAccountNo())) {
             return userClassMapper.deleteById(id);
         } else {
             //删除别人选课信息
@@ -203,10 +206,11 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     @Override
     public Object listUsrClass(UserClassDO userClassDO) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if(StringUtils.isBlank(currentAccountNo)){
+        if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
-        if (userClassDO.getAccountNo()==null||StringUtils.isBlank(userClassDO.getAccountNo())){
+//        if (userClassDO.getAccountNo() == null || StringUtils.isBlank(userClassDO.getAccountNo())) {
+        if (StringUtils.isEmpty(userClassDO.getAccountNo())) {
             //查看自己的选课列表
             QueryWrapper<UserClassDO> qw = new QueryWrapper<>();
             qw.eq("account_no", currentAccountNo);
@@ -235,7 +239,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     @Override
     public Object addTest(TestAddReq testAddReq) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if(StringUtils.isBlank(currentAccountNo)){
+        if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
         //判断班级是否存在
@@ -272,7 +276,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     @Override
     public Object delTest(String id) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if(StringUtils.isBlank(currentAccountNo)){
+        if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
         CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(id);
@@ -298,7 +302,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     @Override
     public Object updateTest(TestUpdateReq testUpdateReq) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if(StringUtils.isBlank(currentAccountNo)){
+        if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
         //判断语料组是否异常
@@ -326,20 +330,51 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     @Override
     public Object detail(String classId) {
         ClassDO classDO = classMapper.selectOne(new QueryWrapper<ClassDO>()
-                .eq("id",classId)
-                .eq("del",0)
+                .eq("id", classId)
+                .eq("del", 0)
         );
         if (classDO == null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         ClassVO classVO = new ClassVO();
-        BeanUtils.copyProperties(classDO,classVO);
+        BeanUtils.copyProperties(classDO, classVO);
         return classVO;
     }
 
+    @Override
+    public Object pageByFilterLYW(ClassFilterReq classFilterReq, Page<ClassDO> page) {
+        //获取登录用户的accountNo
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+        //判断查询类型：查自己/查别人/查所有
+        if (true) { //查自己的班级信息
+            List<UserClassDO> userClassDOS = userClassMapper.selectList(new QueryWrapper<UserClassDO>()
+                    .eq("account_no", currentAccountNo));
+            //classVO聚合userClass信息
+            List<ClassVO_LYW> classVOs = userClassDOS.stream().map(this::beanProcess).collect(Collectors.toList());
+            //classVO聚合class信息
+            classVOs.forEach(classVO -> {
+                //向classVO中部分聚合classDO属性
+                ClassDO classDO = classMapper.selectById(classVO.getClassId());
+                if (classDO == null) throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
+                BeanUtils.copyProperties(classDO, classVO, "id", "name", "creator", "del");
+                classVO.setClassName(classDO.getName());
+                //向classVO中部分聚合courseDO属性
+                CourseDO courseDO = courseMapper.selectById(classDO.getCourseId());
+                if (courseDO == null) throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
+                classVO.setCourseName(courseDO.getName());
+            });
+            return classVOs;
+        }
+//        IPage<ClassDO> classDOIPage = classManager.pageByFilterLYW(classFilterReq, page);
+        return null;
+    }
 
-    private Boolean checkPermission(String accountNo){
+
+    private Boolean checkPermission(String accountNo) {
         Integer topRole = getTopRole(accountNo);
-        if(topRole > RolesConst.ROLE_ADMIN){
+        if (topRole > RolesConst.ROLE_ADMIN) {
             return false;
         }
         return true;
@@ -351,10 +386,16 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         return classVO;
     }
 
+    private ClassVO_LYW beanProcess(UserClassDO userClassDO) {
+        ClassVO_LYW classVO = new ClassVO_LYW();
+        BeanUtils.copyProperties(userClassDO, classVO);
+        return classVO;
+    }
+
     //获取当前用户的最高权限id,并强转为Integer型
     private Integer getTopRole(String accountNo) {
         List<String> roles_temp = userRoleMapper.getRoles(accountNo);
-        if (roles_temp.size()==0)
+        if (roles_temp.size() == 0)
             return 8;//用户没有设置权限id，则默认返回8：游客
         List<Integer> roles = roles_temp.stream().map(Integer::parseInt).collect(Collectors.toList());
         return Collections.min(roles);

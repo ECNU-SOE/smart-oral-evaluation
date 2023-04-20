@@ -1,5 +1,7 @@
 package net.ecnu.manager;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import net.ecnu.controller.request.ClassFilterReq;
 import net.ecnu.model.ClassDO;
 import net.ecnu.model.common.PageData;
@@ -12,4 +14,5 @@ public interface ClassManager {
     int countByFilter(ClassFilterReq classFilterReq);
 
 
+    IPage<ClassDO> pageByFilterLYW(ClassFilterReq classFilterReq, Page<ClassDO> page);
 }

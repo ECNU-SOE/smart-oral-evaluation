@@ -2,9 +2,13 @@ package net.ecnu.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
+
 import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,7 +18,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author LYW
- * @since 2023-04-14
+ * @since 2023-04-20
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -30,7 +34,7 @@ public class CpsgrpDO implements Serializable {
     private String id;
 
     /**
-     * 所属班级id
+     * 所属课程id
      */
     private String classId;
 
@@ -73,6 +77,11 @@ public class CpsgrpDO implements Serializable {
      * 创建者账号id
      */
     private String creator;
+
+    /**
+     * 逻辑删除位置
+     */
+    private Integer del;
 
     /**
      * 创建时间

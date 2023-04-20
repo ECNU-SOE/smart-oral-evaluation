@@ -1,5 +1,6 @@
 package net.ecnu.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.val;
 import net.ecnu.controller.request.CpsgrpReq;
 import net.ecnu.controller.request.CpsgrpFilterReq;
@@ -10,11 +11,8 @@ import net.ecnu.exception.BizException;
 import net.ecnu.manager.CpsgrpManager;
 import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.manager.TopicManager;
-import net.ecnu.mapper.CorpusMapper;
-import net.ecnu.mapper.CpsrcdMapper;
-import net.ecnu.mapper.TranscriptMapper;
+import net.ecnu.mapper.*;
 import net.ecnu.model.*;
-import net.ecnu.mapper.CpsgrpMapper;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.common.PageData;
 import net.ecnu.model.dto.ScoreDTO;
@@ -71,6 +69,9 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     @Autowired
     private TranscriptMapper transcriptMapper;
 
+    @Autowired
+    private TopicMapper topicMapper;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
@@ -97,17 +98,14 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     @Override
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Object del(String cpsgrpId) {
-        //获取登录用户信息,判断操作是否越权
-        /*LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);*/
-        String currentAccountNo = RequestParamUtil.currentAccountNo();
         //判断操作cpsgrp是否存在
         CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(cpsgrpId);
-        if (cpsgrpDO == null || !currentAccountNo.equals(cpsgrpDO.getCreator())) {
+        if (cpsgrpDO == null) {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
-        //TODO 删除对应cpsgrp的 topics 与 cpsrcds
-        return cpsgrpMapper.deleteById(cpsgrpId);
+        //TODO 其他人的 误删问题
+        cpsgrpDO.setDel(1);
+        return "del success";
     }
 
     @Override

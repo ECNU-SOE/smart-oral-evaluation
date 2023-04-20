@@ -9,7 +9,15 @@ public class ClassFilterReq {
      */
     private String id;
 
+    /**
+     * 课程id
+     */
     private String courseId;
+
+    /**
+     * 用户的accountNo
+     */
+    private String accountNo;
 
     /**
      * 课程名
@@ -26,6 +34,9 @@ public class ClassFilterReq {
      */
     private String creator;
 
+    /**
+     * 难易程度
+     */
     private Integer level;
 
 

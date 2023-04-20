@@ -1,6 +1,7 @@
 package net.ecnu.manager.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.controller.request.ClassFilterReq;
@@ -21,16 +22,22 @@ public class ClassManagerImpl implements ClassManager {
 
     @Override
     public List<ClassDO> pageByFilter(ClassFilterReq classFilter, PageData pageData) {
-        return classMapper.selectPage(new Page<ClassDO>(pageData.getCurrent(),pageData.getSize()),
+        return classMapper.selectPage(new Page<ClassDO>(pageData.getCurrent(), pageData.getSize()),
                 new QueryWrapper<ClassDO>()
-                .eq("del", 0)
+                        .eq("del", 0)
         ).getRecords();
     }
 
     @Override
     public int countByFilter(ClassFilterReq classFilter) {
         return classMapper.selectCount(new QueryWrapper<ClassDO>()
-                .eq("del",0)
+                .eq("del", 0)
         );
+    }
+
+    @Override
+    public IPage<ClassDO> pageByFilterLYW(ClassFilterReq classFilterReq, Page<ClassDO> page) {
+        return classMapper.selectPage(page, new QueryWrapper<ClassDO>().eq("del", 0));
+
     }
 }

@@ -14,7 +14,7 @@ import lombok.EqualsAndHashCode;
  * corpus快照
  * </p>
  *
- * @author TGX
+ * @author LYW
  * @since 2023-04-10
  */
 @Data

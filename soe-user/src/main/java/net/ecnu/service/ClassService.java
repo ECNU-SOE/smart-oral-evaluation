@@ -1,5 +1,6 @@
 package net.ecnu.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import net.ecnu.controller.request.*;
 import net.ecnu.model.ClassDO;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -8,7 +9,7 @@ import net.ecnu.model.common.PageData;
 
 /**
  * <p>
- *  服务类
+ * 服务类
  * </p>
  *
  * @author TGX
@@ -17,14 +18,30 @@ import net.ecnu.model.common.PageData;
 public interface ClassService extends IService<ClassDO> {
 
     Object add(ClassAddReq classAddReq);
+
     Object del(String id);
+
     Object update(ClassUpdateReq classUpdateReq);
+
     Object pageByFilter(ClassFilterReq classFilter, PageData pageData);
+
     Object addUsrClass(UsrClassAddReq usrClassAddReq);
+
     Object delUsrClass(String id);
+
     Object listUsrClass(UserClassDO userClassDO);
+
     Object addTest(TestAddReq testAddReq);
+
     Object delTest(String id);
+
     Object updateTest(TestUpdateReq testUpdateReq);
+
     Object detail(String classId);
+
+    /**
+     * 分页查询班级列表
+     */
+    Object pageByFilterLYW(ClassFilterReq classFilterReq, Page<ClassDO> objectPage);
+
 }

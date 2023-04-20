@@ -6,14 +6,7 @@ import lombok.EqualsAndHashCode;
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- * <p>
- * course快照
- * </p>
- *
- * @author TGX
- * @since 2023-3-8
- */
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class ClassVO implements Serializable {
@@ -23,6 +16,9 @@ public class ClassVO implements Serializable {
      */
     private String id;
 
+    /**
+     * 课程Id
+     */
     private String courseId;
 
     /**

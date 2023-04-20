@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.ecnu.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="net.ecnu.model.UserDO">
+        <id column="account_no" property="accountNo" />
+        <result column="identify_id" property="identifyId" />
+        <result column="nick_name" property="nickName" />
+        <result column="real_name" property="realName" />
+        <result column="first_language" property="firstLanguage" />
+        <result column="sex" property="sex" />
+        <result column="birth" property="birth" />
+        <result column="sign" property="sign" />
+        <result column="phone" property="phone" />
+        <result column="mail" property="mail" />
+        <result column="pwd" property="pwd" />
+        <result column="secret" property="secret" />
+        <result column="del" property="del" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        account_no, identify_id,nick_name, real_name, first_language, sex, birth, sign, phone, mail, pwd, secret, del, gmt_create, gmt_modified
+    </sql>
+
+</mapper>

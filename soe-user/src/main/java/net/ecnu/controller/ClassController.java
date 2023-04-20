@@ -1,5 +1,6 @@
 package net.ecnu.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Update;
 import net.ecnu.controller.request.*;
@@ -19,6 +20,19 @@ public class ClassController {
     @Autowired
     private ClassService classService;
 
+    /**
+     * 查询当前用户的班级列表
+     * By:LYW
+     */
+    @PostMapping("list_lyw")
+    public JsonData listByFilter(@RequestParam(value = "cur", defaultValue = "1") int cur,
+                                 @RequestParam(value = "size", defaultValue = "50") int size,
+                                 @RequestBody ClassFilterReq classFilterReq) {
+        Object data = classService.pageByFilterLYW(classFilterReq, new Page<>(cur, size));
+        return JsonData.buildSuccess(data);
+    }
+
+
     @PostMapping("add")
     public JsonData add(@RequestBody @Validated(Create.class) ClassAddReq classAddReq) {
         Object data = classService.add(classAddReq);
@@ -31,7 +45,7 @@ public class ClassController {
         return JsonData.buildSuccess(data);
     }
 
-    @GetMapping("/del")
+    @GetMapping("del")
     public JsonData del(@RequestParam String id) {
         Object data = classService.del(id);
         return JsonData.buildSuccess(data);
@@ -55,15 +69,24 @@ public class ClassController {
         return JsonData.buildSuccess(data);
     }
 
+    /**
+     * 查询班级列表
+     * Create By：TGX
+     * Update By：LYW
+     */
     @PostMapping("list")
-    public JsonData list(
-            @RequestParam(value = "cur", defaultValue = "1") int cur,
-            @RequestParam(value = "size", defaultValue = "50") int size,
-            @RequestBody ClassFilterReq classFilter) {
-        Object data = classService.pageByFilter(classFilter, new PageData(cur, size));
+    public JsonData list(@RequestParam(value = "cur", defaultValue = "1") int cur,
+                         @RequestParam(value = "size", defaultValue = "50") int size,
+                         @RequestBody ClassFilterReq classFilterReq) {
+        Object data = classService.pageByFilter(classFilterReq, new PageData(cur, size));
+//        Object data = classService.pageByFilterLYW(classFilterReq, new Page<ClassDO>(cur, size));
         return JsonData.buildSuccess(data);
     }
 
+    /**
+     * 查询登陆用户班级列表
+     * Create By：TGX
+     */
     @PostMapping("list_usr_class")
     public JsonData list_usr_class(@RequestBody UserClassDO userClassDO) {
         Object data = classService.listUsrClass(userClassDO);
