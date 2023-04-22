@@ -1,11 +1,15 @@
 package net.ecnu.manager.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import net.ecnu.controller.request.UserFilterReq;
 import net.ecnu.manager.UserManager;
 
 import net.ecnu.mapper.UserMapper;
+import net.ecnu.model.ClassDO;
 import net.ecnu.model.UserDO;
+import net.ecnu.model.common.PageData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,5 +43,20 @@ public class UserManagerImpl implements UserManager {
         return userMapper.selectOne(new QueryWrapper<UserDO>()
                 .eq("account_no", accountNo)
                 .eq("del", 0));
+    }
+
+    @Override
+    public List<UserDO> pageByFilter(UserFilterReq userFilterReq, PageData pageData) {
+        return userMapper.selectPage(new Page<UserDO>(pageData.getCurrent(),pageData.getSize()),
+                new QueryWrapper<UserDO>()
+                        .eq("del", 0)
+        ).getRecords();
+    }
+
+    @Override
+    public int countByFilter(UserFilterReq userFilterReq) {
+        return userMapper.selectCount(new QueryWrapper<UserDO>()
+                .eq("del",0)
+        );
     }
 }

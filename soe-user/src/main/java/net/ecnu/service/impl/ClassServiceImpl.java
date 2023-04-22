@@ -341,14 +341,14 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     }
 
     @Override
-    public Object pageByFilterLYW(ClassFilterReq classFilterReq, Page<ClassDO> page) {
+    public Object listUserSelection(String accountNo) {
         //获取登录用户的accountNo
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
-        //判断查询类型：查自己/查别人/查所有
-        if (true) { //查自己的班级信息
+        if (accountNo==null||StringUtils.isBlank(accountNo)){
+            //查自己的班级信息
             List<UserClassDO> userClassDOS = userClassMapper.selectList(new QueryWrapper<UserClassDO>()
                     .eq("account_no", currentAccountNo));
             //classVO聚合userClass信息
@@ -366,8 +366,38 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
                 classVO.setCourseName(courseDO.getName());
             });
             return classVOs;
+        }else {
+            //查别人
+            Integer userRole = getTopRole(accountNo);
+            Integer currentRole = getTopRole(currentAccountNo);
+            if (!hasListRight(currentRole,userRole))
+                throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+            List<UserClassDO> userClassDOS = userClassMapper.selectList(new QueryWrapper<UserClassDO>()
+                    .eq("account_no", accountNo));
+            //classVO聚合userClass信息
+            List<ClassVO_LYW> classVOs = userClassDOS.stream().map(this::beanProcess).collect(Collectors.toList());
+            //classVO聚合class信息
+            classVOs.forEach(classVO -> {
+                //向classVO中部分聚合classDO属性
+                ClassDO classDO = classMapper.selectById(classVO.getClassId());
+                if (classDO == null) throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
+                BeanUtils.copyProperties(classDO, classVO, "id", "name", "creator", "del");
+                classVO.setClassName(classDO.getName());
+                //向classVO中部分聚合courseDO属性
+                CourseDO courseDO = courseMapper.selectById(classDO.getCourseId());
+                if (courseDO == null) throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
+                classVO.setCourseName(courseDO.getName());
+            });
+            return classVOs;
         }
-//        IPage<ClassDO> classDOIPage = classManager.pageByFilterLYW(classFilterReq, page);
+    }
+
+    @Override
+    public Object listAllSelection(ClassFilterReq classFilterReq, PageData pageData) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
         return null;
     }
 
@@ -429,6 +459,8 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
 
     //角色A是否有查看角色B的选课列表的权限
     private Boolean hasListRight(Integer role_A, Integer role_B) {
+        if (role_A<=RolesConst.ROLE_ADMIN)
+            return true;
         return role_A < role_B;
     }
 

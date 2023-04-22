@@ -1,6 +1,5 @@
 package net.ecnu.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import net.ecnu.controller.request.*;
 import net.ecnu.model.ClassDO;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -42,6 +41,7 @@ public interface ClassService extends IService<ClassDO> {
     /**
      * 分页查询班级列表
      */
-    Object pageByFilterLYW(ClassFilterReq classFilterReq, Page<ClassDO> objectPage);
+    Object listUserSelection(String accountNo);
+    Object listAllSelection(ClassFilterReq classFilterReq, PageData pageData);
 
 }
