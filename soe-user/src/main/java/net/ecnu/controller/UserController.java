@@ -43,10 +43,10 @@ public class UserController {
         return JsonData.buildSuccess(data);
     }
 
-    @ApiOperation("获取用户信息")
     /**
      * 查询登陆用户详情（需要携带token）
      */
+    @ApiOperation("获取用户信息")
     @GetMapping("info")
     public JsonData info() {
         Object data = userService.getUserInfo();

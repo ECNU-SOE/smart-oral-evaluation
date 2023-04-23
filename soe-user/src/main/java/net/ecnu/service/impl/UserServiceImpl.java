@@ -94,13 +94,13 @@ public class UserServiceImpl implements UserService {
         LoginUser loginUser = new LoginUser();
         try {
             UsernamePasswordAuthenticationToken upToken =
-                    new UsernamePasswordAuthenticationToken(userReq.getPhone(),userReq.getPwd());
+                    new UsernamePasswordAuthenticationToken(userReq.getPhone(), userReq.getPwd());
             Authentication authentication = authenticationManager.authenticate(upToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             UserDO userInfoByPhone = userManager.selectOneByPhone(userReq.getPhone());
-            BeanUtils.copyProperties(userInfoByPhone,loginUser);
+            BeanUtils.copyProperties(userInfoByPhone, loginUser);
         } catch (AuthenticationException e) {
-            throw new BizException(BizCodeEnum.USER_INPUT_ERROR.getCode(),BizCodeEnum.USER_INPUT_ERROR.getMessage());
+            throw new BizException(BizCodeEnum.USER_INPUT_ERROR.getCode(), BizCodeEnum.USER_INPUT_ERROR.getMessage());
         }
         //验证成功，生成token并返回
         return JWTUtil.geneJsonWebToken(loginUser);
@@ -108,14 +108,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Object getUserInfo() {
-        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
+//        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+//        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        //if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
-        if(StringUtils.isBlank(currentAccountNo)){
+        if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
-        //如果token有效，数据库查询用户个人信息
-        UserDO userDO = userManager.selectOneByAccountNo(currentAccountNo);
+        //如果token有效，数据库查询用户个人信息，TODO del待判断
+        UserDO userDO = userMapper.selectById(currentAccountNo);
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(userDO, userVO);
         return userVO;

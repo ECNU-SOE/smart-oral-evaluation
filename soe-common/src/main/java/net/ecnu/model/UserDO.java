@@ -18,7 +18,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author LYW
- * @since 2022-10-23
+ * @since 2023-04-20
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -38,7 +38,6 @@ public class UserDO implements Serializable {
      */
     private String identifyId;
 
-
     /**
      * 用户昵称
      */
@@ -48,6 +47,11 @@ public class UserDO implements Serializable {
      * 真实姓名
      */
     private String realName;
+
+    /**
+     * 用户头像url
+     */
+    private String avatarUrl;
 
     /**
      * 用户母语
@@ -105,13 +109,14 @@ public class UserDO implements Serializable {
     private Date gmtModified;
 
     /**
-     * 0无效用户，1有效用户
+     * 用户是否被禁用 1-激活用户  0-禁用用户
      */
     private Boolean enabled;
 
     /**
-     * 用户所属组织id
+     * 所属组织id
      */
     private Integer orgId;
+
 
 }
