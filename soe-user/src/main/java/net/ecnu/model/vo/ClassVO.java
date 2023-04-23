@@ -21,6 +21,8 @@ public class ClassVO implements Serializable {
      */
     private String courseId;
 
+    private String courseName;
+
     /**
      * 班级名
      */
@@ -41,6 +43,5 @@ public class ClassVO implements Serializable {
     private Date gmtCreate;
 
     private Date gmtModified;
-
 
 }

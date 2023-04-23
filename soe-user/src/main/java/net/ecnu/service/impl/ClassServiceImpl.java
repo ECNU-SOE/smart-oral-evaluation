@@ -16,6 +16,7 @@ import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.common.PageData;
 import net.ecnu.model.vo.ClassVO;
 import net.ecnu.model.vo.ClassVO_LYW;
+import net.ecnu.model.vo.UserClassVO;
 import net.ecnu.service.ClassService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.util.IDUtil;
@@ -125,6 +126,12 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         int total = classManager.countByFilter(classFilter);
         pageData.setTotal(total);
         List<ClassVO> classVOS = classDOS.stream().map(this::beanProcess).collect(Collectors.toList());
+        classVOS.forEach(classVO->{
+            //向classVO中部分聚合courseDO属性
+            CourseDO courseDO = courseMapper.selectById(classVO.getCourseId());
+            if (courseDO == null) throw new BizException(BizCodeEnum.COURSE_UNEXISTS);
+            classVO.setCourseName(courseDO.getName());
+        });
         pageData.setRecords(classVOS);
         return pageData;
     }
@@ -197,39 +204,6 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             Integer role_B = getTopRole(userClassDO.getAccountNo());
             if (hasAddOrDelRight(role_A, role_B)) {
                 return userClassMapper.deleteById(id);
-            } else {
-                throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
-            }
-        }
-    }
-
-    @Override
-    public Object listUsrClass(UserClassDO userClassDO) {
-        String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if (StringUtils.isBlank(currentAccountNo)) {
-            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
-        }
-//        if (userClassDO.getAccountNo() == null || StringUtils.isBlank(userClassDO.getAccountNo())) {
-        if (StringUtils.isEmpty(userClassDO.getAccountNo())) {
-            //查看自己的选课列表
-            QueryWrapper<UserClassDO> qw = new QueryWrapper<>();
-            qw.eq("account_no", currentAccountNo);
-            return userClassMapper.selectList(qw);
-        }
-
-        if (Objects.equals(currentAccountNo, userClassDO.getAccountNo())) {
-            //查看自己的选课列表
-            QueryWrapper<UserClassDO> qw = new QueryWrapper<>();
-            qw.eq("account_no", userClassDO.getAccountNo());
-            return userClassMapper.selectList(qw);
-        } else {
-            //登录用户查看别人的选课列表
-            Integer top_role1 = getTopRole(currentAccountNo);
-            Integer top_role2 = getTopRole(userClassDO.getAccountNo());
-            if (hasListRight(top_role1, top_role2)) {
-                QueryWrapper<UserClassDO> qw = new QueryWrapper<>();
-                qw.eq("account_no", userClassDO.getAccountNo());
-                return userClassMapper.selectList(qw);
             } else {
                 throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
             }
@@ -341,13 +315,13 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     }
 
     @Override
-    public Object listUserSelection(String accountNo) {
+    public Object listOne(String accountNo) {
         //获取登录用户的accountNo
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
-        if (accountNo==null||StringUtils.isBlank(accountNo)){
+        if (accountNo==null||StringUtils.isBlank(accountNo)||Objects.equals(accountNo,currentAccountNo)){
             //查自己的班级信息
             List<UserClassDO> userClassDOS = userClassMapper.selectList(new QueryWrapper<UserClassDO>()
                     .eq("account_no", currentAccountNo));
@@ -362,11 +336,12 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
                 classVO.setClassName(classDO.getName());
                 //向classVO中部分聚合courseDO属性
                 CourseDO courseDO = courseMapper.selectById(classDO.getCourseId());
-                if (courseDO == null) throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
+                if (courseDO == null) throw new BizException(BizCodeEnum.COURSE_UNEXISTS);
                 classVO.setCourseName(courseDO.getName());
             });
             return classVOs;
-        }else {
+        }else
+        {
             //查别人
             Integer userRole = getTopRole(accountNo);
             Integer currentRole = getTopRole(currentAccountNo);
@@ -385,20 +360,41 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
                 classVO.setClassName(classDO.getName());
                 //向classVO中部分聚合courseDO属性
                 CourseDO courseDO = courseMapper.selectById(classDO.getCourseId());
-                if (courseDO == null) throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
+                if (courseDO == null) throw new BizException(BizCodeEnum.COURSE_UNEXISTS);
                 classVO.setCourseName(courseDO.getName());
             });
             return classVOs;
         }
     }
-
     @Override
-    public Object listAllSelection(ClassFilterReq classFilterReq, PageData pageData) {
+    public Object listMany(UsrClassFilterReq usrClassFilter, PageData pageData) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
-        return null;
+        if (!checkPermission(currentAccountNo))
+            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+        int total = userClassManager.countByFilter(usrClassFilter);
+        pageData.setTotal(total);
+        List<UserClassDO> userClassDOS = userClassManager.pageByFilter(usrClassFilter, pageData);
+        //向VO中注入userClass
+        List<UserClassVO> userClassVOS = userClassDOS.stream().map(userClassDO1 -> {
+            UserClassVO userClassVO =new UserClassVO();
+            BeanUtils.copyProperties(userClassDO1,userClassVO);
+            return userClassVO;
+        }).collect(Collectors.toList());
+        userClassVOS.forEach(userClassVO -> {
+            ClassDO classDO = classMapper.selectById(userClassVO.getClassId());
+            if (classDO == null) throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
+            BeanUtils.copyProperties(classDO, userClassVO, "id", "name", "creator", "del");
+            userClassVO.setClassName(classDO.getName());
+            //聚合course
+            CourseDO courseDO = courseMapper.selectById(classDO.getCourseId());
+            if (courseDO == null) throw new BizException(BizCodeEnum.COURSE_UNEXISTS);
+            userClassVO.setCourseName(courseDO.getName());
+        });
+        pageData.setRecords(userClassVOS);
+        return pageData;
     }
 
 

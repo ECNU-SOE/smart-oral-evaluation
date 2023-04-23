@@ -54,8 +54,8 @@ public class UserController {
     }
 
     @ApiOperation("查询user列表")
-    @PostMapping("query")
-    public JsonData query(@RequestParam(value = "cur", defaultValue = "1") int cur,
+    @PostMapping("list")
+    public JsonData list(@RequestParam(value = "cur", defaultValue = "1") int cur,
                          @RequestParam(value = "size", defaultValue = "50") int size,
                          @RequestBody UserFilterReq userFilterReq){
         Object data = userService.pageByFilter(userFilterReq,new PageData(cur,size));
