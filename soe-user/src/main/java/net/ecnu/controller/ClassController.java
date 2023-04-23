@@ -1,6 +1,5 @@
 package net.ecnu.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Update;
 import net.ecnu.controller.request.*;
@@ -21,14 +20,19 @@ public class ClassController {
     private ClassService classService;
 
     /**
-     * 查询当前用户的班级列表
+     * 查询用户所选班级列表
      * By:LYW
      */
-    @PostMapping("list_lyw")
-    public JsonData listByFilter(@RequestParam(value = "cur", defaultValue = "1") int cur,
-                                 @RequestParam(value = "size", defaultValue = "50") int size,
-                                 @RequestBody ClassFilterReq classFilterReq) {
-        Object data = classService.pageByFilterLYW(classFilterReq, new Page<>(cur, size));
+    @GetMapping("list")
+    public JsonData list(@RequestParam(required = false) String accountNo) {
+        Object data = classService.listUserSelection(accountNo);
+        return JsonData.buildSuccess(data);
+    }
+    @PostMapping("list_all")
+    public JsonData listAll(@RequestParam(value = "cur", defaultValue = "1") int cur,
+                            @RequestParam(value = "size", defaultValue = "50") int size,
+                            @RequestBody ClassFilterReq classFilterReq){
+        Object data = classService.listAllSelection(classFilterReq,new PageData(cur,size));
         return JsonData.buildSuccess(data);
     }
 
@@ -79,7 +83,7 @@ public class ClassController {
                          @RequestParam(value = "size", defaultValue = "50") int size,
                          @RequestBody ClassFilterReq classFilterReq) {
         Object data = classService.pageByFilter(classFilterReq, new PageData(cur, size));
-//        Object data = classService.pageByFilterLYW(classFilterReq, new Page<ClassDO>(cur, size));
+//        Object data = classService.listUserSelection(classFilterReq, new Page<ClassDO>(cur, size));
         return JsonData.buildSuccess(data);
     }
 

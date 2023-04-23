@@ -4,8 +4,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Find;
+import net.ecnu.controller.request.ClassFilterReq;
+import net.ecnu.controller.request.UserFilterReq;
 import net.ecnu.controller.request.UserReq;
 import net.ecnu.model.UserDO;
+import net.ecnu.model.common.PageData;
 import net.ecnu.service.UserService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +50,15 @@ public class UserController {
     @GetMapping("info")
     public JsonData info() {
         Object data = userService.getUserInfo();
+        return JsonData.buildSuccess(data);
+    }
+
+    @ApiOperation("查询user列表")
+    @PostMapping("query")
+    public JsonData query(@RequestParam(value = "cur", defaultValue = "1") int cur,
+                         @RequestParam(value = "size", defaultValue = "50") int size,
+                         @RequestBody UserFilterReq userFilterReq){
+        Object data = userService.pageByFilter(userFilterReq,new PageData(cur,size));
         return JsonData.buildSuccess(data);
     }
 

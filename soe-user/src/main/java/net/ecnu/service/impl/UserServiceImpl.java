@@ -18,10 +18,13 @@ import net.ecnu.exception.BizException;
 import net.ecnu.manager.UserManager;
 import net.ecnu.mapper.MyUserDetailsServiceMapper;
 import net.ecnu.mapper.UserMapper;
+import net.ecnu.mapper.UserRoleMapper;
+import net.ecnu.model.ClassDO;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.UserDO;
 import net.ecnu.model.common.PageData;
 import net.ecnu.model.dto.UserDTO;
+import net.ecnu.model.vo.ClassVO;
 import net.ecnu.model.vo.UserVO;
 import net.ecnu.service.UserService;
 import net.ecnu.util.IDUtil;
@@ -40,7 +43,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -57,6 +63,8 @@ public class UserServiceImpl implements UserService {
     private AuthenticationManager authenticationManager;
     @Resource
     private MyUserDetailsServiceMapper mapper;
+    @Resource
+    private UserRoleMapper userRoleMapper;
 
     @Resource
     private PasswordEncoder passwordEncoder;
@@ -115,7 +123,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Object pageByFilter(UserFilterReq userFilterReq, PageData pageData) {
-        return null;
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if(StringUtils.isBlank(currentAccountNo)){
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+        if(!checkPermission(currentAccountNo)){
+            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+        }
+        List<UserDO> userDOS = userManager.pageByFilter(userFilterReq, pageData);
+        int total = userManager.countByFilter(userFilterReq);
+        pageData.setTotal(total);
+        List<UserVO> userVOS = userDOS.stream().map(this::beanProcess).collect(Collectors.toList());
+        pageData.setRecords(userVOS);
+        return pageData;
     }
 
 
@@ -169,6 +189,28 @@ public class UserServiceImpl implements UserService {
         } catch (ClientException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private UserVO beanProcess(UserDO userDO){
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(userDO,userVO);
+        return userVO;
+    }
+
+    private Boolean checkPermission(String accountNo){
+        Integer topRole = getTopRole(accountNo);
+        if(topRole > RolesConst.ROLE_ADMIN){
+            return false;
+        }
+        return true;
+    }
+
+    private Integer getTopRole(String accountNo) {
+        List<String> roles_temp = userRoleMapper.getRoles(accountNo);
+        if (roles_temp.size()==0)
+            return 8;//用户没有设置权限id，则默认返回8：游客
+        List<Integer> roles = roles_temp.stream().map(Integer::parseInt).collect(Collectors.toList());
+        return Collections.min(roles);
     }
 
 
