@@ -19,4 +19,6 @@ public interface TopicService extends IService<TopicDO> {
     Object del(String topicId);
 
     Object modify(TopicReq topicReq);
+
+    Object getDetail(String topicId);
 }

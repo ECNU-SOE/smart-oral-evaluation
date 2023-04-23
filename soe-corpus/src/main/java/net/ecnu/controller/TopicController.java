@@ -1,13 +1,9 @@
 package net.ecnu.controller;
 
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Update;
-import net.ecnu.controller.request.CorpusFilterReq;
-import net.ecnu.controller.request.CorpusReq;
 import net.ecnu.controller.request.TopicReq;
-import net.ecnu.service.CorpusService;
 import net.ecnu.service.TopicService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +16,15 @@ public class TopicController {
 
     @Autowired
     private TopicService topicService;
+
+    /**
+     * 查询topic下的所有子题
+     */
+    @GetMapping("detail")
+    public JsonData getDetail(@RequestParam(value = "topicId", required = true) String topicId) {
+        Object data = topicService.getDetail(topicId);
+        return JsonData.buildSuccess(data);
+    }
 
     /**
      * 添加大题目Topic
