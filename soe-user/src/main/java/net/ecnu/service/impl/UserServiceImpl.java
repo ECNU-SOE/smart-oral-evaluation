@@ -128,10 +128,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Object pageByFilter(UserFilterReq userFilterReq, PageData pageData) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if(StringUtils.isBlank(currentAccountNo)){
+        if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
-        if(!checkPermission(currentAccountNo)){
+        if (!checkPermission(currentAccountNo)) {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
         List<UserDO> userDOS = userManager.pageByFilter(userFilterReq, pageData);
@@ -145,24 +145,24 @@ public class UserServiceImpl implements UserService {
     @Override
     public Object update(UserReq userReq) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if(StringUtils.isBlank(currentAccountNo)){
+        if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
-        if (userReq.getAccountNo()==null||StringUtils.isBlank(userReq.getAccountNo())||Objects.equals(currentAccountNo,userReq.getAccountNo())){
+        if (userReq.getAccountNo() == null || StringUtils.isBlank(userReq.getAccountNo()) || Objects.equals(currentAccountNo, userReq.getAccountNo())) {
             //用户更新自己的信息
             UserDO userDO = new UserDO();
-            BeanUtils.copyProperties(userReq,userDO,"accountNo","phone","pwd");
+            BeanUtils.copyProperties(userReq, userDO, "accountNo", "phone", "pwd");
             userDO.setAccountNo(currentAccountNo);
             System.out.println("userDO是: " + userDO);
             return userMapper.updateById(userDO);
-        }else {
+        } else {
             //用户更新别人的信息
             Integer roleA = getTopRole(currentAccountNo);
             Integer roleB = getTopRole(userReq.getAccountNo());
-            if (!hasOpRight(roleA,roleB))
+            if (!hasOpRight(roleA, roleB))
                 throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
             UserDO userDO = new UserDO();
-            BeanUtils.copyProperties(userReq,userDO,"phone","pwd");
+            BeanUtils.copyProperties(userReq, userDO, "phone", "pwd");
             return userMapper.updateById(userDO);
         }
     }
@@ -170,16 +170,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Object batch(MultipartFile excelFile) throws IOException {
         Sheet sheet = getFirstSheet(excelFile);
-        List<List<String>> data = getData(sheet);
+        List<UserDO> data = getData(sheet);
         int count = 0;
-        for (int i = 1;i<data.size();i++) {
-            List<String> info = data.get(i);
-            UserDO userDO = new UserDO();
-            userDO.setRealName(info.get(0));
-            userDO.setPhone(info.get(1));
-            userDO.setIdentifyId(info.get(2));
-            userDO.setPwd("soe12345");
-            userMapper.insert(userDO);
+        for (int i = 1; i < data.size(); i++) {
+            userMapper.insert(data.get(i));
             count++;
         }
         return count;
@@ -221,15 +215,15 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private UserVO beanProcess(UserDO userDO){
+    private UserVO beanProcess(UserDO userDO) {
         UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(userDO,userVO);
+        BeanUtils.copyProperties(userDO, userVO);
         return userVO;
     }
 
-    private Boolean checkPermission(String accountNo){
+    private Boolean checkPermission(String accountNo) {
         Integer topRole = getTopRole(accountNo);
-        if(topRole > RolesConst.ROLE_ADMIN){
+        if (topRole > RolesConst.ROLE_ADMIN) {
             return false;
         }
         return true;
@@ -237,18 +231,18 @@ public class UserServiceImpl implements UserService {
 
     private Integer getTopRole(String accountNo) {
         List<String> roles_temp = userRoleMapper.getRoles(accountNo);
-        if (roles_temp.size()==0)
+        if (roles_temp.size() == 0)
             return 8;//用户没有设置权限id，则默认返回8：游客
         List<Integer> roles = roles_temp.stream().map(Integer::parseInt).collect(Collectors.toList());
         return Collections.min(roles);
     }
 
-    private boolean hasOpRight(Integer roleA, Integer roleB){
+    private boolean hasOpRight(Integer roleA, Integer roleB) {
         //角色a为管理员，且b不是超管
-        if (roleA<=RolesConst.ROLE_ADMIN&& !Objects.equals(roleB, RolesConst.ROLE_SUPER_ADMIN))
+        if (roleA <= RolesConst.ROLE_ADMIN && !Objects.equals(roleB, RolesConst.ROLE_SUPER_ADMIN))
             return true;
         //角色a权限高于角色b
-        if (roleA<roleB)
+        if (roleA < roleB)
             return true;
         return false;
     }
@@ -259,28 +253,41 @@ public class UserServiceImpl implements UserService {
         Workbook workbook = null;
         String name = excelFile.getOriginalFilename();
         assert name != null;
-        if ("xls".equals(name.substring(name.lastIndexOf(".")+1))){
-            workbook =new HSSFWorkbook(inputStream);
-        }else if ("xlsx".equals(name.substring(name.lastIndexOf(".")+1))){
+        if ("xls".equals(name.substring(name.lastIndexOf(".") + 1))) {
+            workbook = new HSSFWorkbook(inputStream);
+        } else if ("xlsx".equals(name.substring(name.lastIndexOf(".") + 1))) {
             workbook = new XSSFWorkbook(inputStream);
         }
         assert workbook != null;
         return workbook.getSheetAt(0);
     }
 
-    private List<List<String>> getData(Sheet sheet){
-        List<List<String>> data = new ArrayList<>();
-        for(int i=0;i<sheet.getPhysicalNumberOfRows();i++){
+    private List<UserDO> getData(Sheet sheet) {
+        List<UserDO> data = new ArrayList<>();
+        for (int i = 0; i < sheet.getPhysicalNumberOfRows(); i++) {
             Row row = sheet.getRow(i);
-            List<String> temp = new ArrayList<>();
-            for (int index =0;index<row.getPhysicalNumberOfCells();index++){
-                Cell cell =row.getCell(index);
+            UserDO userDO = new UserDO();
+            for (int index = 0; index < row.getPhysicalNumberOfCells(); index++) {
+                Cell cell = row.getCell(index);
                 cell.setCellType(CellType.STRING);
-                if (!StringUtils.isBlank(cell.getStringCellValue())){
-                    temp.add(cell.getStringCellValue());
+                switch (index) {
+                    case 0:
+                        if (!StringUtils.isBlank(cell.getStringCellValue())) {
+                            userDO.setRealName(cell.getStringCellValue());
+                        }
+                    case 1:
+                        if (!StringUtils.isBlank(cell.getStringCellValue())) {
+                            userDO.setPhone(cell.getStringCellValue());
+                        }
+
+                    case 2:
+                        if (!StringUtils.isBlank(cell.getStringCellValue())) {
+                            userDO.setIdentifyId(cell.getStringCellValue());
+                        }
                 }
             }
-            data.add(temp);
+            userDO.setPwd("soe12345");
+            data.add(userDO);
         }
         return data;
     }
