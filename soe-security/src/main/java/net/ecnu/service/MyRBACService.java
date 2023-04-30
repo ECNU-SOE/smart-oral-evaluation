@@ -28,16 +28,20 @@ public class MyRBACService {
     public boolean hasPermission(HttpServletRequest request, Authentication authentication){
 
         Object principal = authentication.getPrincipal();
+        //权限开关
+        if (jwtProperties.getAuthenticationKey()) {
+            if (principal instanceof UserDetails) {
 
-        if(principal instanceof UserDetails){
-
-            UserDetails userDetails = ((UserDetails)principal);
-            List<GrantedAuthority> authorityList =
-                    AuthorityUtils.commaSeparatedStringToAuthorityList(request.getRequestURI());
-            return userDetails.getAuthorities().contains(authorityList.get(0))
-                    || jwtProperties.getDevOpeningURI().contains(request.getRequestURI());
+                UserDetails userDetails = ((UserDetails) principal);
+                List<GrantedAuthority> authorityList =
+                        AuthorityUtils.commaSeparatedStringToAuthorityList(request.getRequestURI());
+                return userDetails.getAuthorities().contains(authorityList.get(0))
+                        || jwtProperties.getDevOpeningURI().contains(request.getRequestURI());
+            }
+            return false;
+        } else {
+            return true;
         }
-        return false;
     }
 
     public MyUserDetails findByUserName(String username) {

@@ -54,7 +54,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String jwtToken = request.getHeader(jwtProperties.getHeader());
-        if(!StringUtils.isBlank(jwtToken)){
+        if(!StringUtils.isBlank(jwtToken) && jwtProperties.getAuthenticationKey()){
             String username = null;
             LoginUser loginUser = jwtTokenUtil.checkJWT(jwtToken);
             if(Objects.isNull(loginUser)){//token校验失败处理
