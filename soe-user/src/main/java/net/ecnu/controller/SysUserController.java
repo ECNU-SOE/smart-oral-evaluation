@@ -121,14 +121,14 @@ public class SysUserController {
         if(StringUtils.isBlank(username)){
             return JsonData.buildCodeAndMsg(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(), BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getMessage());
         }
-        //用户不能重置同等级及以上用户的密码
+        //用户不能重置同等级及以上用户的密码,不过用户可以重置自己的密码
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         Integer topRoleAsUser = userService.getTopRole(currentAccountNo);
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq(LoginProperties.username,username);
         UserDO userDO = sysUserMapper.selectOne(queryWrapper);
         Integer topRoleAsOperated = userService.getTopRole(userDO.getAccountNo());
-        if (topRoleAsUser < topRoleAsOperated) {
+        if (topRoleAsUser < topRoleAsOperated || currentAccountNo.equals(userDO.getAccountNo())) {
             if(topRoleAsUser > RolesConst.ROLE_ADMIN){
                 return JsonData.buildError("请联系管理员进行操作");
             }
