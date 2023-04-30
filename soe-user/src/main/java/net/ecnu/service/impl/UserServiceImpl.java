@@ -229,7 +229,8 @@ public class UserServiceImpl implements UserService {
         return true;
     }
 
-    private Integer getTopRole(String accountNo) {
+    @Override
+    public Integer getTopRole(String accountNo) {
         List<String> roles_temp = userRoleMapper.getRoles(accountNo);
         if (roles_temp.size() == 0)
             return 8;//用户没有设置权限id，则默认返回8：游客

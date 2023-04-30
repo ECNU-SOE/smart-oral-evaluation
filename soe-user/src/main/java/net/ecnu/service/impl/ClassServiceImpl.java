@@ -1,24 +1,21 @@
 package net.ecnu.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.constant.RolesConst;
 import net.ecnu.controller.request.*;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
-//import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.manager.ClassManager;
 import net.ecnu.manager.UserClassManager;
 import net.ecnu.mapper.*;
 import net.ecnu.model.*;
-import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.common.PageData;
 import net.ecnu.model.vo.ClassVO;
 import net.ecnu.model.vo.ClassVO_LYW;
 import net.ecnu.model.vo.UserClassVO;
 import net.ecnu.service.ClassService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import net.ecnu.service.UserService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -26,8 +23,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+
+//import net.ecnu.interceptor.LoginInterceptor;
 
 /**
  * <p>
@@ -56,15 +56,13 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     private UserRoleMapper userRoleMapper;
     @Autowired
     private CpsgrpMapper cpsgrpMapper;
-
+    @Autowired
+    private UserService userService;
 
     @Override
     public Object add(ClassAddReq classAddReq) {
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if (StringUtils.isBlank(currentAccountNo)) {
-            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
-        }
         if (!checkPermission(currentAccountNo)) {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
@@ -89,14 +87,10 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if (StringUtils.isBlank(currentAccountNo)) {
-            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
-        }
         if (!checkPermission(currentAccountNo)) {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
         //判断该班级是否存在选课信息
-
         return classMapper.deleteById(id);
     }
 
@@ -108,9 +102,6 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if (StringUtils.isBlank(currentAccountNo)) {
-            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
-        }
         if (!checkPermission(currentAccountNo)) {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
@@ -172,8 +163,8 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
                 return userClassMapper.insert(userClassDO1);
             } else {
                 //token的accountNo与请求体的accountNo不同，给别人选课
-                Integer roleA = getTopRole(currentAccountNo);
-                Integer roleB = getTopRole(usrClassAddReq.getAccountNo());
+                Integer roleA = userService.getTopRole(currentAccountNo);
+                Integer roleB = userService.getTopRole(usrClassAddReq.getAccountNo());
                 if (hasAddOrDelRight(roleA, roleB)) {
                     UserClassDO userClassDO1 = new UserClassDO();
                     BeanUtils.copyProperties(usrClassAddReq, userClassDO1);
@@ -200,8 +191,8 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             return userClassMapper.deleteById(id);
         } else {
             //删除别人选课信息
-            Integer role_A = getTopRole(currentAccountNo);
-            Integer role_B = getTopRole(userClassDO.getAccountNo());
+            Integer role_A = userService.getTopRole(currentAccountNo);
+            Integer role_B = userService.getTopRole(userClassDO.getAccountNo());
             if (hasAddOrDelRight(role_A, role_B)) {
                 return userClassMapper.deleteById(id);
             } else {
@@ -225,7 +216,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         if (cpsgrpDO == null || cpsgrpDO.getClassId() != null)
             throw new BizException(BizCodeEnum.CPSGRP_ERROR);
         //身份校验,管理员可以直接发布，教师需要自己选了这门课程才能发布
-        Integer topRole = getTopRole(currentAccountNo);
+        Integer topRole = userService.getTopRole(currentAccountNo);
         if (topRole <= RolesConst.ROLE_ADMIN) {
             CpsgrpDO cpsgrpDO1 = new CpsgrpDO();
             BeanUtils.copyProperties(cpsgrpDO, cpsgrpDO1);
@@ -259,7 +250,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         //语料组被加入班级才可删除
         if (cpsgrpDO.getClassId() == null)
             throw new BizException(BizCodeEnum.CPSGRP_ERROR);
-        Integer topRole = getTopRole(currentAccountNo);
+        Integer topRole = userService.getTopRole(currentAccountNo);
         if (topRole <= RolesConst.ROLE_ADMIN) {
             return cpsgrpMapper.deleteById(id);
         } else if (topRole <= RolesConst.TRAINER_C) {
@@ -284,7 +275,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         if (cpsgrpDO == null || cpsgrpDO.getClassId() == null)
             throw new BizException(BizCodeEnum.CPSGRP_ERROR);
         //身份校验,管理员可以直接修改，教师需要自己选了这门课程才能修改
-        Integer topRole = getTopRole(currentAccountNo);
+        Integer topRole = userService.getTopRole(currentAccountNo);
         if (topRole <= RolesConst.ROLE_ADMIN) {
             CpsgrpDO cpsgrpDO1 = new CpsgrpDO();
             BeanUtils.copyProperties(testUpdateReq, cpsgrpDO1);
@@ -343,8 +334,8 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         }else
         {
             //查别人
-            Integer userRole = getTopRole(accountNo);
-            Integer currentRole = getTopRole(currentAccountNo);
+            Integer userRole = userService.getTopRole(accountNo);
+            Integer currentRole = userService.getTopRole(currentAccountNo);
             if (!hasListRight(currentRole,userRole))
                 throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
             List<UserClassDO> userClassDOS = userClassMapper.selectList(new QueryWrapper<UserClassDO>()
@@ -399,7 +390,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
 
 
     private Boolean checkPermission(String accountNo) {
-        Integer topRole = getTopRole(accountNo);
+        Integer topRole = userService.getTopRole(accountNo);
         if (topRole > RolesConst.ROLE_ADMIN) {
             return false;
         }
@@ -418,14 +409,6 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         return classVO;
     }
 
-    //获取当前用户的最高权限id,并强转为Integer型
-    private Integer getTopRole(String accountNo) {
-        List<String> roles_temp = userRoleMapper.getRoles(accountNo);
-        if (roles_temp.size() == 0)
-            return 8;//用户没有设置权限id，则默认返回8：游客
-        List<Integer> roles = roles_temp.stream().map(Integer::parseInt).collect(Collectors.toList());
-        return Collections.min(roles);
-    }
 
     //角色A是否有为角色B添加/删除课程的权限
     private Boolean hasAddOrDelRight(Integer role_A, Integer role_B) {
