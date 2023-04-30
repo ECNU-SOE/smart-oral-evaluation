@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import net.ecnu.constant.RolesConst;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.mapper.UserMapper;
@@ -128,6 +129,9 @@ public class SysUserController {
         UserDO userDO = sysUserMapper.selectOne(queryWrapper);
         Integer topRoleAsOperated = userService.getTopRole(userDO.getAccountNo());
         if (topRoleAsUser < topRoleAsOperated) {
+            if(topRoleAsUser > RolesConst.ROLE_ADMIN){
+                return JsonData.buildError("请联系管理员进行操作");
+            }
             sysuserService.pwdreset(username);
             return JsonData.buildSuccess("重置密码成功!");
         } else {
