@@ -259,7 +259,10 @@ public class UserServiceImpl implements UserService {
             throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
         if (!hasDelRight(currentAccountNo,accountNo))
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
-        return userMapper.deleteById(accountNo);
+        UserDO newUserDo = new UserDO();
+        BeanUtils.copyProperties(userDO,newUserDo,"del");
+        newUserDo.setDel(true);
+        return userMapper.updateById(newUserDo);
     }
 
     private boolean hasOpRight(Integer roleA, Integer roleB) {
