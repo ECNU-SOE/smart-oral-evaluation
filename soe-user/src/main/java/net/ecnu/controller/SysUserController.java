@@ -1,15 +1,19 @@
 package net.ecnu.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import net.ecnu.constant.RolesConst;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.mapper.UserMapper;
+import net.ecnu.model.LoginProperties;
 import net.ecnu.model.UserDO;
 import net.ecnu.model.authentication.SysUserOrg;
 import net.ecnu.model.dto.UserDTO;
 import net.ecnu.model.vo.UserVO;
+import net.ecnu.service.UserService;
 import net.ecnu.service.authentication.SysUserService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.JsonData;
@@ -32,6 +36,9 @@ public class SysUserController {
 
     @Resource
     private SysUserService sysuserService;
+
+    @Resource
+    private UserService userService;
 
     @Autowired
     UserMapper sysUserMapper;
@@ -110,12 +117,26 @@ public class SysUserController {
     //用户管理：重置密码
     @ApiOperation("用户管理：重置密码")
     @PostMapping(value = "/pwd/reset")
-    public JsonData pwdreset(@RequestParam String accountNo) {
-        if(StringUtils.isBlank(accountNo)){
+    public JsonData pwdreset(@RequestParam String username) {
+        if(StringUtils.isBlank(username)){
             return JsonData.buildCodeAndMsg(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(), BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getMessage());
         }
-        sysuserService.pwdreset(accountNo);
-        return JsonData.buildSuccess("重置密码成功!");
+        //用户不能重置同等级及以上用户的密码,不过用户可以重置自己的密码
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        Integer topRoleAsUser = userService.getTopRole(currentAccountNo);
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq(LoginProperties.username,username);
+        UserDO userDO = sysUserMapper.selectOne(queryWrapper);
+        Integer topRoleAsOperated = userService.getTopRole(userDO.getAccountNo());
+        if (topRoleAsUser < topRoleAsOperated || currentAccountNo.equals(userDO.getAccountNo())) {
+            if(topRoleAsUser > RolesConst.ROLE_ADMIN){
+                return JsonData.buildError("请联系管理员进行操作");
+            }
+            sysuserService.pwdreset(username);
+            return JsonData.buildSuccess("重置密码成功!");
+        } else {
+            return JsonData.buildError("用户权限不足!");
+        }
     }
 
     //判断登录用户密码是否是默认密码

@@ -20,19 +20,19 @@ public class ClassController {
     private ClassService classService;
 
     /**
-     * 查询用户所选班级列表
+     * 查询单个用户选课列表
      * By:LYW
      */
-    @GetMapping("list")
-    public JsonData list(@RequestParam(required = false) String accountNo) {
-        Object data = classService.listUserSelection(accountNo);
+    @GetMapping("list_one")
+    public JsonData listOne(@RequestParam(required = false) String accountNo) {
+        Object data = classService.listOne(accountNo);
         return JsonData.buildSuccess(data);
     }
-    @PostMapping("list_all")
-    public JsonData listAll(@RequestParam(value = "cur", defaultValue = "1") int cur,
+    @PostMapping("list_many")
+    public JsonData listMany(@RequestParam(value = "cur", defaultValue = "1") int cur,
                             @RequestParam(value = "size", defaultValue = "50") int size,
-                            @RequestBody ClassFilterReq classFilterReq){
-        Object data = classService.listAllSelection(classFilterReq,new PageData(cur,size));
+                            @RequestBody UsrClassFilterReq usrClassFilter){
+        Object data = classService.listMany(usrClassFilter,new PageData(cur,size));
         return JsonData.buildSuccess(data);
     }
 
@@ -83,17 +83,6 @@ public class ClassController {
                          @RequestParam(value = "size", defaultValue = "50") int size,
                          @RequestBody ClassFilterReq classFilterReq) {
         Object data = classService.pageByFilter(classFilterReq, new PageData(cur, size));
-//        Object data = classService.listUserSelection(classFilterReq, new Page<ClassDO>(cur, size));
-        return JsonData.buildSuccess(data);
-    }
-
-    /**
-     * 查询登陆用户班级列表
-     * Create By：TGX
-     */
-    @PostMapping("list_usr_class")
-    public JsonData list_usr_class(@RequestBody UserClassDO userClassDO) {
-        Object data = classService.listUsrClass(userClassDO);
         return JsonData.buildSuccess(data);
     }
 

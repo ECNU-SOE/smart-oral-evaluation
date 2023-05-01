@@ -111,8 +111,8 @@ public class SysUserServiceImpl implements SysUserService {
 
     //用户管理：重置密码
     @Override
-    public void pwdreset(String accountNo) {
-        if(StringUtils.isBlank(accountNo)){
+    public void pwdreset(String username) {
+        if(StringUtils.isBlank(username)){
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"重置密码操作必须带手机号");
         }
         UserDO sysUser = new UserDO();
@@ -122,7 +122,7 @@ public class SysUserServiceImpl implements SysUserService {
 
         //根据用户名修改用户信息
         LambdaQueryWrapper<UserDO> lambdaQ = Wrappers.lambdaQuery();
-        lambdaQ.eq(UserDO::getAccountNo, accountNo);
+        lambdaQ.eq(UserDO::getPhone, username);
         userMapper.update(sysUser,lambdaQ);
     }
 

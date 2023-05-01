@@ -62,20 +62,22 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             }else{
                 //将用户唯一ID放入请求头中
                 request.setAttribute("accountNo",loginUser.getAccountNo());
-                //用户名暂时只能是手机号，后期再做优化
-                if(!Objects.isNull(loginUser)&&StringUtils.isNotBlank(loginUser.getPhone())){
-                    username = loginUser.getPhone();
-                }
-                if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
-                    UserDetails userDetails = myUserDetailsService.loadUserByUsername(username);
-                    //校验JWT令牌有效性及是否过期
-                    if(jwtTokenUtil.validateToken(jwtToken)){
-                        //给使用该JWT令牌的用户进行授权
-                        UsernamePasswordAuthenticationToken authenticationToken
-                                = new UsernamePasswordAuthenticationToken(
-                                userDetails,null, userDetails.getAuthorities());
-                        //Spring Security将可以访问的接口授权访问
-                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                if(jwtProperties.getAuthenticationKey()){
+                    //用户名暂时只能是手机号，后期再做优化
+                    if(!Objects.isNull(loginUser)&&StringUtils.isNotBlank(loginUser.getPhone())){
+                        username = loginUser.getPhone();
+                    }
+                    if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
+                        UserDetails userDetails = myUserDetailsService.loadUserByUsername(username);
+                        //校验JWT令牌有效性及是否过期
+                        if(jwtTokenUtil.validateToken(jwtToken)){
+                            //给使用该JWT令牌的用户进行授权
+                            UsernamePasswordAuthenticationToken authenticationToken
+                                    = new UsernamePasswordAuthenticationToken(
+                                    userDetails,null, userDetails.getAuthorities());
+                            //Spring Security将可以访问的接口授权访问
+                            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                        }
                     }
                 }
             }

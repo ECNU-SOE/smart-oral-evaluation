@@ -29,7 +29,7 @@ public interface SysUserService {
 
     void deleteUser(String accountNo);
 
-    void pwdreset(String accountNo);
+    void pwdreset(String username);
 
     void updateEnabled(String accountNo, Boolean enabled);
 

@@ -8,6 +8,10 @@ import java.util.List;
 @Data
 @ConfigurationProperties(prefix ="soe.jwt")
 public class JwtProperties {
+
+    //开启权限认证开发
+    private Boolean authenticationKey;
+
     //是否开启JWT，即注入相关的类对象
     private Boolean enabled;
     //JWT密钥

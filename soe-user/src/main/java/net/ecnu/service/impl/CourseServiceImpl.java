@@ -10,20 +10,18 @@ import net.ecnu.exception.BizException;
 import net.ecnu.manager.CourseManager;
 import net.ecnu.mapper.ClassMapper;
 import net.ecnu.mapper.CourseMapper;
-import net.ecnu.mapper.UserRoleMapper;
 import net.ecnu.model.ClassDO;
 import net.ecnu.model.CourseDO;
 import net.ecnu.model.common.PageData;
-import net.ecnu.model.vo.ClassVO;
 import net.ecnu.model.vo.CourseVO;
 import net.ecnu.service.CourseService;
+import net.ecnu.service.UserService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.RequestParamUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -39,6 +37,8 @@ public class CourseServiceImpl implements CourseService {
     private CourseManager courseManager;
     @Autowired
     private ClassMapper classMapper;
+    @Autowired
+    private UserService userService;
 
 //
 //    @Autowired
@@ -50,14 +50,13 @@ public class CourseServiceImpl implements CourseService {
 //    @Autowired
 //    private CpsgrpManager cpsgrpManager;
 //
-    @Autowired
-    private UserRoleMapper userRoleMapper;
+
 
     @Override
     public Object add(CourAddReq courAddReq) {
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        Integer topRole = getTopRole(currentAccountNo);
+        Integer topRole = userService.getTopRole(currentAccountNo);
         if(Objects.equals(topRole, RolesConst.ROLE_SUPER_ADMIN) || Objects.equals(topRole, RolesConst.ROLE_SYSTEM_ADMIN) || Objects.equals(topRole, RolesConst.ROLE_ADMIN)){
             CourseDO csDO = new CourseDO();
             BeanUtils.copyProperties(courAddReq, csDO);
@@ -83,7 +82,7 @@ public class CourseServiceImpl implements CourseService {
             throw new BizException(BizCodeEnum.COURSE_USING);
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        Integer topRole = getTopRole(currentAccountNo);
+        Integer topRole = userService.getTopRole(currentAccountNo);
         if(topRole <= RolesConst.ROLE_ADMIN){
             return courseMapper.deleteById(id);
         }else{
@@ -100,7 +99,7 @@ public class CourseServiceImpl implements CourseService {
         //判断用户权限
         //LoginUser loginUser = LoginInterceptor.threadLocal.get();
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        Integer topRole = getTopRole(currentAccountNo);
+        Integer topRole = userService.getTopRole(currentAccountNo);
         if(topRole <= RolesConst.ROLE_ADMIN){
             CourseDO csDO = new CourseDO();
             BeanUtils.copyProperties(courUpdateReq, csDO);
@@ -133,26 +132,10 @@ public class CourseServiceImpl implements CourseService {
         return courseVO;
     }
 
-    //
-//
-//
-//
     private CourseVO beanProcess(CourseDO courseDO) {
         CourseVO courseVO = new CourseVO();
         BeanUtils.copyProperties(courseDO, courseVO);
         return courseVO;
-    }
-//
-//    private CpsgrpVO beanProcess(CpsgrpDO cpsgrpDO) {
-//            CpsgrpVO cpsgrpVO = new CpsgrpVO();
-//            BeanUtils.copyProperties(cpsgrpDO, cpsgrpVO);
-//            return cpsgrpVO;
-//    }
-//
-    private Integer getTopRole(String accountNo) {
-        List<String> roles_temp = userRoleMapper.getRoles(accountNo);
-        List<Integer> roles = roles_temp.stream().map(Integer::parseInt).collect(Collectors.toList());
-        return Collections.min(roles);
     }
 
 }

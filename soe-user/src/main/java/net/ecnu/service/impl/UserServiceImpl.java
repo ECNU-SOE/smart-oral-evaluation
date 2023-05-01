@@ -9,6 +9,7 @@ import com.aliyuncs.IAcsClient;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.constant.RolesConst;
 import net.ecnu.controller.request.UserFilterReq;
@@ -19,18 +20,19 @@ import net.ecnu.manager.UserManager;
 import net.ecnu.mapper.MyUserDetailsServiceMapper;
 import net.ecnu.mapper.UserMapper;
 import net.ecnu.mapper.UserRoleMapper;
-import net.ecnu.model.ClassDO;
-import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.UserDO;
+import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.common.PageData;
-import net.ecnu.model.dto.UserDTO;
-import net.ecnu.model.vo.ClassVO;
 import net.ecnu.model.vo.UserVO;
 import net.ecnu.service.UserService;
+import net.ecnu.util.FileUtil;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.JWTUtil;
 import net.ecnu.util.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,13 +42,16 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.nio.file.Files;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.path;
 
 
 @Service
@@ -140,21 +145,50 @@ public class UserServiceImpl implements UserService {
         return pageData;
     }
 
+    @Override
+    public Object update(UserReq userReq) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+        if (userReq.getAccountNo() == null || StringUtils.isBlank(userReq.getAccountNo()) || Objects.equals(currentAccountNo, userReq.getAccountNo())) {
+            //用户更新自己的信息
+            UserDO userDO = new UserDO();
+            BeanUtils.copyProperties(userReq, userDO, "accountNo", "phone", "pwd");
+            userDO.setAccountNo(currentAccountNo);
+            System.out.println("userDO是: " + userDO);
+            return userMapper.updateById(userDO);
+        } else {
+            //用户更新别人的信息
+            Integer roleA = getTopRole(currentAccountNo);
+            Integer roleB = getTopRole(userReq.getAccountNo());
+            if (!hasOpRight(roleA, roleB))
+                throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+            UserDO userDO = new UserDO();
+            BeanUtils.copyProperties(userReq, userDO, "phone", "pwd");
+            return userMapper.updateById(userDO);
+        }
+    }
 
     @Override
-    public int update(UserDO user) {
-        if (user.getDel() != null && user.getDel()) {
-            return 0;
+    public Object batch(MultipartFile excelFile) throws IOException {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
-        if (StringUtils.isBlank(user.getAccountNo())) {
-            return 0;
+        Sheet sheet = getFirstSheet(excelFile);
+        List<UserDO> data = getData(sheet);
+        int count = 0;
+        for (int i = 1; i < data.size(); i++) {
+            UserDO newUserDo = data.get(i);
+            UserDO userDO = userManager.selectOneByPhone(newUserDo.getPhone());
+            if (userDO!=null)
+                throw new BizException(BizCodeEnum.ACCOUNT_REPEAT);
+            userMapper.insert(newUserDo);
+            mapper.insertUserRole(RolesConst.DEFAULT_ROLE, newUserDo.getAccountNo());
+            count++;
         }
-        UserDTO userDTO = new UserDTO();
-        BeanUtils.copyProperties(user, userDTO);
-        UserDO userDO = new UserDO();
-        BeanUtils.copyProperties(userDTO, userDO);
-        userDO.setAccountNo(user.getAccountNo());
-        return userMapper.updateById(userDO);
+        return count;
     }
 
     @Override
@@ -207,7 +241,8 @@ public class UserServiceImpl implements UserService {
         return true;
     }
 
-    private Integer getTopRole(String accountNo) {
+    @Override
+    public Integer getTopRole(String accountNo) {
         List<String> roles_temp = userRoleMapper.getRoles(accountNo);
         if (roles_temp.size() == 0)
             return 8;//用户没有设置权限id，则默认返回8：游客
@@ -215,6 +250,89 @@ public class UserServiceImpl implements UserService {
         return Collections.min(roles);
     }
 
+    @Override
+    public Object del(String accountNo) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+        UserDO userDO = userMapper.selectById(accountNo);
+        if (userDO==null)
+            throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
+        if (!hasDelRight(currentAccountNo,accountNo))
+            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+        UserDO newUserDo = new UserDO();
+        BeanUtils.copyProperties(userDO,newUserDo,"del");
+        newUserDo.setDel(true);
+        return userMapper.updateById(newUserDo);
+    }
+
+    private boolean hasOpRight(Integer roleA, Integer roleB) {
+        //角色a为管理员，且b不是超管
+        if (roleA <= RolesConst.ROLE_ADMIN && !Objects.equals(roleB, RolesConst.ROLE_SUPER_ADMIN))
+            return true;
+        //角色a权限高于角色b
+        if (roleA < roleB)
+            return true;
+        return false;
+    }
+
+    private Sheet getFirstSheet(MultipartFile excelFile) throws IOException {
+        File file = FileUtil.transferToFile(excelFile);
+        InputStream inputStream = Files.newInputStream(file.toPath());
+        Workbook workbook = null;
+        String name = excelFile.getOriginalFilename();
+        assert name != null;
+        if ("xls".equals(name.substring(name.lastIndexOf(".") + 1))) {
+            workbook = new HSSFWorkbook(inputStream);
+        } else if ("xlsx".equals(name.substring(name.lastIndexOf(".") + 1))) {
+            workbook = new XSSFWorkbook(inputStream);
+        }
+        assert workbook != null;
+        return workbook.getSheetAt(0);
+    }
+
+    private List<UserDO> getData(Sheet sheet) {
+        List<UserDO> data = new ArrayList<>();
+        for (int i = 0; i < sheet.getPhysicalNumberOfRows(); i++) {
+            Row row = sheet.getRow(i);
+            UserDO userDO = new UserDO();
+            for (int index = 0; index < row.getPhysicalNumberOfCells(); index++) {
+                Cell cell = row.getCell(index);
+                cell.setCellType(CellType.STRING);
+                switch (index) {
+                    case 0:
+                        if (!StringUtils.isBlank(cell.getStringCellValue())) {
+                            userDO.setRealName(cell.getStringCellValue());
+                        }
+                    case 1:
+                        if (!StringUtils.isBlank(cell.getStringCellValue())) {
+                            userDO.setPhone(cell.getStringCellValue());
+                        }
+
+                    case 2:
+                        if (!StringUtils.isBlank(cell.getStringCellValue())) {
+                            userDO.setIdentifyId(cell.getStringCellValue());
+                        }
+                }
+            }
+            userDO.setPwd(passwordEncoder.encode("soe12345"));
+            userDO.setAccountNo("user_"+IDUtil.getSnowflakeId());
+            data.add(userDO);
+        }
+        return data;
+    }
+
+    //当前用户有无删除此用户的权限
+    private Boolean hasDelRight(String currentAccountNo, String accountNo){
+        Integer roleA = getTopRole(currentAccountNo);
+        Integer roleB = getTopRole(accountNo);
+        if (roleA<=RolesConst.ROLE_ADMIN&& !Objects.equals(roleB, RolesConst.ROLE_SUPER_ADMIN))
+            return true;
+        if (Objects.equals(currentAccountNo, accountNo))
+            return true;
+        return false;
+    }
 
 }
 

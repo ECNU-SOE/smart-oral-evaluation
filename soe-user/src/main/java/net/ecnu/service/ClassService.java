@@ -27,9 +27,6 @@ public interface ClassService extends IService<ClassDO> {
     Object addUsrClass(UsrClassAddReq usrClassAddReq);
 
     Object delUsrClass(String id);
-
-    Object listUsrClass(UserClassDO userClassDO);
-
     Object addTest(TestAddReq testAddReq);
 
     Object delTest(String id);
@@ -39,9 +36,10 @@ public interface ClassService extends IService<ClassDO> {
     Object detail(String classId);
 
     /**
-     * 分页查询班级列表
+     * 查询单个用户选课列表
      */
-    Object listUserSelection(String accountNo);
-    Object listAllSelection(ClassFilterReq classFilterReq, PageData pageData);
+    Object listOne(String accountNo);
+    //条件分页查询多个用户选课列表
+    Object listMany(UsrClassFilterReq usrClassFilter, PageData pageData);
 
 }

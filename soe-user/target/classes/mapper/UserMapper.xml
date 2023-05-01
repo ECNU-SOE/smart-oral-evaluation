@@ -8,6 +8,7 @@
         <result column="identify_id" property="identifyId" />
         <result column="nick_name" property="nickName" />
         <result column="real_name" property="realName" />
+        <result column="avatar_url" property="avatarUrl" />
         <result column="first_language" property="firstLanguage" />
         <result column="sex" property="sex" />
         <result column="birth" property="birth" />
@@ -19,11 +20,13 @@
         <result column="del" property="del" />
         <result column="gmt_create" property="gmtCreate" />
         <result column="gmt_modified" property="gmtModified" />
+        <result column="enabled" property="enabled" />
+        <result column="org_id" property="orgId" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        account_no, identify_id,nick_name, real_name, first_language, sex, birth, sign, phone, mail, pwd, secret, del, gmt_create, gmt_modified
+        account_no, identify_id, nick_name, real_name, avatar_url, first_language, sex, birth, sign, phone, mail, pwd, secret, del, gmt_create, gmt_modified, enabled, org_id
     </sql>
 
 </mapper>
