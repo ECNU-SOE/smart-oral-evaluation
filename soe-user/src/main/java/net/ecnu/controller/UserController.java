@@ -34,6 +34,13 @@ public class UserController {
         return JsonData.buildSuccess(data);
     }
 
+    @ApiOperation("删除用户")
+    @GetMapping("del")
+    public JsonData register(@RequestParam String accountNo) {
+        Object data = userService.del(accountNo);
+        return JsonData.buildSuccess(data);
+    }
+
     @ApiOperation("批量新增用户")
     @PostMapping("batch")
     public JsonData batch(@RequestParam("file") MultipartFile excelFile) throws IOException {

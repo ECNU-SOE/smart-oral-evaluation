@@ -9,6 +9,7 @@ import com.aliyuncs.IAcsClient;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.constant.RolesConst;
 import net.ecnu.controller.request.UserFilterReq;
@@ -247,6 +248,20 @@ public class UserServiceImpl implements UserService {
         return Collections.min(roles);
     }
 
+    @Override
+    public Object del(String accountNo) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+        UserDO userDO = userMapper.selectById(accountNo);
+        if (userDO==null)
+            throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
+        if (!hasDelRight(currentAccountNo,accountNo))
+            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+        return userMapper.deleteById(accountNo);
+    }
+
     private boolean hasOpRight(Integer roleA, Integer roleB) {
         //角色a为管理员，且b不是超管
         if (roleA <= RolesConst.ROLE_ADMIN && !Objects.equals(roleB, RolesConst.ROLE_SUPER_ADMIN))
@@ -297,9 +312,21 @@ public class UserServiceImpl implements UserService {
                 }
             }
             userDO.setPwd(passwordEncoder.encode("soe12345"));
+            userDO.setAccountNo("user_"+IDUtil.getSnowflakeId());
             data.add(userDO);
         }
         return data;
+    }
+
+    //当前用户有无删除此用户的权限
+    private Boolean hasDelRight(String currentAccountNo, String accountNo){
+        Integer roleA = getTopRole(currentAccountNo);
+        Integer roleB = getTopRole(accountNo);
+        if (roleA<=RolesConst.ROLE_ADMIN&& !Objects.equals(roleB, RolesConst.ROLE_SUPER_ADMIN))
+            return true;
+        if (Objects.equals(currentAccountNo, accountNo))
+            return true;
+        return false;
     }
 
 }

@@ -21,4 +21,5 @@ public interface UserService {
     Object batch(MultipartFile excelFile) throws IOException;
     //获取角色的最高角色身份
     Integer getTopRole(String accountNo);
+    Object del(String accountNo);
 }
