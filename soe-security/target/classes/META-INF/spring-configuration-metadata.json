@@ -1,0 +1,87 @@
+{
+  "groups": [
+    {
+      "name": "soe.jwt",
+      "type": "net.ecnu.model.JwtProperties",
+      "sourceType": "net.ecnu.model.JwtProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "soe.jwt.authentication-key",
+      "type": "java.lang.Boolean",
+      "sourceType": "net.ecnu.model.JwtProperties"
+    },
+    {
+      "name": "soe.jwt.cors-allowed-methods",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "net.ecnu.model.JwtProperties"
+    },
+    {
+      "name": "soe.jwt.cors-allowed-origins",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "net.ecnu.model.JwtProperties"
+    },
+    {
+      "name": "soe.jwt.csrf-disabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "net.ecnu.model.JwtProperties"
+    },
+    {
+      "name": "soe.jwt.dev-opening-u-r-i",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "net.ecnu.model.JwtProperties"
+    },
+    {
+      "name": "soe.jwt.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "net.ecnu.model.JwtProperties"
+    },
+    {
+      "name": "soe.jwt.expiration",
+      "type": "java.lang.Long",
+      "sourceType": "net.ecnu.model.JwtProperties"
+    },
+    {
+      "name": "soe.jwt.header",
+      "type": "java.lang.String",
+      "sourceType": "net.ecnu.model.JwtProperties"
+    },
+    {
+      "name": "soe.jwt.permit-all-u-r-i",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "net.ecnu.model.JwtProperties"
+    },
+    {
+      "name": "soe.jwt.pwd-param-name",
+      "type": "java.lang.String",
+      "sourceType": "net.ecnu.model.JwtProperties"
+    },
+    {
+      "name": "soe.jwt.secret",
+      "type": "java.lang.String",
+      "sourceType": "net.ecnu.model.JwtProperties"
+    },
+    {
+      "name": "soe.jwt.subject",
+      "type": "java.lang.String",
+      "sourceType": "net.ecnu.model.JwtProperties"
+    },
+    {
+      "name": "soe.jwt.token-prefix",
+      "type": "java.lang.String",
+      "sourceType": "net.ecnu.model.JwtProperties"
+    },
+    {
+      "name": "soe.jwt.use-default-controller",
+      "type": "java.lang.Boolean",
+      "sourceType": "net.ecnu.model.JwtProperties"
+    },
+    {
+      "name": "soe.jwt.user-param-name",
+      "type": "java.lang.String",
+      "sourceType": "net.ecnu.model.JwtProperties"
+    }
+  ],
+  "hints": []
+}

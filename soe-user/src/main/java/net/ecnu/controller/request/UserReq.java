@@ -17,7 +17,6 @@ public class UserReq {
 
     private String accountNo;
 //    private String identifyId;
-    private String nickName;
     private String realName;
     private String avatarUrl;
     //用户母语
@@ -41,6 +40,7 @@ public class UserReq {
     @NotBlank(message = "手机号不能为空")
     @Pattern(regexp = SOEConst.PHONE_PATTERN, groups = {Create.class, Find.class})
     private String phone;
+
     private String mail;
 
     /**

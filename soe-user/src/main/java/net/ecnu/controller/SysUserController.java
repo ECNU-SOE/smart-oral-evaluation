@@ -62,22 +62,22 @@ public class SysUserController {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         UserDO userByUserName = sysuserService.getUserByUserName(currentAccountNo);
         UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(userByUserName,userVO);
+        BeanUtils.copyProperties(userByUserName, userVO);
         return JsonData.buildSuccess(userVO);
     }
 
     //用户管理：查询，username替换成user表中realName，页面展示时隐藏掉用户的accountNo
     @ApiOperation("用户管理：查询")
     @PostMapping("/query")
-    public JsonData query(@RequestParam(value = "orgId",required = false) Integer orgId ,
-                                   @RequestParam(value = "realName",required = false) String realName ,
-                                   @RequestParam(value = "phone",required = false) String phone,
-                                   @RequestParam(value = "email",required = false) String email,
-                                   @RequestParam(value = "enabled",required = false) Boolean enabled,
-                                   @RequestParam(value = "createStartTime",required = false) Date createStartTime,
-                                   @RequestParam(value = "createEndTime",required = false) Date createEndTime,
-                                   @RequestParam(value = "pageNum",required = true) Integer pageNum,
-                                   @RequestParam(value = "pageSize",required = true) Integer pageSize) {
+    public JsonData query(@RequestParam(value = "orgId", required = false) Integer orgId,
+                          @RequestParam(value = "realName", required = false) String realName,
+                          @RequestParam(value = "phone", required = false) String phone,
+                          @RequestParam(value = "email", required = false) String email,
+                          @RequestParam(value = "enabled", required = false) Boolean enabled,
+                          @RequestParam(value = "createStartTime", required = false) Date createStartTime,
+                          @RequestParam(value = "createEndTime", required = false) Date createEndTime,
+                          @RequestParam(value = "pageNum", required = true) Integer pageNum,
+                          @RequestParam(value = "pageSize", required = true) Integer pageSize) {
 
         IPage<SysUserOrg> sysUserOrgIPage = sysuserService.queryUser(orgId, realName, phone, email, enabled,
                 createStartTime, createEndTime,
@@ -107,7 +107,7 @@ public class SysUserController {
     @ApiOperation("用户管理：删除")
     @PostMapping(value = "/delete")
     public JsonData delete(@RequestParam String accountNo) {
-        if(StringUtils.isBlank(accountNo)){
+        if (StringUtils.isBlank(accountNo)) {
             return JsonData.buildCodeAndMsg(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(), BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getMessage());
         }
         sysuserService.deleteUser(accountNo);
@@ -118,18 +118,18 @@ public class SysUserController {
     @ApiOperation("用户管理：重置密码")
     @PostMapping(value = "/pwd/reset")
     public JsonData pwdreset(@RequestParam String username) {
-        if(StringUtils.isBlank(username)){
+        if (StringUtils.isBlank(username)) {
             return JsonData.buildCodeAndMsg(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(), BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getMessage());
         }
         //用户不能重置同等级及以上用户的密码,不过用户可以重置自己的密码
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         Integer topRoleAsUser = userService.getTopRole(currentAccountNo);
         QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq(LoginProperties.username,username);
+        queryWrapper.eq(LoginProperties.username, username);
         UserDO userDO = sysUserMapper.selectOne(queryWrapper);
         Integer topRoleAsOperated = userService.getTopRole(userDO.getAccountNo());
         if (topRoleAsUser < topRoleAsOperated || currentAccountNo.equals(userDO.getAccountNo())) {
-            if(topRoleAsUser > RolesConst.ROLE_ADMIN){
+            if (topRoleAsUser > RolesConst.ROLE_ADMIN) {
                 return JsonData.buildError("请联系管理员进行操作");
             }
             sysuserService.pwdreset(username);
@@ -153,16 +153,16 @@ public class SysUserController {
     public JsonData pwdchange(@RequestParam String oldPass,
                               @RequestParam String newPass) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        sysuserService.changePwd(currentAccountNo,oldPass,newPass);
+        sysuserService.changePwd(currentAccountNo, oldPass, newPass);
         return JsonData.buildSuccess("修改密码成功!");
     }
 
     //用户管理：更新用户激活状态
     @ApiOperation("用户管理：更新用户激活状态")
     @PostMapping(value = "/enabled/change")
-    public JsonData update(@RequestParam Boolean enabled,@RequestParam String accountNo) {
-        if(StringUtils.isEmpty(accountNo)){
-            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getMessage());
+    public JsonData update(@RequestParam Boolean enabled, @RequestParam String accountNo) {
+        if (StringUtils.isEmpty(accountNo)) {
+            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(), BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getMessage());
         }
         sysuserService.updateEnabled(accountNo, enabled);
         return JsonData.buildSuccess("用户状态更新成功！");
