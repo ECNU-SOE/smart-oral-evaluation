@@ -169,11 +169,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Object batch(MultipartFile excelFile) throws IOException {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
         Sheet sheet = getFirstSheet(excelFile);
         List<UserDO> data = getData(sheet);
         int count = 0;
         for (int i = 1; i < data.size(); i++) {
-            userMapper.insert(data.get(i));
+            UserDO newUserDo = data.get(i);
+            UserDO userDO = userManager.selectOneByPhone(newUserDo.getPhone());
+            if (userDO!=null)
+                throw new BizException(BizCodeEnum.ACCOUNT_REPEAT);
+            userMapper.insert(newUserDo);
+            mapper.insertUserRole(RolesConst.DEFAULT_ROLE, newUserDo.getAccountNo());
             count++;
         }
         return count;
@@ -287,7 +296,7 @@ public class UserServiceImpl implements UserService {
                         }
                 }
             }
-            userDO.setPwd("soe12345");
+            userDO.setPwd(passwordEncoder.encode("soe12345"));
             data.add(userDO);
         }
         return data;
