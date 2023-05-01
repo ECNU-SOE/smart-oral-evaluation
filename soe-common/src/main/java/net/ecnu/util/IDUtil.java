@@ -34,4 +34,8 @@ public class IDUtil {
     public static String nextTranscriptId() {
         return "transcript_" + getSnowflakeId();
     }
+
+    public static String nextUserId() {
+        return "user_" + getSnowflakeId();
+    }
 }

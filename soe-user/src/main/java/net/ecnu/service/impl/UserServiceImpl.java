@@ -61,8 +61,10 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private AuthenticationManager authenticationManager;
+
     @Resource
     private MyUserDetailsServiceMapper mapper;
+
     @Resource
     private UserRoleMapper userRoleMapper;
 
@@ -74,14 +76,14 @@ public class UserServiceImpl implements UserService {
         //check手机验证码 与 数据库唯一性
         UserDO userDO = userManager.selectOneByPhone(userReq.getPhone());
         if (userDO != null) throw new BizException(BizCodeEnum.ACCOUNT_REPEAT);
+
         //处理生成userDO对象，插入数据库
         UserDO newUserDO = new UserDO();
-        newUserDO.setAccountNo("user_" + IDUtil.getSnowflakeId());
-        newUserDO.setNickName(userReq.getPhone());
+        newUserDO.setAccountNo(IDUtil.nextUserId());
+        newUserDO.setNickName(userReq.getNickName());
         newUserDO.setPhone(userReq.getPhone());
-
 //        //密码加密处理
-//        newUserDO.setSecret("$1$" + CommonUtil.getStringNumRandom(8));
+//        newUserDO.setSecret("$1$" + CommonUtil.getStringNumRandom(8)); //加密盐
 //        newUserDO.setPwd(Md5Crypt.md5Crypt(userRegisterReq.getPwd().getBytes(), newUserDO.getSecret()));
         newUserDO.setPwd(passwordEncoder.encode(userReq.getPwd()));
         mapper.insertUserRole(RolesConst.DEFAULT_ROLE, newUserDO.getAccountNo());
@@ -124,10 +126,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Object pageByFilter(UserFilterReq userFilterReq, PageData pageData) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if(StringUtils.isBlank(currentAccountNo)){
+        if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
-        if(!checkPermission(currentAccountNo)){
+        if (!checkPermission(currentAccountNo)) {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
         List<UserDO> userDOS = userManager.pageByFilter(userFilterReq, pageData);
@@ -191,15 +193,15 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private UserVO beanProcess(UserDO userDO){
+    private UserVO beanProcess(UserDO userDO) {
         UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(userDO,userVO);
+        BeanUtils.copyProperties(userDO, userVO);
         return userVO;
     }
 
-    private Boolean checkPermission(String accountNo){
+    private Boolean checkPermission(String accountNo) {
         Integer topRole = getTopRole(accountNo);
-        if(topRole > RolesConst.ROLE_ADMIN){
+        if (topRole > RolesConst.ROLE_ADMIN) {
             return false;
         }
         return true;
@@ -207,7 +209,7 @@ public class UserServiceImpl implements UserService {
 
     private Integer getTopRole(String accountNo) {
         List<String> roles_temp = userRoleMapper.getRoles(accountNo);
-        if (roles_temp.size()==0)
+        if (roles_temp.size() == 0)
             return 8;//用户没有设置权限id，则默认返回8：游客
         List<Integer> roles = roles_temp.stream().map(Integer::parseInt).collect(Collectors.toList());
         return Collections.min(roles);

@@ -103,8 +103,9 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         if (cpsgrpDO == null) {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
-        //TODO 其他人的 误删问题
+        //TODO 其他用户的 误删问题
         cpsgrpDO.setDel(1);
+        int i = cpsgrpMapper.updateById(cpsgrpDO);
         return "del success";
     }
 
@@ -142,13 +143,7 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         int totalCount = cpsgrpManager.countByFilter(cpsgrpFilter);
         pageData.setTotal(totalCount);
         //生成处理cpsgrpVOS对象
-        List<CpsgrpVO> cpsgrpVOS = cpsgrpDOS.stream().map(cpsgrpDO -> {
-            CpsgrpVO cpsgrpVO = beanProcess(cpsgrpDO);
-            //统计题目数量
-//            int cpsrcdNum = cpsrcdManager.countByCpsgrpId(cpsgrpVO.getId());
-//            cpsgrpVO.setCpsrcdNum(cpsrcdNum);
-            return cpsgrpVO;
-        }).collect(Collectors.toList());
+        List<CpsgrpVO> cpsgrpVOS = cpsgrpDOS.stream().map(this::beanProcess).collect(Collectors.toList());
         pageData.setRecords(cpsgrpVOS);
         //返回分页对象
         return pageData;

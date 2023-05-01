@@ -2,8 +2,6 @@ package net.ecnu.mapper;
 
 import net.ecnu.model.CpsrcdDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
-
 
 /**
  * <p>
@@ -13,6 +11,5 @@ import org.apache.ibatis.annotations.Mapper;
  * @author LYW
  * @since 2022-11-03
  */
-@Mapper
 public interface CpsrcdMapper extends BaseMapper<CpsrcdDO> {
 }
