@@ -2,7 +2,6 @@ package net.ecnu.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
-import net.ecnu.aop.annotate.TokenAnalysis;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.request.CorpusFilterReq;
 import net.ecnu.controller.request.CorpusReq;
@@ -35,7 +34,6 @@ public class CorpusController {
     /**
      * 添加语料
      */
-    @TokenAnalysis
     @PostMapping("add")
     public JsonData add(@RequestBody @Validated(Create.class) CorpusReq corpusReq) {
         Object data = corpusService.add(corpusReq);
