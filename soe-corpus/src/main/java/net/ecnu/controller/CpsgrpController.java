@@ -1,6 +1,7 @@
 package net.ecnu.controller;
 
 
+import net.ecnu.aop.annotate.TokenAnalysis;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Update;
 import net.ecnu.controller.request.CpsgrpReq;
@@ -47,6 +48,7 @@ public class CpsgrpController {
     /**
      * 创建语料组cpsgrp
      */
+    @TokenAnalysis
     @PostMapping("create")
     public JsonData create(@RequestBody @Validated(Create.class) CpsgrpReq cpsgrpReq) {
         Object data = cpsgrpService.create(cpsgrpReq);
@@ -84,6 +86,7 @@ public class CpsgrpController {
     /**
      * 存储答题题报告
      */
+    @TokenAnalysis
     @PostMapping("save_transcript")
     public JsonData saveTranscript(@RequestBody @Validated TranscriptReq transcriptReq) {
         Object data = transcriptService.save(transcriptReq);//生成报告
@@ -93,6 +96,7 @@ public class CpsgrpController {
     /**
      * 查询答题报告
      */
+    @TokenAnalysis
     @PostMapping("transcripts")
     public JsonData transcript(@RequestBody TranscriptReq transcriptReq) {
         Object data = transcriptService.getTranscript(transcriptReq);//生成报告
