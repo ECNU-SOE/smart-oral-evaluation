@@ -63,7 +63,7 @@ public class CpsgrpController {
     }
 
     /**
-     * 删除语料组（物理删除）
+     * 删除语料组（逻辑删除）
      */
     @GetMapping("del")
     public JsonData del(@RequestParam String cpsgrpId) {

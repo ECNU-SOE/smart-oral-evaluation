@@ -12,6 +12,9 @@ import net.ecnu.model.UserDO;
 import net.ecnu.model.common.PageData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -47,8 +50,17 @@ public class UserManagerImpl implements UserManager {
 
     @Override
     public List<UserDO> pageByFilter(UserFilterReq userFilterReq, PageData pageData) {
-        return userMapper.selectPage(new Page<UserDO>(pageData.getCurrent(),pageData.getSize()),
+        return userMapper.selectPage(new Page<UserDO>(pageData.getCurrent(), pageData.getSize()),
                 new QueryWrapper<UserDO>()
+                        .eq(!ObjectUtils.isEmpty(userFilterReq.getAccountNo()), "account_no", userFilterReq.getAccountNo())
+                        .eq(!ObjectUtils.isEmpty(userFilterReq.getIdentifyId()), "identify_id", userFilterReq.getIdentifyId())
+                        .like(!ObjectUtils.isEmpty(userFilterReq.getNickName()), "nick_name", userFilterReq.getNickName())
+                        .like(!ObjectUtils.isEmpty(userFilterReq.getRealName()), "real_name", userFilterReq.getRealName())
+                        .eq(!ObjectUtils.isEmpty(userFilterReq.getFirstLanguage()), "first_language", userFilterReq.getFirstLanguage())
+                        .eq(!ObjectUtils.isEmpty(userFilterReq.getSex()), "sex", userFilterReq.getSex())
+                        .eq(!ObjectUtils.isEmpty(userFilterReq.getBirth()), "birth", userFilterReq.getBirth())
+                        .like(!ObjectUtils.isEmpty(userFilterReq.getPhone()), "phone", userFilterReq.getPhone())
+                        .like(!ObjectUtils.isEmpty(userFilterReq.getMail()), "mail", userFilterReq.getMail())
                         .eq("del", 0)
         ).getRecords();
     }
@@ -56,7 +68,16 @@ public class UserManagerImpl implements UserManager {
     @Override
     public int countByFilter(UserFilterReq userFilterReq) {
         return userMapper.selectCount(new QueryWrapper<UserDO>()
-                .eq("del",0)
+                .eq(!ObjectUtils.isEmpty(userFilterReq.getAccountNo()), "account_no", userFilterReq.getAccountNo())
+                .eq(!ObjectUtils.isEmpty(userFilterReq.getIdentifyId()), "identify_id", userFilterReq.getIdentifyId())
+                .like(!ObjectUtils.isEmpty(userFilterReq.getNickName()), "nick_name", userFilterReq.getNickName())
+                .like(!ObjectUtils.isEmpty(userFilterReq.getRealName()), "real_name", userFilterReq.getRealName())
+                .eq(!ObjectUtils.isEmpty(userFilterReq.getFirstLanguage()), "first_language", userFilterReq.getFirstLanguage())
+                .eq(!ObjectUtils.isEmpty(userFilterReq.getSex()), "sex", userFilterReq.getSex())
+                .eq(!ObjectUtils.isEmpty(userFilterReq.getBirth()), "birth", userFilterReq.getBirth())
+                .like(!ObjectUtils.isEmpty(userFilterReq.getPhone()), "phone", userFilterReq.getPhone())
+                .like(!ObjectUtils.isEmpty(userFilterReq.getMail()), "mail", userFilterReq.getMail())
+                .eq("del", 0)
         );
     }
 }

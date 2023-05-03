@@ -34,6 +34,13 @@ public class UserController {
         return JsonData.buildSuccess(data);
     }
 
+    @ApiOperation("删除用户")
+    @GetMapping("del")
+    public JsonData register(@RequestParam String accountNo) {
+        Object data = userService.del(accountNo);
+        return JsonData.buildSuccess(data);
+    }
+
     @ApiOperation("批量新增用户")
     @PostMapping("batch")
     public JsonData batch(@RequestParam("file") MultipartFile excelFile) throws IOException {
@@ -60,9 +67,10 @@ public class UserController {
         Object data = userService.getUserInfo();
         return JsonData.buildSuccess(data);
     }
+
     @ApiOperation("更新用户信息")
     @PostMapping("update")
-    public JsonData update(@RequestBody UserReq userReq){
+    public JsonData update(@RequestBody UserReq userReq) {
         Object data = userService.update(userReq);
         return JsonData.buildSuccess(data);
     }
@@ -71,8 +79,8 @@ public class UserController {
     @PostMapping("list")
     public JsonData list(@RequestParam(value = "cur", defaultValue = "1") int cur,
                          @RequestParam(value = "size", defaultValue = "50") int size,
-                         @RequestBody UserFilterReq userFilterReq){
-        Object data = userService.pageByFilter(userFilterReq,new PageData(cur,size));
+                         @RequestBody UserFilterReq userFilterReq) {
+        Object data = userService.pageByFilter(userFilterReq, new PageData(cur, size));
         return JsonData.buildSuccess(data);
     }
 

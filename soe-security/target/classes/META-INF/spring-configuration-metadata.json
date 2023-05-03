@@ -8,6 +8,11 @@
   ],
   "properties": [
     {
+      "name": "soe.jwt.authentication-key",
+      "type": "java.lang.Boolean",
+      "sourceType": "net.ecnu.model.JwtProperties"
+    },
+    {
       "name": "soe.jwt.cors-allowed-methods",
       "type": "java.util.List<java.lang.String>",
       "sourceType": "net.ecnu.model.JwtProperties"

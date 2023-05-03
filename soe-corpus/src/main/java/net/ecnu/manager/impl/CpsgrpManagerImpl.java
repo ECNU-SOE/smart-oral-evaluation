@@ -17,7 +17,7 @@ import net.ecnu.model.vo.CpsrcdVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,9 +43,12 @@ public class CpsgrpManagerImpl implements CpsgrpManager {
         Page<CpsgrpDO> cpsgrpDOPage = cpsgrpMapper.selectPage(
                 new Page<CpsgrpDO>(pageData.getCurrent(), pageData.getSize()),
                 new QueryWrapper<CpsgrpDO>()
-                        .like(!StringUtils.isEmpty(cpsgrpFilter.getTitle()), "title", cpsgrpFilter.getTitle())
-                        .eq(!StringUtils.isEmpty(cpsgrpFilter.getCourseId()), "course_id", cpsgrpFilter.getCourseId())
+                        .eq(!ObjectUtils.isEmpty(cpsgrpFilter.getClassId()), "class_id", cpsgrpFilter.getClassId())
+                        .like(!ObjectUtils.isEmpty(cpsgrpFilter.getTitle()), "title", cpsgrpFilter.getTitle())
+                        .like(!ObjectUtils.isEmpty(cpsgrpFilter.getDescription()), "description", cpsgrpFilter.getDescription())
                         .eq(cpsgrpFilter.getType() != null, "type", cpsgrpFilter.getType())
+                        .eq(cpsgrpFilter.getIsPublic() != null, "is_public", cpsgrpFilter.getIsPublic())
+                        .like(!ObjectUtils.isEmpty(cpsgrpFilter.getDifficulty()), "difficulty", cpsgrpFilter.getDifficulty())
         );
         return cpsgrpDOPage.getRecords();
     }
@@ -53,9 +56,12 @@ public class CpsgrpManagerImpl implements CpsgrpManager {
     @Override
     public int countByFilter(CpsgrpFilterReq cpsgrpFilter) {
         return cpsgrpMapper.selectCount(new QueryWrapper<CpsgrpDO>()
-                .like(!StringUtils.isEmpty(cpsgrpFilter.getTitle()), "title", cpsgrpFilter.getTitle())
-                .eq(!StringUtils.isEmpty(cpsgrpFilter.getCourseId()), "course_id", cpsgrpFilter.getCourseId())
+                .eq(!ObjectUtils.isEmpty(cpsgrpFilter.getClassId()), "class_id", cpsgrpFilter.getClassId())
+                .like(!ObjectUtils.isEmpty(cpsgrpFilter.getTitle()), "title", cpsgrpFilter.getTitle())
+                .like(!ObjectUtils.isEmpty(cpsgrpFilter.getDescription()), "description", cpsgrpFilter.getDescription())
                 .eq(cpsgrpFilter.getType() != null, "type", cpsgrpFilter.getType())
+                .eq(cpsgrpFilter.getIsPublic() != null, "is_public", cpsgrpFilter.getIsPublic())
+                .eq(cpsgrpFilter.getDifficulty() != null, "difficulty", cpsgrpFilter.getDifficulty())
         );
     }
 

@@ -9,6 +9,7 @@ import com.aliyuncs.IAcsClient;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.constant.RolesConst;
 import net.ecnu.controller.request.UserFilterReq;
@@ -65,8 +66,10 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private AuthenticationManager authenticationManager;
+
     @Resource
     private MyUserDetailsServiceMapper mapper;
+
     @Resource
     private UserRoleMapper userRoleMapper;
 
@@ -78,14 +81,14 @@ public class UserServiceImpl implements UserService {
         //check手机验证码 与 数据库唯一性
         UserDO userDO = userManager.selectOneByPhone(userReq.getPhone());
         if (userDO != null) throw new BizException(BizCodeEnum.ACCOUNT_REPEAT);
+
         //处理生成userDO对象，插入数据库
         UserDO newUserDO = new UserDO();
-        newUserDO.setAccountNo("user_" + IDUtil.getSnowflakeId());
-        newUserDO.setNickName(userReq.getPhone());
+        newUserDO.setAccountNo(IDUtil.nextUserId());
+        newUserDO.setNickName(userReq.getNickName());
         newUserDO.setPhone(userReq.getPhone());
-
 //        //密码加密处理
-//        newUserDO.setSecret("$1$" + CommonUtil.getStringNumRandom(8));
+//        newUserDO.setSecret("$1$" + CommonUtil.getStringNumRandom(8)); //加密盐
 //        newUserDO.setPwd(Md5Crypt.md5Crypt(userRegisterReq.getPwd().getBytes(), newUserDO.getSecret()));
         newUserDO.setPwd(passwordEncoder.encode(userReq.getPwd()));
         mapper.insertUserRole(RolesConst.DEFAULT_ROLE, newUserDO.getAccountNo());
@@ -169,11 +172,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Object batch(MultipartFile excelFile) throws IOException {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
         Sheet sheet = getFirstSheet(excelFile);
         List<UserDO> data = getData(sheet);
         int count = 0;
         for (int i = 1; i < data.size(); i++) {
-            userMapper.insert(data.get(i));
+            UserDO newUserDo = data.get(i);
+            UserDO userDO = userManager.selectOneByPhone(newUserDo.getPhone());
+            if (userDO!=null)
+                throw new BizException(BizCodeEnum.ACCOUNT_REPEAT);
+            userMapper.insert(newUserDo);
+            mapper.insertUserRole(RolesConst.DEFAULT_ROLE, newUserDo.getAccountNo());
             count++;
         }
         return count;
@@ -238,6 +250,23 @@ public class UserServiceImpl implements UserService {
         return Collections.min(roles);
     }
 
+    @Override
+    public Object del(String accountNo) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+        UserDO userDO = userMapper.selectById(accountNo);
+        if (userDO==null)
+            throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
+        if (!hasDelRight(currentAccountNo,accountNo))
+            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+        UserDO newUserDo = new UserDO();
+        BeanUtils.copyProperties(userDO,newUserDo,"del");
+        newUserDo.setDel(true);
+        return userMapper.updateById(newUserDo);
+    }
+
     private boolean hasOpRight(Integer roleA, Integer roleB) {
         //角色a为管理员，且b不是超管
         if (roleA <= RolesConst.ROLE_ADMIN && !Objects.equals(roleB, RolesConst.ROLE_SUPER_ADMIN))
@@ -287,10 +316,22 @@ public class UserServiceImpl implements UserService {
                         }
                 }
             }
-            userDO.setPwd("soe12345");
+            userDO.setPwd(passwordEncoder.encode("soe12345"));
+            userDO.setAccountNo("user_"+IDUtil.getSnowflakeId());
             data.add(userDO);
         }
         return data;
+    }
+
+    //当前用户有无删除此用户的权限
+    private Boolean hasDelRight(String currentAccountNo, String accountNo){
+        Integer roleA = getTopRole(currentAccountNo);
+        Integer roleB = getTopRole(accountNo);
+        if (roleA<=RolesConst.ROLE_ADMIN&& !Objects.equals(roleB, RolesConst.ROLE_SUPER_ADMIN))
+            return true;
+        if (Objects.equals(currentAccountNo, accountNo))
+            return true;
+        return false;
     }
 
 }
