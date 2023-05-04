@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import net.ecnu.constant.RolesConst;
 import net.ecnu.constant.SOEConst;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
@@ -23,7 +24,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -95,6 +98,10 @@ public class SysUserServiceImpl implements SysUserService {
         UserDO userDO = new UserDO();
         BeanUtils.copyProperties(sysuser,userDO);
         userMapper.insert(userDO);
+        //给用户赋默认角色权限
+        List<String> role = new ArrayList<>();
+        role.add(String.valueOf(RolesConst.DEFAULT_ROLE));
+        systemMapper.insertUserRoleIds(sysuser.getAccountNo(),role);
     }
 
     //用户管理：删除

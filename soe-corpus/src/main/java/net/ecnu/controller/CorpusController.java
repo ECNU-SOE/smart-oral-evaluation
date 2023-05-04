@@ -1,7 +1,7 @@
 package net.ecnu.controller;
 
-
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.request.CorpusFilterReq;
 import net.ecnu.controller.request.CorpusReq;
@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/corpus/v1")
 public class CorpusController {
