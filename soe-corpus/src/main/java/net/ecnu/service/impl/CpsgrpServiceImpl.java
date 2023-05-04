@@ -1,7 +1,5 @@
 package net.ecnu.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import lombok.val;
 import net.ecnu.controller.request.CpsgrpReq;
 import net.ecnu.controller.request.CpsgrpFilterReq;
 import net.ecnu.controller.request.TranscriptReq;
@@ -13,7 +11,6 @@ import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.manager.TopicManager;
 import net.ecnu.mapper.*;
 import net.ecnu.model.*;
-import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.common.PageData;
 import net.ecnu.model.dto.ScoreDTO;
 import net.ecnu.model.vo.CpsgrpVO;
@@ -29,9 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.OptionalDouble;
@@ -72,17 +68,20 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     @Autowired
     private TopicMapper topicMapper;
 
+    @Autowired
+    private ClassMapper classMapper;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Object create(CpsgrpReq cpsgrpReq) {
-        //获取登录用户信息
-        /*LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);*/
+        //获取当前用户信息
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        //校验参数合法性
-        if (!CollectionUtils.isEmpty(Collections.singleton(cpsgrpReq.getCourseId()))) {
-            //判断课程是存在
+        if (currentAccountNo == null) throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
+        //校验参数合法性,判断班级是存在
+        if (!ObjectUtils.isEmpty(cpsgrpReq.getClassId())) {
+            ClassDO classDO = classMapper.selectById(cpsgrpReq.getClassId());
+            if (classDO == null) throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
         //处理生成 cpsgrpDO 对象，并插入数据库
         CpsgrpDO cpsgrpDO = new CpsgrpDO();
@@ -154,8 +153,9 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         //更新语料组
         CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(cpsgrpReq.getId());
         if (cpsgrpDO == null) throw new BizException(BizCodeEnum.CPSGRP_NOT_EXIST);
-        //全量更新cpsgrp,不更新：id,courseId
-        BeanUtils.copyProperties(cpsgrpReq, cpsgrpDO, "id", "courseId");
+        //全量更新cpsgrp,不更新：id, classId, null值
+        BeanUtils.copyProperties(cpsgrpReq, cpsgrpDO, "id");
+        cpsgrpDO.setGmtModified(null);
         int i = cpsgrpMapper.updateById(cpsgrpDO);
         cpsgrpDO = cpsgrpMapper.selectById(cpsgrpDO.getId());
         return cpsgrpDO;

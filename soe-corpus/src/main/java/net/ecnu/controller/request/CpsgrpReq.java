@@ -19,32 +19,31 @@ public class CpsgrpReq {
     private String id;
 
     /**
-     * 所属课程id
+     * 所属班级id
      */
-    private String courseId;
+    private String classId;
 
     /**
      * 语料组名称
      */
-    @NotEmpty(message = "title can't be empty in add/update", groups = {Create.class, Update.class})
+    @NotEmpty(message = "title can't be empty in add", groups = {Create.class})
     private String title;
 
     /**
      * 语料组描述
      */
-    @NotEmpty(message = "title can't be empty in add/update", groups = {Update.class})
     private String description;
 
     /**
      * 语料组类型
      */
-    @NotNull(message = "type can't be null in add/update", groups = {Create.class, Update.class})
+    @NotNull(message = "type can't be null in add", groups = {Create.class})
     private Integer type;
 
     /**
      * 难易程度
      */
-    private Integer difficulty;
+    private String difficulty;
 
     /**
      * 公开类型
