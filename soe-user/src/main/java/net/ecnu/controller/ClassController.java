@@ -3,7 +3,6 @@ package net.ecnu.controller;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Update;
 import net.ecnu.controller.request.*;
-import net.ecnu.model.UserClassDO;
 import net.ecnu.model.common.PageData;
 import net.ecnu.service.ClassService;
 import net.ecnu.util.JsonData;
@@ -23,16 +22,9 @@ public class ClassController {
      * 查询单个用户选课列表
      * By:LYW
      */
-    @GetMapping("list_one")
+    @GetMapping("list_sel")
     public JsonData listOne(@RequestParam(required = false) String accountNo) {
-        Object data = classService.listOne(accountNo);
-        return JsonData.buildSuccess(data);
-    }
-    @PostMapping("list_many")
-    public JsonData listMany(@RequestParam(value = "cur", defaultValue = "1") int cur,
-                            @RequestParam(value = "size", defaultValue = "50") int size,
-                            @RequestBody UsrClassFilterReq usrClassFilter){
-        Object data = classService.listMany(usrClassFilter,new PageData(cur,size));
+        Object data = classService.listSel(accountNo);
         return JsonData.buildSuccess(data);
     }
 

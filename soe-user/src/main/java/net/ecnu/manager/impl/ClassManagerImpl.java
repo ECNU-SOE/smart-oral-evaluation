@@ -9,6 +9,7 @@ import net.ecnu.manager.ClassManager;
 import net.ecnu.mapper.ClassMapper;
 import net.ecnu.model.ClassDO;
 import net.ecnu.model.common.PageData;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,12 @@ public class ClassManagerImpl implements ClassManager {
     public List<ClassDO> pageByFilter(ClassFilterReq classFilter, PageData pageData) {
         return classMapper.selectPage(new Page<ClassDO>(pageData.getCurrent(), pageData.getSize()),
                 new QueryWrapper<ClassDO>()
+                        .eq(!ObjectUtils.isEmpty(classFilter.getId()),"id",classFilter.getId())
+                        .eq(!ObjectUtils.isEmpty(classFilter.getCourseId()),"course_id",classFilter.getCourseId())
+                        .like(!ObjectUtils.isEmpty(classFilter.getName()),"name",classFilter.getName())
+                        .like(!ObjectUtils.isEmpty(classFilter.getDescription()),"description",classFilter.getDescription())
+                        .eq(!ObjectUtils.isEmpty(classFilter.getCreator()),"creator",classFilter.getCreator())
+                        .eq(!ObjectUtils.isEmpty(classFilter.getLevel()),"level",classFilter.getLevel())
                         .eq("del", 0)
         ).getRecords();
     }
@@ -31,6 +38,12 @@ public class ClassManagerImpl implements ClassManager {
     @Override
     public int countByFilter(ClassFilterReq classFilter) {
         return classMapper.selectCount(new QueryWrapper<ClassDO>()
+                .eq(!ObjectUtils.isEmpty(classFilter.getId()),"id",classFilter.getId())
+                .eq(!ObjectUtils.isEmpty(classFilter.getCourseId()),"course_id",classFilter.getCourseId())
+                .like(!ObjectUtils.isEmpty(classFilter.getName()),"name",classFilter.getName())
+                .like(!ObjectUtils.isEmpty(classFilter.getDescription()),"description",classFilter.getDescription())
+                .eq(!ObjectUtils.isEmpty(classFilter.getCreator()),"creator",classFilter.getCreator())
+                .eq(!ObjectUtils.isEmpty(classFilter.getLevel()),"level",classFilter.getLevel())
                 .eq("del", 0)
         );
     }
