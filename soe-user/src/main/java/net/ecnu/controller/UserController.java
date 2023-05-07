@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Find;
+import net.ecnu.controller.group.Update;
 import net.ecnu.controller.request.UserFilterReq;
 import net.ecnu.controller.request.UserReq;
 import net.ecnu.model.common.PageData;
@@ -70,7 +71,7 @@ public class UserController {
 
     @ApiOperation("更新用户信息")
     @PostMapping("update")
-    public JsonData update(@RequestBody UserReq userReq) {
+    public JsonData update(@RequestBody @Validated(Update.class) UserReq userReq) {
         Object data = userService.update(userReq);
         return JsonData.buildSuccess(data);
     }

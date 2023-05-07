@@ -49,7 +49,7 @@ public class UserVO implements Serializable {
     /**
      * 用户母语
      */
-    private Integer firstLanguage;
+    private String firstLanguage;
 
     /**
      * 性别

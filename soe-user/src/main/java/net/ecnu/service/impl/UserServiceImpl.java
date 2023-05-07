@@ -153,11 +153,11 @@ public class UserServiceImpl implements UserService {
         }
         if (userReq.getAccountNo() == null || StringUtils.isBlank(userReq.getAccountNo()) || Objects.equals(currentAccountNo, userReq.getAccountNo())) {
             //用户更新自己的信息
-            UserDO userDO = new UserDO();
+            UserDO userDO = userMapper.selectById(currentAccountNo);
             BeanUtils.copyProperties(userReq, userDO, "accountNo", "phone", "pwd");
-            userDO.setAccountNo(currentAccountNo);
-            System.out.println("userDO是: " + userDO);
-            return userMapper.updateById(userDO);
+            userDO.setGmtModified(null);//更新时间
+            int i = userMapper.updateById(userDO);
+            return userMapper.selectById(currentAccountNo);
         } else {
             //用户更新别人的信息
             Integer roleA = getTopRole(currentAccountNo);
@@ -182,7 +182,7 @@ public class UserServiceImpl implements UserService {
         for (int i = 1; i < data.size(); i++) {
             UserDO newUserDo = data.get(i);
             UserDO userDO = userManager.selectOneByPhone(newUserDo.getPhone());
-            if (userDO!=null)
+            if (userDO != null)
                 throw new BizException(BizCodeEnum.ACCOUNT_REPEAT);
             userMapper.insert(newUserDo);
             mapper.insertUserRole(RolesConst.DEFAULT_ROLE, newUserDo.getAccountNo());
@@ -257,12 +257,12 @@ public class UserServiceImpl implements UserService {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
         UserDO userDO = userMapper.selectById(accountNo);
-        if (userDO==null)
+        if (userDO == null)
             throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
-        if (!hasDelRight(currentAccountNo,accountNo))
+        if (!hasDelRight(currentAccountNo, accountNo))
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         UserDO newUserDo = new UserDO();
-        BeanUtils.copyProperties(userDO,newUserDo,"del");
+        BeanUtils.copyProperties(userDO, newUserDo, "del");
         newUserDo.setDel(true);
         return userMapper.updateById(newUserDo);
     }
@@ -317,17 +317,17 @@ public class UserServiceImpl implements UserService {
                 }
             }
             userDO.setPwd(passwordEncoder.encode("soe12345"));
-            userDO.setAccountNo("user_"+IDUtil.getSnowflakeId());
+            userDO.setAccountNo("user_" + IDUtil.getSnowflakeId());
             data.add(userDO);
         }
         return data;
     }
 
     //当前用户有无删除此用户的权限
-    private Boolean hasDelRight(String currentAccountNo, String accountNo){
+    private Boolean hasDelRight(String currentAccountNo, String accountNo) {
         Integer roleA = getTopRole(currentAccountNo);
         Integer roleB = getTopRole(accountNo);
-        if (roleA<=RolesConst.ROLE_ADMIN&& !Objects.equals(roleB, RolesConst.ROLE_SUPER_ADMIN))
+        if (roleA <= RolesConst.ROLE_ADMIN && !Objects.equals(roleB, RolesConst.ROLE_SUPER_ADMIN))
             return true;
         if (Objects.equals(currentAccountNo, accountNo))
             return true;

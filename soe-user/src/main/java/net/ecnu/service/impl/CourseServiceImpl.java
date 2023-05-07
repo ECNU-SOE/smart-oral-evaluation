@@ -57,17 +57,18 @@ public class CourseServiceImpl implements CourseService {
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         Integer topRole = userService.getTopRole(currentAccountNo);
-        if(Objects.equals(topRole, RolesConst.ROLE_SUPER_ADMIN) || Objects.equals(topRole, RolesConst.ROLE_SYSTEM_ADMIN) || Objects.equals(topRole, RolesConst.ROLE_ADMIN)){
+        if (Objects.equals(topRole, RolesConst.ROLE_SUPER_ADMIN) || Objects.equals(topRole, RolesConst.ROLE_SYSTEM_ADMIN) || Objects.equals(topRole, RolesConst.ROLE_ADMIN)) {
             CourseDO csDO = new CourseDO();
             BeanUtils.copyProperties(courAddReq, csDO);
             csDO.setId(IDUtil.nextCourseId());
             csDO.setCreator(currentAccountNo);
             csDO.setDel(false);
             return courseMapper.insert(csDO);
-        }else{
+        } else {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
     }
+
     @Override
     public Object delete(String id) {
         //判断课程是否存在
@@ -83,9 +84,9 @@ public class CourseServiceImpl implements CourseService {
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         Integer topRole = userService.getTopRole(currentAccountNo);
-        if(topRole <= RolesConst.ROLE_ADMIN){
+        if (topRole <= RolesConst.ROLE_ADMIN) {
             return courseMapper.deleteById(id);
-        }else{
+        } else {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
     }
@@ -94,17 +95,16 @@ public class CourseServiceImpl implements CourseService {
     public Object update(CourUpdateReq courUpdateReq) {
         //判断课程是否存在
         CourseDO courseDO = courseMapper.selectById(courUpdateReq.getId());
-        if (courseDO == null)
-            throw new BizException(BizCodeEnum.COURSE_UNEXISTS);
+        if (courseDO == null) throw new BizException(BizCodeEnum.COURSE_UNEXISTS);
         //判断用户权限
-        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         Integer topRole = userService.getTopRole(currentAccountNo);
-        if(topRole <= RolesConst.ROLE_ADMIN){
-            CourseDO csDO = new CourseDO();
-            BeanUtils.copyProperties(courUpdateReq, csDO);
-            return courseMapper.updateById(csDO);
-        }else{
+        if (topRole <= RolesConst.ROLE_ADMIN) {
+            BeanUtils.copyProperties(courUpdateReq, courseDO, "id");
+            courseDO.setGmtModified(null);//更新时间
+            int i = courseMapper.updateById(courseDO);
+            return courseMapper.selectById(courseDO.getId());
+        } else {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
     }
@@ -122,13 +122,13 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Object detail(String courseId) {
         CourseDO courseDO = courseMapper.selectOne(new QueryWrapper<CourseDO>()
-                .eq("id",courseId)
-                .eq("del",0)
+                .eq("id", courseId)
+                .eq("del", 0)
         );
         if (courseDO == null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
-        CourseVO courseVO =new CourseVO();
-        BeanUtils.copyProperties(courseDO,courseVO);
+        CourseVO courseVO = new CourseVO();
+        BeanUtils.copyProperties(courseDO, courseVO);
         return courseVO;
     }
 
