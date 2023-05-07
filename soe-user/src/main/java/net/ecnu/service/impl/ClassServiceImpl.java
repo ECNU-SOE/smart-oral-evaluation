@@ -306,7 +306,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     }
 
     @Override
-    public Object listOne(String accountNo) {
+    public Object listSel(String accountNo) {
         //获取登录用户的accountNo
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         if (StringUtils.isBlank(currentAccountNo)) {
@@ -356,36 +356,6 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             });
             return classVOs;
         }
-    }
-    @Override
-    public Object listMany(UsrClassFilterReq usrClassFilter, PageData pageData) {
-        String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if (StringUtils.isBlank(currentAccountNo)) {
-            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
-        }
-        if (!checkPermission(currentAccountNo))
-            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
-        int total = userClassManager.countByFilter(usrClassFilter);
-        pageData.setTotal(total);
-        List<UserClassDO> userClassDOS = userClassManager.pageByFilter(usrClassFilter, pageData);
-        //向VO中注入userClass
-        List<UserClassVO> userClassVOS = userClassDOS.stream().map(userClassDO1 -> {
-            UserClassVO userClassVO =new UserClassVO();
-            BeanUtils.copyProperties(userClassDO1,userClassVO);
-            return userClassVO;
-        }).collect(Collectors.toList());
-        userClassVOS.forEach(userClassVO -> {
-            ClassDO classDO = classMapper.selectById(userClassVO.getClassId());
-            if (classDO == null) throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
-            BeanUtils.copyProperties(classDO, userClassVO, "id", "name", "creator", "del");
-            userClassVO.setClassName(classDO.getName());
-            //聚合course
-            CourseDO courseDO = courseMapper.selectById(classDO.getCourseId());
-            if (courseDO == null) throw new BizException(BizCodeEnum.COURSE_UNEXISTS);
-            userClassVO.setCourseName(courseDO.getName());
-        });
-        pageData.setRecords(userClassVOS);
-        return pageData;
     }
 
 

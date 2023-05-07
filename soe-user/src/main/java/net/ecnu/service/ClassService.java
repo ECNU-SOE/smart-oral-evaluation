@@ -3,7 +3,6 @@ package net.ecnu.service;
 import net.ecnu.controller.request.*;
 import net.ecnu.model.ClassDO;
 import com.baomidou.mybatisplus.extension.service.IService;
-import net.ecnu.model.UserClassDO;
 import net.ecnu.model.common.PageData;
 
 /**
@@ -38,8 +37,6 @@ public interface ClassService extends IService<ClassDO> {
     /**
      * 查询单个用户选课列表
      */
-    Object listOne(String accountNo);
-    //条件分页查询多个用户选课列表
-    Object listMany(UsrClassFilterReq usrClassFilter, PageData pageData);
+    Object listSel(String accountNo);
 
 }

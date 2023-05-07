@@ -9,5 +9,9 @@ public interface CorpusService {
 
     Object pageByFilter(CorpusFilterReq corpusFilter, Page<CorpusDO> objectPage);
 
-    Object add(CorpusReq corpusReq);
+    void add(CorpusReq corpusReq);
+
+    void delCorpusInfo(String corpusId);
+
+    void updateCorpusInfo(CorpusReq corpusReq);
 }

@@ -26,7 +26,7 @@ public class CorpusDO implements Serializable {
     /**
      * 语料id
      */
-      @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id")
     private String id;
 
     /**
@@ -48,6 +48,21 @@ public class CorpusDO implements Serializable {
      * 难易程度
      */
     private Integer difficulty;
+
+    /**
+     * 每字分值
+     */
+    private Double wordWeight;
+
+    /**
+     * 示范音频
+     * */
+    private String audioUrl;
+
+    /**
+     * 标签
+     * */
+    private String tags;
 
     /**
      * 创建者id

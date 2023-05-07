@@ -9,6 +9,4 @@ import java.util.List;
 
 public interface UserClassManager {
     UserClassDO getByAccountNoAndClassId(String accountNo, String courseId);
-    List<UserClassDO> pageByFilter(UsrClassFilterReq usrClassFilter, PageData pageData);
-    int countByFilter(UsrClassFilterReq usrClassFilter);
 }

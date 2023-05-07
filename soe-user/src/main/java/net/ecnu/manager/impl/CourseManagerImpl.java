@@ -8,6 +8,7 @@ import net.ecnu.manager.CourseManager;
 import net.ecnu.mapper.CourseMapper;
 import net.ecnu.model.CourseDO;
 import net.ecnu.model.common.PageData;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,16 +22,24 @@ public class CourseManagerImpl implements CourseManager {
 
     @Override
     public List<CourseDO> pageByFilter(CourFilterReq courseFilter, PageData pageData) {
-        return courseMapper.selectPage(new Page<CourseDO>(pageData.getCurrent(),pageData.getSize()),
+        return courseMapper.selectPage(new Page<CourseDO>(pageData.getCurrent(), pageData.getSize()),
                 new QueryWrapper<CourseDO>()
-                .eq("del", 0)
+                        .eq(!ObjectUtils.isEmpty(courseFilter.getId()), "id", courseFilter.getId())
+                        .like(!ObjectUtils.isEmpty(courseFilter.getName()), "name", courseFilter.getName())
+                        .like(!ObjectUtils.isEmpty(courseFilter.getDescription()), "description", courseFilter.getDescription())
+                        .eq(!ObjectUtils.isEmpty(courseFilter.getCreator()), "creator", courseFilter.getCreator())
+                        .eq("del", 0)
         ).getRecords();
     }
 
     @Override
-    public int countByFilter(CourFilterReq courFilterReq) {
+    public int countByFilter(CourFilterReq courseFilter) {
         return courseMapper.selectCount(new QueryWrapper<CourseDO>()
-                .eq("del",0)
+                .eq(!ObjectUtils.isEmpty(courseFilter.getId()), "id", courseFilter.getId())
+                .like(!ObjectUtils.isEmpty(courseFilter.getName()), "name", courseFilter.getName())
+                .like(!ObjectUtils.isEmpty(courseFilter.getDescription()), "description", courseFilter.getDescription())
+                .eq(!ObjectUtils.isEmpty(courseFilter.getCreator()), "creator", courseFilter.getCreator())
+                .eq("del", 0)
         );
     }
 }
