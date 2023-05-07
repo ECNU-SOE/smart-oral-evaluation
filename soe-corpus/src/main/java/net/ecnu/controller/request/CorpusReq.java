@@ -10,14 +10,34 @@ import javax.validation.constraints.NotNull;
 public class CorpusReq {
 
     /**
-     * 语料类型
+     * 语料id
+     * */
+    private String corpusId;
+
+    /**
+     * 评测模式
      */
-    private Integer type;
+    private Integer evalMode;
 
     /**
      * 难易程度
      */
-    private Integer level;
+    private Integer difficulty;
+
+    /**
+     * 分值
+     * */
+    private Double wordWeight;
+
+    /**
+     * 示范音频url
+     * */
+    private String audioUrl;
+
+    /**
+     * 标签
+     * */
+    private String tags;
 
     /**
      * 汉语拼音
@@ -27,7 +47,6 @@ public class CorpusReq {
     /**
      * 参考文本
      */
-    @NotEmpty(message = "refText can't be empty", groups = {Create.class})
     private String refText;
 
 }

@@ -31,6 +31,12 @@ public enum BizCodeEnum {
     CPSGRP_ERROR(260001, "语料组异常"),
     CPSGRP_NOT_EXIST(260002, "语料组不存在"),
 
+    /**
+     * 语料相关
+     * */
+    CORPUS_DEL_ERROR(270001,"删除语料异常"),
+    CORPUS_UPDATE_ERROR(270002,"更新语料异常"),
+    CORPUS_ADD_ERROR(270003,"添加语料异常"),
 
     /**
      * 参数异常

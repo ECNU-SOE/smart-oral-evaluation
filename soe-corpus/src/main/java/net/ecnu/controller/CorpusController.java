@@ -7,9 +7,12 @@ import net.ecnu.controller.request.CorpusFilterReq;
 import net.ecnu.controller.request.CorpusReq;
 import net.ecnu.service.CorpusService;
 import net.ecnu.util.JsonData;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -36,10 +39,36 @@ public class CorpusController {
      */
     @PostMapping("add")
     public JsonData add(@RequestBody @Validated(Create.class) CorpusReq corpusReq) {
-        Object data = corpusService.add(corpusReq);
-        return JsonData.buildSuccess(data);
+        if (StringUtils.isEmpty(corpusReq.getRefText())) {
+            return JsonData.buildError("语料文本为必填！");
+        }
+        corpusService.add(corpusReq);
+        return JsonData.buildSuccess("添加语料成功！");
     }
 
+    /**
+     * 删除语料
+     */
+    @GetMapping("/del")
+    public JsonData delCorpusInfo(@RequestParam String corpusId) {
+        if (StringUtils.isEmpty(corpusId)) {
+            return JsonData.buildError("语料id为空");
+        }
+        corpusService.delCorpusInfo(corpusId);
+        return JsonData.buildSuccess("删除语料成功！");
+    }
+
+    /**
+     * 更新语料
+     */
+    @PostMapping("/update")
+    public JsonData updateCorpusInfo(@RequestBody CorpusReq corpusReq) {
+        if(Objects.isNull(corpusReq)){
+            return JsonData.buildError("更新语料内容不能为空！");
+        }
+        corpusService.updateCorpusInfo(corpusReq);
+        return JsonData.buildSuccess("更新语料成功！");
+    }
 
 
 }
