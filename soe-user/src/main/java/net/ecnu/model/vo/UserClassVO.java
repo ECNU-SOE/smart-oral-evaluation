@@ -13,51 +13,80 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class UserClassVO implements Serializable {
 
+    /**
+     * 用户账号id
+     */
     private String accountNo;
-    /**
-     * 班级id
-     */
-    private String classId;
+
+
 
     /**
-     * 班级名称
+     * 身份认证id
      */
-    private String className;
+    private String identifyId;
 
     /**
-     * 所属课程Id
+     * 用户昵称
      */
-    private String courseId;
+    private String nickName;
 
     /**
-     * 所属课程名称
+     * 真实姓名
      */
-    private String courseName;
+    private String realName;
 
     /**
-     * 班级描述
+     * 用户头像url
      */
-    private String description;
+    private String avatarUrl;
 
     /**
-     * 班级水平
+     * 用户母语
      */
-    private Integer level;
+    private String firstLanguage;
 
     /**
-     * 当前用户在班级中的角色
+     * 性别
      */
-    @JsonProperty
+    private Integer sex;
+
+    /**
+     * 生日
+     */
+    private Date birth;
+
+    /**
+     * 个性签名
+     */
+    private String sign;
+
+    /**
+     * 手机
+     */
+    private String phone;
+
+    /**
+     * 邮箱
+     */
+    private String mail;
+
+
+    /**
+     * 用户是否被禁用 1-激活用户  0-禁用用户
+     */
+    private Boolean enabled;
+
+    /**
+     * 所属组织id
+     */
+    private Integer orgId;
+    //角色类型
     private Integer rType;
-
-    /**
-     * 班级创建时间
-     */
+    //选课时间
     private Date gmtCreate;
 
-    /**
-     * 班级更新时间
-     */
-    private Date gmtModified;
+    private String classId;
+
+    private String courseId;
 
 }

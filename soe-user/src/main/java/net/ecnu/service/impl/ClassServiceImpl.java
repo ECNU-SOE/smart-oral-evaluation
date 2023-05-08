@@ -14,6 +14,7 @@ import net.ecnu.model.common.PageData;
 import net.ecnu.model.vo.ClassVO;
 import net.ecnu.model.vo.ClassVO_LYW;
 import net.ecnu.model.vo.UserClassVO;
+import net.ecnu.model.vo.UserVO;
 import net.ecnu.service.ClassService;
 import net.ecnu.service.UserService;
 import net.ecnu.util.IDUtil;
@@ -23,6 +24,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -358,6 +360,29 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         }
     }
 
+    @Override
+    public Object listMem(UsrClassFilterReq usrClassFilter, PageData pageData) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+        int i = userClassManager.countByFilter(usrClassFilter);
+        pageData.setTotal(i);
+        List<UserClassDO> userClassDOs = userClassManager.pageByfilter(usrClassFilter, pageData);
+        //聚合rType和gmtCreate
+        List<UserClassVO> userClassVOS = userClassDOs.stream().map(this::beanProcess2).collect(Collectors.toList());
+        //聚合userVO和courseId
+        userClassVOS.forEach(userClassVO -> {
+            UserDO userDO = userMapper.selectById(userClassVO.getAccountNo());
+            BeanUtils.copyProperties(userDO,userClassVO);
+            ClassDO classDO = classMapper.selectById(userClassVO.getClassId());
+            userClassVO.setCourseId(classDO.getCourseId());
+        });
+
+        pageData.setRecords(userClassVOS);
+        return pageData;
+    }
+
 
     private Boolean checkPermission(String accountNo) {
         Integer topRole = userService.getTopRole(accountNo);
@@ -377,6 +402,18 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         ClassVO_LYW classVO = new ClassVO_LYW();
         BeanUtils.copyProperties(userClassDO, classVO);
         return classVO;
+    }
+
+    private UserClassVO beanProcess2(UserClassDO userClassDO) {
+        UserClassVO userClassVO = new UserClassVO();
+        BeanUtils.copyProperties(userClassDO, userClassVO);
+        return userClassVO;
+    }
+
+    private UserClassVO beanProcess(UserDO userDO){
+        UserClassVO userClassVO = new UserClassVO();
+        BeanUtils.copyProperties(userDO,userClassVO,"gmtCreate");
+        return userClassVO;
     }
 
 

@@ -19,12 +19,20 @@ public class ClassController {
     private ClassService classService;
 
     /**
-     * 查询单个用户选课列表
+     * 查询用户选课列表
      * By:LYW
      */
     @GetMapping("list_sel")
     public JsonData listOne(@RequestParam(required = false) String accountNo) {
         Object data = classService.listSel(accountNo);
+        return JsonData.buildSuccess(data);
+    }
+
+    @PostMapping("list_mem")
+    public JsonData listMem(@RequestParam(value = "cur", defaultValue = "1") int cur,
+                            @RequestParam(value = "size", defaultValue = "50") int size,
+                            @RequestBody UsrClassFilterReq usrClassFilter){
+        Object data = classService.listMem(usrClassFilter, new PageData(cur, size));
         return JsonData.buildSuccess(data);
     }
 
