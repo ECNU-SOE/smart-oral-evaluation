@@ -331,8 +331,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
                 classVO.setCourseName(courseDO.getName());
             });
             return classVOs;
-        }else
-        {
+        }else {
             //查别人
             Integer userRole = userService.getTopRole(accountNo);
             Integer currentRole = userService.getTopRole(currentAccountNo);

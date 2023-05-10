@@ -19,7 +19,7 @@ public class ClassController {
     private ClassService classService;
 
     /**
-     * 查询单个用户选课列表
+     * 查询用户的班级列表
      * By:LYW
      */
     @GetMapping("list_sel")

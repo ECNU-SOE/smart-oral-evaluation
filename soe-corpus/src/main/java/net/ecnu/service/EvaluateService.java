@@ -19,4 +19,6 @@ public interface EvaluateService {
     Object evaluateByXF(File audio, String refText, String pinyin, String evalMode);
 
     Object evaluateByXF2(File convertAudio, String refText, String pinyin, String category);
+
+    Object evaluateByXFWithSecretAndKey(File convertAudio, String refText, String s, String category, String appId, String apiSecret, String apiKey);
 }

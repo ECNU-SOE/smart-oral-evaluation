@@ -4,19 +4,12 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.XML;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import net.ecnu.util.JsonUtil;
 import okhttp3.*;
-import cn.hutool.core.util.XmlUtil;
 
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /*评测示例默认为中文句子题型的示例,
@@ -33,8 +26,17 @@ public class EvalListener extends WebSocketListener {
 
     private String text;//评测文本
 
-    private JSONObject evalRes = null;//评测结果
+    public String getAppIdTest() {
+        return appIdTest;
+    }
 
+    public void setAppIdTest(String appIdTest) {
+        this.appIdTest = appIdTest;
+    }
+
+    private String appIdTest = null;//测试用appid
+
+    private JSONObject evalRes = null;//评测结果
 
     public String getCategory() {
         return category;
@@ -139,7 +141,7 @@ public class EvalListener extends WebSocketListener {
     //上传参数添加与发送
     private void ssb(WebSocket webSocket) {
         ParamBuilder p = new ParamBuilder();
-        p.add("common", new ParamBuilder().add("app_id", appid))
+        p.add("common", new ParamBuilder().add("app_id", appIdTest == null ? appid : appIdTest))
                 .add("business", new ParamBuilder()
                                 .add("category", category)
                                 .add("rstcd", "utf8")

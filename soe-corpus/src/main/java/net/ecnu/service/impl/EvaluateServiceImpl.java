@@ -10,8 +10,6 @@ import net.ecnu.constant.SOEConst;
 import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.mapper.CpsgrpMapper;
 import net.ecnu.mapper.EvalRecordMapper;
-import net.ecnu.model.CpsgrpDO;
-import net.ecnu.model.CpsrcdDO;
 import net.ecnu.model.EvalListener;
 import net.ecnu.model.EvalRecordDO;
 import net.ecnu.model.vo.EvalResultVO;
@@ -22,7 +20,6 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -47,8 +44,6 @@ import ws.schild.jave.AudioAttributes;
 import ws.schild.jave.Encoder;
 import ws.schild.jave.EncodingAttributes;
 import ws.schild.jave.MultimediaObject;
-
-import java.io.File;
 
 
 /**
@@ -220,6 +215,7 @@ public class EvaluateServiceImpl implements EvaluateService {
         return "message";
     }
 
+
     /**
      * 语音评测（讯飞版）
      */
@@ -252,7 +248,36 @@ public class EvaluateServiceImpl implements EvaluateService {
         evalRecordMapper.insert(evalRecordDO);
         //返回结果
         return evalJsonRes;
+    }
 
+    @Override
+    public Object evaluateByXFWithSecretAndKey(File audio, String refText, String s, String category, String appId, String apiSecret, String apiKey) {
+        String authUrl = getAuthUrl(hostUrl, apiKey, apiSecret);// 构建鉴权url
+        //将url中的 schema http://和https://分别替换为ws:// 和 wss://
+        String url = authUrl.replace("http://", "ws://").replace("https://", "wss://");
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        Request request = new Request.Builder().url(url).build();
+        EvalListener evalListener = new EvalListener();
+        evalListener.setFile(audio);
+        evalListener.setText(refText);
+        evalListener.setCategory(category); //TODO category校验
+        evalListener.setAppIdTest(appId);   //appId
+        WebSocket webSocket = client.newWebSocket(request, evalListener);
+        //循环等待结果
+        while (evalListener.getEvalRes() == null) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        //新增评测记录evalRecord
+        Object evalJsonRes = ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
+        EvalRecordDO evalRecordDO = new EvalRecordDO();
+        evalRecordDO.setAlgRes(evalJsonRes.toString());
+        evalRecordMapper.insert(evalRecordDO);
+        //返回结果
+        return evalJsonRes;
     }
 
     /**

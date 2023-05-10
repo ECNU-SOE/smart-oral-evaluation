@@ -53,6 +53,23 @@ public class EvaluateController {
     }
 
     /**
+     * 讯飞 评测数据 提供接口
+     */
+    @PostMapping("eval_test")
+    public JsonData eval_test(@RequestParam(value = "audio", required = true) MultipartFile audio,
+                              @RequestParam(value = "refText", required = true) String refText,
+                              @RequestParam(value = "category", required = true) String category,
+                              @RequestParam(value = "appId", required = true) String appId,
+                              @RequestParam(value = "apiSecret", required = true) String apiSecret,
+                              @RequestParam(value = "apiKey", required = true) String apiKey) {
+        long startTime = System.currentTimeMillis();
+        File convertAudio = evaluateService.convert_lyw(audio);
+        System.out.println("语音格式转换耗时：" + (System.currentTimeMillis() - startTime) + "ms");
+        Object data = evaluateService.evaluateByXFWithSecretAndKey(convertAudio, refText, "", category, appId, apiSecret, apiKey);
+        return JsonData.buildSuccess(data);
+    }
+
+    /**
      * 语音评测（腾讯版）
      */
     @Deprecated
