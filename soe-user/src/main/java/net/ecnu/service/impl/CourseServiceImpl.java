@@ -40,23 +40,17 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private UserService userService;
 
-//
-//    @Autowired
-//    private UserCourseMapper userCourseMapper;
-//
-//    @Autowired
-//    private CpsgrpMapper cpsgrpMapper;
-//
-//    @Autowired
-//    private CpsgrpManager cpsgrpManager;
-//
-
 
     @Override
     public Object add(CourAddReq courAddReq) {
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         Integer topRole = userService.getTopRole(currentAccountNo);
+        CourseDO courseDO = courseMapper.selectOne(new QueryWrapper<CourseDO>()
+                .eq("name", courAddReq.getName())
+        );
+        if (courseDO!=null)
+            throw new BizException(BizCodeEnum.COURSE_REPEAT);
         if (Objects.equals(topRole, RolesConst.ROLE_SUPER_ADMIN) || Objects.equals(topRole, RolesConst.ROLE_SYSTEM_ADMIN) || Objects.equals(topRole, RolesConst.ROLE_ADMIN)) {
             CourseDO csDO = new CourseDO();
             BeanUtils.copyProperties(courAddReq, csDO);

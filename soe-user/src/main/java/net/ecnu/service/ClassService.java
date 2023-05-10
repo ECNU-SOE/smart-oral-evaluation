@@ -35,8 +35,10 @@ public interface ClassService extends IService<ClassDO> {
     Object detail(String classId);
 
     /**
-     * 查询单个用户选课列表
+     * 查询用户选课列表
      */
     Object listSel(String accountNo);
+    //查看班级成员信息
+    Object listMem(UsrClassFilterReq usrClassFilter,PageData pageData);
 
 }

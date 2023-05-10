@@ -11,5 +11,4 @@ public class UsrClassFilterReq {
     private String classId;
     @JsonProperty("rType")
     private Integer rType;
-    private Date gmtCreate;
 }

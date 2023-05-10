@@ -28,6 +28,14 @@ public class ClassController {
         return JsonData.buildSuccess(data);
     }
 
+    @PostMapping("list_mem")
+    public JsonData listMem(@RequestParam(value = "cur", defaultValue = "1") int cur,
+                            @RequestParam(value = "size", defaultValue = "50") int size,
+                            @RequestBody UsrClassFilterReq usrClassFilter){
+        Object data = classService.listMem(usrClassFilter, new PageData(cur, size));
+        return JsonData.buildSuccess(data);
+    }
+
 
     @PostMapping("add")
     public JsonData add(@RequestBody @Validated(Create.class) ClassAddReq classAddReq) {
