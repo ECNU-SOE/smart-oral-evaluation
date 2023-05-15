@@ -2,13 +2,9 @@ package net.ecnu.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-
 import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableId;
-
 import java.io.Serializable;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,8 +13,8 @@ import lombok.EqualsAndHashCode;
  * 课程信息
  * </p>
  *
- * @author TGX
- * @since 2023-04-10
+ * @author LYW
+ * @since 2023-05-15
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -30,7 +26,7 @@ public class CourseDO implements Serializable {
     /**
      * id
      */
-    @TableId(value = "id", type = IdType.NONE)
+      @TableId(value = "id", type = IdType.NONE)
     private String id;
 
     /**
@@ -44,13 +40,19 @@ public class CourseDO implements Serializable {
     private String description;
 
     /**
+     * 课程图片
+     */
+    private String picture;
+
+    /**
+     * 课程难度，0~10，默认-1：未知
+     */
+    private Integer difficulty;
+
+    /**
      * 创建者id
      */
     private String creator;
-
-    private Date startTime;
-
-    private Date endTime;
 
     /**
      * 逻辑删除标识位

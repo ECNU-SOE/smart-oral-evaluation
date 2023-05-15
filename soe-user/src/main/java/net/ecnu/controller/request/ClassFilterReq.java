@@ -2,6 +2,8 @@ package net.ecnu.controller.request;
 
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class ClassFilterReq {
     /**
@@ -34,6 +36,10 @@ public class ClassFilterReq {
      * 难易程度
      */
     private Integer level;
+
+    private Integer joinStatus;
+
+    private Integer dropStatus;
 
 
 }

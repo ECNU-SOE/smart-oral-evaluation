@@ -41,6 +41,20 @@ public class ClassVO_LYW implements Serializable {
      */
     private Integer level;
 
+    private Date startTime;
+
+    private Date endTime;
+
+    private String picture;
+
+    private String notice;
+
+    private int stuLimit;
+
+    private int joinStatus;
+
+    private int dropStatus;
+
     /**
      * 当前用户在班级中的角色
      */

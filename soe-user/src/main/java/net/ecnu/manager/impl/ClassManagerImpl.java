@@ -31,6 +31,8 @@ public class ClassManagerImpl implements ClassManager {
                         .like(!ObjectUtils.isEmpty(classFilter.getDescription()),"description",classFilter.getDescription())
                         .eq(!ObjectUtils.isEmpty(classFilter.getCreator()),"creator",classFilter.getCreator())
                         .eq(!ObjectUtils.isEmpty(classFilter.getLevel()),"level",classFilter.getLevel())
+                        .eq(classFilter.getJoinStatus()!=null,"join_status",classFilter.getJoinStatus())
+                        .eq(classFilter.getDropStatus()!=null,"drop_status",classFilter.getDropStatus())
                         .eq("del", 0)
         ).getRecords();
     }
@@ -44,6 +46,8 @@ public class ClassManagerImpl implements ClassManager {
                 .like(!ObjectUtils.isEmpty(classFilter.getDescription()),"description",classFilter.getDescription())
                 .eq(!ObjectUtils.isEmpty(classFilter.getCreator()),"creator",classFilter.getCreator())
                 .eq(!ObjectUtils.isEmpty(classFilter.getLevel()),"level",classFilter.getLevel())
+                .eq(classFilter.getJoinStatus()!=null,"join_status",classFilter.getJoinStatus())
+                .eq(classFilter.getDropStatus()!=null,"drop_status",classFilter.getDropStatus())
                 .eq("del", 0)
         );
     }

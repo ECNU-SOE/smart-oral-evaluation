@@ -40,6 +40,20 @@ public class ClassVO implements Serializable {
 
     private Integer level;
 
+    private Date startTime;
+
+    private Date endTime;
+
+    private String picture;
+
+    private String notice;
+
+    private int stuLimit;
+
+    private int joinStatus;
+
+    private int dropStatus;
+
     private Date gmtCreate;
 
     private Date gmtModified;

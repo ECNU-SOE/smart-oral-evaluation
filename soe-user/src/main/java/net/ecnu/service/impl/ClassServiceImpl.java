@@ -70,11 +70,15 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         }
         //判断课程是否存在，存在才能插入
         CourseDO courseDO = courseMapper.selectById(classAddReq.getCourseId());
-        if (courseDO == null)
+        if (courseDO == null||courseDO.getDel())
             throw new BizException(BizCodeEnum.COURSE_UNEXISTS);
         //插入数据
         ClassDO classDO = new ClassDO();
         BeanUtils.copyProperties(classAddReq, classDO);
+        //如没有班级图片则赋予默认值
+        String picUrl = "https://img2.woyaogexing.com/2023/05/15/289be248ba0940546190f685063d7dca.jpg";
+        if (classDO.getPicture()==null||StringUtils.isBlank(picUrl))
+            classDO.setPicture(picUrl);
         classDO.setId("class_" + IDUtil.getSnowflakeId());
         classDO.setCreator(currentAccountNo);
         classDO.setDel(false);
@@ -85,7 +89,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     public Object del(String id) {
         //判断班级是否存在
         ClassDO classDO = classMapper.selectById(id);
-        if (classDO == null)
+        if (classDO == null|| classDO.getDel())
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
@@ -93,14 +97,17 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
         //判断该班级是否存在选课信息
-        return classMapper.deleteById(id);
+        ClassDO newClassDO= new ClassDO();
+        BeanUtils.copyProperties(classDO,newClassDO,"del");
+        newClassDO.setDel(true);
+        return classMapper.updateById(newClassDO);
     }
 
     @Override
     public Object update(ClassUpdateReq classUpdateReq) {
         //判断班级是否存在
         ClassDO classDO = classMapper.selectById(classUpdateReq.getId());
-        if (classDO == null)
+        if (classDO == null||classDO.getDel())
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();

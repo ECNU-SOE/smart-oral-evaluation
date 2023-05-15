@@ -28,6 +28,7 @@ public class CourseManagerImpl implements CourseManager {
                         .like(!ObjectUtils.isEmpty(courseFilter.getName()), "name", courseFilter.getName())
                         .like(!ObjectUtils.isEmpty(courseFilter.getDescription()), "description", courseFilter.getDescription())
                         .eq(!ObjectUtils.isEmpty(courseFilter.getCreator()), "creator", courseFilter.getCreator())
+                        .eq(courseFilter.getDifficulty()!=null, "difficulty", courseFilter.getDifficulty())
                         .eq("del", 0)
         ).getRecords();
     }
@@ -39,6 +40,7 @@ public class CourseManagerImpl implements CourseManager {
                 .like(!ObjectUtils.isEmpty(courseFilter.getName()), "name", courseFilter.getName())
                 .like(!ObjectUtils.isEmpty(courseFilter.getDescription()), "description", courseFilter.getDescription())
                 .eq(!ObjectUtils.isEmpty(courseFilter.getCreator()), "creator", courseFilter.getCreator())
+                .eq(courseFilter.getDifficulty()!=null, "difficulty", courseFilter.getDifficulty())
                 .eq("del", 0)
         );
     }

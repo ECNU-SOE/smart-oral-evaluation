@@ -35,8 +35,5 @@ public class CourUpdateReq {
     private Integer difficulty;
 
 
-//    private Date startTime;
-//
-//    private Date endTime;
 
 }

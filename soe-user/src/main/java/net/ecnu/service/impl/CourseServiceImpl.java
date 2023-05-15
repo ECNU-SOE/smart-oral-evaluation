@@ -18,6 +18,7 @@ import net.ecnu.service.CourseService;
 import net.ecnu.service.UserService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.RequestParamUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,14 +47,18 @@ public class CourseServiceImpl implements CourseService {
         //判断用户权限
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         Integer topRole = userService.getTopRole(currentAccountNo);
+        //不允许插入重复课程名
         CourseDO courseDO = courseMapper.selectOne(new QueryWrapper<CourseDO>()
                 .eq("name", courAddReq.getName())
         );
         if (courseDO!=null)
             throw new BizException(BizCodeEnum.COURSE_REPEAT);
+
         if (Objects.equals(topRole, RolesConst.ROLE_SUPER_ADMIN) || Objects.equals(topRole, RolesConst.ROLE_SYSTEM_ADMIN) || Objects.equals(topRole, RolesConst.ROLE_ADMIN)) {
             CourseDO csDO = new CourseDO();
             BeanUtils.copyProperties(courAddReq, csDO);
+            if (csDO.getPicture()==null|| StringUtils.isBlank(csDO.getPicture()))
+                csDO.setPicture("https://img2.woyaogexing.com/2023/05/13/c898da777fb886a1aa9e2ae07a9e2296.jpg");
             csDO.setId(IDUtil.nextCourseId());
             csDO.setCreator(currentAccountNo);
             csDO.setDel(false);
@@ -67,7 +72,7 @@ public class CourseServiceImpl implements CourseService {
     public Object delete(String id) {
         //判断课程是否存在
         CourseDO courseDO = courseMapper.selectById(id);
-        if (courseDO == null)
+        if (courseDO == null||courseDO.getDel())
             throw new BizException(BizCodeEnum.COURSE_UNEXISTS);
         //判断该课程下是否有班级，如果有则不能删除
         List<ClassDO> classDOS = classMapper.selectList(new QueryWrapper<ClassDO>()
@@ -79,7 +84,10 @@ public class CourseServiceImpl implements CourseService {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         Integer topRole = userService.getTopRole(currentAccountNo);
         if (topRole <= RolesConst.ROLE_ADMIN) {
-            return courseMapper.deleteById(id);
+            CourseDO csDO = new CourseDO();
+            BeanUtils.copyProperties(courseDO,csDO,"del");
+            csDO.setDel(true);
+            return courseMapper.updateById(csDO);
         } else {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }

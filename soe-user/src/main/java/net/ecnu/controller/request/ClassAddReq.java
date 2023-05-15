@@ -20,4 +20,18 @@ public class ClassAddReq {
 
     private int level;
 
+    private Date startTime;
+
+    private Date endTime;
+
+    private String picture;
+
+    private String notice;
+
+    private int stuLimit;
+
+    private int joinStatus;
+
+    private int dropStatus;
+
 }

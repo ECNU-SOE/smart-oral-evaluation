@@ -9,7 +9,14 @@
         <result column="name" property="name" />
         <result column="description" property="description" />
         <result column="creator" property="creator" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
         <result column="level" property="level" />
+        <result column="picture" property="picture" />
+        <result column="notice" property="notice" />
+        <result column="stu_limit" property="stuLimit" />
+        <result column="join_status" property="joinStatus" />
+        <result column="drop_status" property="dropStatus" />
         <result column="del" property="del" />
         <result column="gmt_create" property="gmtCreate" />
         <result column="gmt_modified" property="gmtModified" />
@@ -17,7 +24,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, course_id, name, description, creator, level, del, gmt_create, gmt_modified
+        id, course_id, name, description, creator, start_time, end_time, level, picture, notice, stu_limit, join_status, drop_status, del, gmt_create, gmt_modified
     </sql>
 
 </mapper>

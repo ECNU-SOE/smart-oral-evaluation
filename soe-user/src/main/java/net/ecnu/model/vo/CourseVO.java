@@ -38,9 +38,9 @@ public class CourseVO implements Serializable {
      */
     private String creator;
 
-    private Date startTime;
+    private String picture;
 
-    private Date endTime;
+    private Integer difficulty;
 
     private Date gmtCreate;
 

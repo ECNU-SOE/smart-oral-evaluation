@@ -1,5 +1,6 @@
 package net.ecnu.controller.request;
 
+import io.swagger.models.auth.In;
 import lombok.Data;
 import net.ecnu.controller.group.Create;
 
@@ -20,15 +21,8 @@ public class CourAddReq {
      */
     private String description;
 
+    private String picture;
 
-    /**
-     * 开始时间
-     */
-    private Date startTime;
-
-    /**
-     * 结束时间
-     */
-    private Date endTime;
+    private Integer difficulty;
 
 }

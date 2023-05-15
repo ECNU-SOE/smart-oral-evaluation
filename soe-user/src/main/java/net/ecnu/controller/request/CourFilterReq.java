@@ -27,9 +27,7 @@ public class CourFilterReq {
      */
     private String creator;
 
-    private Date startTime;
-
-    private Date endTime;
+    private Integer difficulty;
 
 
 }
