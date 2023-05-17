@@ -29,12 +29,13 @@ public class UserReq {
     /**
      * 用户昵称
      */
-    @NotBlank(message = "nickName can't be empty in create", groups = {Create.class})
+//    @NotBlank(message = "nickName can't be empty in create", groups = {Create.class})
     private String nickName;
 
     /**
      * 真实姓名
      */
+    @NotBlank(message = "realName can't be empty in create", groups = {Create.class})
     private String realName;
 
     /**

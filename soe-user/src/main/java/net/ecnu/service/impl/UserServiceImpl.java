@@ -85,15 +85,15 @@ public class UserServiceImpl implements UserService {
         //处理生成userDO对象，插入数据库
         UserDO newUserDO = new UserDO();
         newUserDO.setAccountNo(IDUtil.nextUserId());
-        newUserDO.setNickName(userReq.getNickName());
+        newUserDO.setRealName(userReq.getRealName());
         newUserDO.setPhone(userReq.getPhone());
 //        //密码加密处理
 //        newUserDO.setSecret("$1$" + CommonUtil.getStringNumRandom(8)); //加密盐
 //        newUserDO.setPwd(Md5Crypt.md5Crypt(userRegisterReq.getPwd().getBytes(), newUserDO.getSecret()));
         newUserDO.setPwd(passwordEncoder.encode(userReq.getPwd()));
-        mapper.insertUserRole(RolesConst.DEFAULT_ROLE, newUserDO.getAccountNo());
-        int rows = userMapper.insert(newUserDO);
-        return rows;
+        int rows = mapper.insertUserRole(RolesConst.DEFAULT_ROLE, newUserDO.getAccountNo());
+        rows += userMapper.insert(newUserDO);
+        return "register success";
     }
 
     @Override
