@@ -9,26 +9,21 @@ import net.ecnu.exception.BizException;
 import net.ecnu.mapper.ClassMapper;
 import net.ecnu.mapper.CourseDiscussMapper;
 import net.ecnu.mapper.UserMapper;
-import net.ecnu.model.ClassDO;
 import net.ecnu.model.CourseDiscussDo;
 import net.ecnu.model.DiscussAudioDo;
 import net.ecnu.model.UserDO;
 import net.ecnu.model.dto.DiscussDto;
-import net.ecnu.model.dto.DiscussInfoDto;
-import net.ecnu.model.dto.ReplyInfoDto;
 import net.ecnu.service.CourseDiscussService;
 import net.ecnu.service.DiscussAudioService;
 import net.ecnu.util.RequestParamUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @description:
@@ -116,15 +111,10 @@ public class CourseDiscussServiceImpl implements CourseDiscussService {
     }
 
     @Override
-    public Page<CourseDiscussDo> getDiscussInfo(String courseId, Integer pageNum, Integer pageSize) {
-        LambdaQueryWrapper<ClassDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ClassDO::getCourseId,courseId).eq(ClassDO::getDel,0);
-        List<ClassDO> classDOS = classMapper.selectList(wrapper);
-        //获取该课程下的所有的班级id
-        List<String> classIds = classDOS.stream().map(ClassDO::getCourseId).collect(Collectors.toList());
+    public Page<CourseDiscussDo> getDiscussInfo(String classId, Integer pageNum, Integer pageSize) {
         //获取该课程下的所有话题（不包含回复）
         LambdaQueryWrapper<CourseDiscussDo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.in(CourseDiscussDo::getClassId,classIds)
+        lambdaQueryWrapper.eq(CourseDiscussDo::getClassId,classId)
                 .eq(CourseDiscussDo::getParentId,0).eq(CourseDiscussDo::getDelFlg,0);
         Page<CourseDiscussDo> courseDiscussDoPage = courseDiscussMapper.selectPage(new Page<>(pageNum, pageSize), lambdaQueryWrapper);
         return courseDiscussDoPage;

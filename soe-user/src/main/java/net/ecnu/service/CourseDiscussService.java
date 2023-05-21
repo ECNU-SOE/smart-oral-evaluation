@@ -33,7 +33,7 @@ public interface CourseDiscussService {
 
     Boolean addDiscuss(DiscussDto discussDto);
 
-    Page<CourseDiscussDo> getDiscussInfo(String courseId, Integer pageNum, Integer pageSize);
+    Page<CourseDiscussDo> getDiscussInfo(String classId, Integer pageNum, Integer pageSize);
 
     Page<CourseDiscussDo> getReplyInfo(String discussId, Integer pageNum, Integer pageSize);
 

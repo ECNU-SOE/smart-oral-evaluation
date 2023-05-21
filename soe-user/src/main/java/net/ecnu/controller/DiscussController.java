@@ -54,20 +54,20 @@ public class DiscussController {
     }
 
     /**
-     * 查询课程下的讨论内容，不包含回复
+     * 查询班级下的讨论内容，不包含回复
      * TODO
      * 回复数还未统计，音频数据未返回
      * */
     @GetMapping("/getDiscussInfo")
-    public JsonData getReplyInfo(@RequestParam("courseId") String courseId, @RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize) {
-        if(StringUtils.isEmpty(courseId)){
+    public JsonData getReplyInfo(@RequestParam("classId") String classId, @RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize) {
+        if(StringUtils.isEmpty(classId)){
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY);
         }
         if(Objects.isNull(pageNum))
             pageNum = 1;
         if(Objects.isNull(pageSize))
             pageSize = 10;
-        Page<CourseDiscussDo> pageList = courseDiscussService.getDiscussInfo(courseId,pageNum,pageSize);
+        Page<CourseDiscussDo> pageList = courseDiscussService.getDiscussInfo(classId,pageNum,pageSize);
         return JsonData.buildSuccess(pageList);
     }
 
