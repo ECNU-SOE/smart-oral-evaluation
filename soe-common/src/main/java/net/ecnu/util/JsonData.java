@@ -56,6 +56,10 @@ public class JsonData {
         return new JsonData(0, data, null);
     }
 
+    public static JsonData buildSuccess(String msg) {
+        return new JsonData(0, null, msg);
+    }
+
 
     /**
      * 失败，传入描述信息
