@@ -44,6 +44,8 @@ public class UserClassDO implements Serializable {
      */
     private Integer rType;
 
+    private Integer status;
+
     /**
      * 创建时间
      */

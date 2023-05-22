@@ -8,13 +8,14 @@
         <result column="account_no" property="accountNo" />
         <result column="class_id" property="classId" />
         <result column="r_type" property="rType" />
+        <result column="status" property="status" />
         <result column="gmt_create" property="gmtCreate" />
         <result column="gmt_modified" property="gmtModified" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, account_no, class_id, r_type, gmt_create, gmt_modified
+        id, account_no, class_id, r_type, status, gmt_create, gmt_modified
     </sql>
 
 </mapper>

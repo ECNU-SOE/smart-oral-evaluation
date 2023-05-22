@@ -2,13 +2,9 @@ package net.ecnu.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-
 import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableId;
-
 import java.io.Serializable;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -18,7 +14,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author LYW
- * @since 2023-05-01
+ * @since 2023-05-21
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -34,7 +30,7 @@ public class CpsgrpDO implements Serializable {
     private String id;
 
     /**
-     * 所属课程id
+     * 所属课程id(弃用)
      */
     private String classId;
 
@@ -49,27 +45,32 @@ public class CpsgrpDO implements Serializable {
     private String description;
 
     /**
-     * 语料组类型：1-测验；2-试卷；3-作业
+     * 语料组类型：1测验、2试卷、3作业(弃用)
      */
     private Integer type;
 
     /**
-     * 难易程度：-1未知；[A~J][0~9]
+     * 难易程度：[A~J][0~9]
      */
     private String difficulty;
 
     /**
-     * 公开类型：0-公开；1-私有
+     * 公开类型：0公开、1私有
      */
-    private Integer isPublic;
+    private Integer isPrivate;
 
     /**
-     * 起始时间
+     * 修改状态：0允许修改、1允许创建者修改、2不允许修改
+     */
+    private Integer modStatus;
+
+    /**
+     * 起始时间(弃用)
      */
     private Date startTime;
 
     /**
-     * 截止时间
+     * 截止时间(弃用)
      */
     private Date endTime;
 
@@ -79,7 +80,7 @@ public class CpsgrpDO implements Serializable {
     private String creator;
 
     /**
-     * 逻辑删除位置
+     * 逻辑删除标识位
      */
     private Integer del;
 

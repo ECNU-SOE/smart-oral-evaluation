@@ -6,7 +6,6 @@ import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Update;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
@@ -19,14 +18,14 @@ public class CpsgrpReq {
     private String id;
 
     /**
-     * 所属班级id
+     * 所属班级id（弃用）
      */
     private String classId;
 
     /**
      * 语料组名称
      */
-    @NotEmpty(message = "title can't be empty in add", groups = {Create.class})
+    @NotEmpty(message = "title can't be empty in create", groups = {Create.class})
     private String title;
 
     /**
@@ -34,11 +33,11 @@ public class CpsgrpReq {
      */
     private String description;
 
-    /**
-     * 语料组类型
-     */
-    @NotNull(message = "type can't be null in add", groups = {Create.class})
-    private Integer type;
+//    /**
+//     * 语料组类型（弃用）
+//     */
+//    @NotNull(message = "type can't be null in create", groups = {Create.class})
+//    private Integer type;
 
     /**
      * 难易程度
@@ -48,7 +47,7 @@ public class CpsgrpReq {
     /**
      * 公开类型
      */
-    private Integer isPublic;
+    private Integer isPrivate;
 
     /**
      * 起始时间

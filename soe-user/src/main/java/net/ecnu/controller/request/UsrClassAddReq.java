@@ -16,4 +16,6 @@ public class UsrClassAddReq {
 
     @JsonProperty("rType")
     private Integer rType;
+
+//    private Integer status;
 }

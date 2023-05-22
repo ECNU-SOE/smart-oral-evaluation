@@ -52,7 +52,7 @@ public class CpsgrpVO implements Serializable {
     /**
      * 公开类型：0-公开；1-私有
      */
-    private Integer isPublic;
+    private Integer isPrivate;
 
     /**
      * 起始时间

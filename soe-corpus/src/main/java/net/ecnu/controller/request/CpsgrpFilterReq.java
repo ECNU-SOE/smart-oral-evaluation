@@ -29,14 +29,14 @@ public class CpsgrpFilterReq {
     private Integer type;
 
     /**
-     * 难易程度：-1-未知；1～10难度递增
+     * 难易程度：[A～J][0~9]
      */
     private String difficulty;
 
     /**
      * 公开类型：0-公开；1-私有
      */
-    private Integer isPublic;
+    private Integer isPrivate;
 
     /**
      * 开始时间
