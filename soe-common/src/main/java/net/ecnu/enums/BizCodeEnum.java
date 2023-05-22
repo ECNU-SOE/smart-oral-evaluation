@@ -41,6 +41,12 @@ public enum BizCodeEnum {
     CORPUS_ADD_ERROR(270003, "添加语料异常"),
 
     /**
+     * 话题相关
+     * */
+    DISCUSS_AUDIO_ADD_ERROR(280001,"添加话题异常"),
+    DISCUSS_REPLY_ADD_ERROR(280002,"回复异常"),
+
+    /**
      * 参数异常
      */
     PARAM_CANNOT_BE_EMPTY(350000, "参数不能为空");
