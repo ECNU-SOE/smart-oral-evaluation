@@ -49,11 +49,11 @@ public class ClassVO_LYW implements Serializable {
 
     private String notice;
 
-    private int stuLimit;
+    private Integer stuLimit;
 
-    private int joinStatus;
+    private Integer joinStatus;
 
-    private int dropStatus;
+    private Integer dropStatus;
 
     /**
      * 当前用户在班级中的角色
