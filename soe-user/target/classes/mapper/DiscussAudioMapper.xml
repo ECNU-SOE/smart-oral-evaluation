@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.ecnu.mapper.DiscussAudioMapper">
+  <resultMap id="BaseResultMap" type="net.ecnu.model.DiscussAudioDo">
+    <!--@mbg.generated-->
+    <!--@Table discuss_audio-->
+    <id column="audio_id" jdbcType="BIGINT" property="audioId" />
+    <result column="discuss_id" jdbcType="BIGINT" property="discussId" />
+    <result column="audio_url" jdbcType="VARCHAR" property="audioUrl" />
+    <result column="upload_time" jdbcType="TIMESTAMP" property="uploadTime" />
+    <result column="del_flg" jdbcType="BOOLEAN" property="delFlg" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    audio_id, discuss_id, audio_url, upload_time, del_flg
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from discuss_audio
+    where audio_id = #{audioId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    <!--@mbg.generated-->
+    delete from discuss_audio
+    where audio_id = #{audioId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" keyColumn="audio_id" keyProperty="audioId" parameterType="net.ecnu.model.DiscussAudioDo" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into discuss_audio (discuss_id, audio_url, upload_time, 
+      del_flg)
+    values (#{discussId,jdbcType=BIGINT}, #{audioUrl,jdbcType=VARCHAR}, #{uploadTime,jdbcType=TIMESTAMP}, 
+      #{delFlg,jdbcType=BOOLEAN})
+  </insert>
+  <insert id="insertSelective" keyColumn="audio_id" keyProperty="audioId" parameterType="net.ecnu.model.DiscussAudioDo" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into discuss_audio
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="discussId != null">
+        discuss_id,
+      </if>
+      <if test="audioUrl != null">
+        audio_url,
+      </if>
+      <if test="uploadTime != null">
+        upload_time,
+      </if>
+      <if test="delFlg != null">
+        del_flg,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="discussId != null">
+        #{discussId,jdbcType=BIGINT},
+      </if>
+      <if test="audioUrl != null">
+        #{audioUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadTime != null">
+        #{uploadTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlg != null">
+        #{delFlg,jdbcType=BOOLEAN},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="net.ecnu.model.DiscussAudioDo">
+    <!--@mbg.generated-->
+    update discuss_audio
+    <set>
+      <if test="discussId != null">
+        discuss_id = #{discussId,jdbcType=BIGINT},
+      </if>
+      <if test="audioUrl != null">
+        audio_url = #{audioUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadTime != null">
+        upload_time = #{uploadTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlg != null">
+        del_flg = #{delFlg,jdbcType=BOOLEAN},
+      </if>
+    </set>
+    where audio_id = #{audioId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="net.ecnu.model.DiscussAudioDo">
+    <!--@mbg.generated-->
+    update discuss_audio
+    set discuss_id = #{discussId,jdbcType=BIGINT},
+      audio_url = #{audioUrl,jdbcType=VARCHAR},
+      upload_time = #{uploadTime,jdbcType=TIMESTAMP},
+      del_flg = #{delFlg,jdbcType=BOOLEAN}
+    where audio_id = #{audioId,jdbcType=BIGINT}
+  </update>
+</mapper>

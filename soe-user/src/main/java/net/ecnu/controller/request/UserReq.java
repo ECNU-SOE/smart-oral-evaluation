@@ -29,13 +29,14 @@ public class UserReq {
     /**
      * 用户昵称
      */
-//    @NotBlank(message = "nickName can't be empty in create", groups = {Create.class})
+    @NotBlank(message = "nickName can't be empty in create", groups = {Create.class})
+    @Size(min = 1, max = 10, message = "The nickName must contain 1 to 10 characters", groups = {Create.class})
     private String nickName;
 
     /**
      * 真实姓名
      */
-    @NotBlank(message = "realName can't be empty in create", groups = {Create.class})
+//    @NotBlank(message = "realName can't be empty in create", groups = {Create.class})
     private String realName;
 
     /**
@@ -67,7 +68,7 @@ public class UserReq {
      * 手机
      */
     @NotBlank(message = "手机号不能为空", groups = {Create.class})
-//    @Pattern(regexp = SOEConst.PHONE_PATTERN, groups = {Create.class, Find.class})
+    @Pattern(regexp = SOEConst.PHONE_PATTERN, groups = {Create.class})
     private String phone;
 
     /**
