@@ -47,7 +47,7 @@ public class CpsgrpManagerImpl implements CpsgrpManager {
                         .like(!ObjectUtils.isEmpty(cpsgrpFilter.getTitle()), "title", cpsgrpFilter.getTitle())
                         .like(!ObjectUtils.isEmpty(cpsgrpFilter.getDescription()), "description", cpsgrpFilter.getDescription())
                         .eq(cpsgrpFilter.getType() != null, "type", cpsgrpFilter.getType())
-                        .eq(cpsgrpFilter.getIsPublic() != null, "is_public", cpsgrpFilter.getIsPublic())
+                        .eq(cpsgrpFilter.getIsPrivate() != null, "is_private", cpsgrpFilter.getIsPrivate())
                         .like(!ObjectUtils.isEmpty(cpsgrpFilter.getDifficulty()), "difficulty", cpsgrpFilter.getDifficulty())
         );
         return cpsgrpDOPage.getRecords();
@@ -60,7 +60,7 @@ public class CpsgrpManagerImpl implements CpsgrpManager {
                 .like(!ObjectUtils.isEmpty(cpsgrpFilter.getTitle()), "title", cpsgrpFilter.getTitle())
                 .like(!ObjectUtils.isEmpty(cpsgrpFilter.getDescription()), "description", cpsgrpFilter.getDescription())
                 .eq(cpsgrpFilter.getType() != null, "type", cpsgrpFilter.getType())
-                .eq(cpsgrpFilter.getIsPublic() != null, "is_public", cpsgrpFilter.getIsPublic())
+                .eq(cpsgrpFilter.getIsPrivate() != null, "is_private", cpsgrpFilter.getIsPrivate())
                 .eq(cpsgrpFilter.getDifficulty() != null, "difficulty", cpsgrpFilter.getDifficulty())
         );
     }
