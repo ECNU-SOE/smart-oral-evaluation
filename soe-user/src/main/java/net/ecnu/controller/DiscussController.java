@@ -35,7 +35,7 @@ public class DiscussController {
         }
         //新增话题，同时获取到该条数据的自增id
         if (courseDiscussService.addDiscuss(discussDto)) {
-            return JsonData.buildSuccess("添加话题成功");
+            return JsonData.buildSuccess(null,"添加话题成功");
         } else {
             return JsonData.buildError("添加话题失败");
         }
