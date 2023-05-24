@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.ecnu.mapper.SignMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="net.ecnu.model.SignDO">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="total_days" property="totalDays" />
+        <result column="continue_days" property="continueDays" />
+        <result column="last_sign" property="lastSign" />
+        <result column="resign_num" property="resignNum" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id, total_days, continue_days, last_sign, resign_num
+    </sql>
+
+</mapper>

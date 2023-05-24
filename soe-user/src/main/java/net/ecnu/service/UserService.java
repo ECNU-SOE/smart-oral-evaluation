@@ -22,4 +22,5 @@ public interface UserService {
     //获取角色的最高角色身份
     Integer getTopRole(String accountNo);
     Object del(String accountNo);
+    Object sign();
 }

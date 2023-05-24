@@ -95,4 +95,11 @@ public class UserController {
             return JsonData.buildError("短信发送错误");
     }
 
+    @ApiOperation("用户签到")
+    @PostMapping("sign")
+    public JsonData sign() {
+        Object data = userService.sign();
+        return JsonData.buildSuccess(data);
+    }
+
 }

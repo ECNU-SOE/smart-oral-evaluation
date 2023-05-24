@@ -9,7 +9,6 @@ import com.aliyuncs.IAcsClient;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.constant.RolesConst;
 import net.ecnu.controller.request.UserFilterReq;
@@ -17,9 +16,8 @@ import net.ecnu.controller.request.UserReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.manager.UserManager;
-import net.ecnu.mapper.MyUserDetailsServiceMapper;
-import net.ecnu.mapper.UserMapper;
-import net.ecnu.mapper.UserRoleMapper;
+import net.ecnu.mapper.*;
+import net.ecnu.model.SignDO;
 import net.ecnu.model.UserDO;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.common.PageData;
@@ -45,13 +43,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.path;
 
 
 @Service
@@ -76,6 +74,12 @@ public class UserServiceImpl implements UserService {
     @Resource
     private PasswordEncoder passwordEncoder;
 
+    @Resource
+    private SignMapper signMapper;
+
+    @Resource
+    private SignLogMapper signLogMapper;
+
     @Override
     public Object register(UserReq userReq) {
         //check手机验证码 与 数据库唯一性
@@ -86,7 +90,7 @@ public class UserServiceImpl implements UserService {
         UserDO newUserDO = new UserDO();
         newUserDO.setAccountNo(IDUtil.nextUserId());
         newUserDO.setNickName(userReq.getNickName());
-        String defaultAvatarUrl = "woyaogexing.com/tupian/dongman/2023/212866.html";
+        String defaultAvatarUrl = "https://img2.woyaogexing.com/2023/05/14/11d01024a840b3f4c3a4e1eda17deb55.png";
         newUserDO.setAvatarUrl(defaultAvatarUrl);
         newUserDO.setPhone(userReq.getPhone());
 //        //密码加密处理
@@ -267,6 +271,17 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(userDO, newUserDo, "del");
         newUserDo.setDel(true);
         return userMapper.updateById(newUserDo);
+    }
+
+    @Override
+    public Object sign() {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+
+        SignDO signDO = new SignDO();
+        return null;
     }
 
     private boolean hasOpRight(Integer roleA, Integer roleB) {
