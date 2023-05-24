@@ -86,6 +86,8 @@ public class UserServiceImpl implements UserService {
         UserDO newUserDO = new UserDO();
         newUserDO.setAccountNo(IDUtil.nextUserId());
         newUserDO.setNickName(userReq.getNickName());
+        String defaultAvatarUrl = "woyaogexing.com/tupian/dongman/2023/212866.html";
+        newUserDO.setAvatarUrl(defaultAvatarUrl);
         newUserDO.setPhone(userReq.getPhone());
 //        //密码加密处理
 //        newUserDO.setSecret("$1$" + CommonUtil.getStringNumRandom(8)); //加密盐
