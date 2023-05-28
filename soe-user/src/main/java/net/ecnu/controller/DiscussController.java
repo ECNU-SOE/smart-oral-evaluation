@@ -3,9 +3,12 @@ package net.ecnu.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
-import net.ecnu.model.CourseDiscussDo;
+import net.ecnu.model.ClassDiscussDo;
 import net.ecnu.model.dto.DiscussDto;
-import net.ecnu.service.CourseDiscussService;
+import net.ecnu.model.dto.ForwardDto;
+import net.ecnu.model.vo.DiscussVo;
+import net.ecnu.model.vo.ReplyInfoVo;
+import net.ecnu.service.ClassDiscussService;
 import net.ecnu.util.JsonData;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +26,7 @@ import java.util.Objects;
 public class DiscussController {
 
     @Autowired
-    private CourseDiscussService courseDiscussService;
+    private ClassDiscussService classDiscussService;
 
     /**
      * 新建话题
@@ -34,7 +37,7 @@ public class DiscussController {
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY);
         }
         //新增话题，同时获取到该条数据的自增id
-        if (courseDiscussService.addDiscuss(discussDto)) {
+        if (classDiscussService.addDiscuss(discussDto)) {
             return JsonData.buildSuccess(null,"添加话题成功");
         } else {
             return JsonData.buildError("添加话题失败");
@@ -49,14 +52,12 @@ public class DiscussController {
         if (Objects.isNull(discussDto)) {
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY);
         }
-        courseDiscussService.reply(discussDto);
+        classDiscussService.reply(discussDto);
         return JsonData.buildSuccess();
     }
 
     /**
      * 查询班级下的讨论内容，不包含回复
-     * TODO
-     * 回复数还未统计，音频数据未返回
      * */
     @GetMapping("/getDiscussInfo")
     public JsonData getReplyInfo(@RequestParam("classId") String classId, @RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize) {
@@ -67,7 +68,7 @@ public class DiscussController {
             pageNum = 1;
         if(Objects.isNull(pageSize))
             pageSize = 10;
-        Page<CourseDiscussDo> pageList = courseDiscussService.getDiscussInfo(classId,pageNum,pageSize);
+        Page<DiscussVo> pageList = classDiscussService.getDiscussInfo(classId,pageNum,pageSize);
         return JsonData.buildSuccess(pageList);
     }
 
@@ -87,7 +88,7 @@ public class DiscussController {
         if(Objects.isNull(pageSize)){
             pageSize = 10;
         }
-        Page<CourseDiscussDo> pageList = courseDiscussService.getReplyInfo(discussId,pageNum,pageSize);
+        Page<ReplyInfoVo> pageList = classDiscussService.getReplyInfo(discussId,pageNum,pageSize);
         return JsonData.buildSuccess(pageList);
     }
 
@@ -99,10 +100,41 @@ public class DiscussController {
         if (StringUtils.isEmpty(discussId)) {
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY);
         }
-        if (courseDiscussService.addLikes(discussId) > 0) {
+        if (classDiscussService.addLikes(discussId) > 0) {
             return JsonData.buildSuccess();
         } else {
             return JsonData.buildError("更新失败");
+        }
+    }
+
+    /**
+     * 转发
+     * */
+    @PostMapping("/forward")
+    public JsonData forward(@RequestBody ForwardDto forwardDto){
+        if (StringUtils.isEmpty(forwardDto.getClassId()) || StringUtils.isEmpty(forwardDto.getDiscussTest())
+                || Objects.isNull(forwardDto.getForwardId())) {
+            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY);
+        }
+        if (classDiscussService.forward(forwardDto) > 0) {
+            return JsonData.buildSuccess();
+        } else {
+            return JsonData.buildError("转发失败");
+        }
+    }
+
+    /**
+     * 置顶话题
+     * */
+    @GetMapping("/topDiscuss")
+    public JsonData topDiscuss(@RequestParam("discussId")Long discussId){
+        if (Objects.isNull(discussId)) {
+            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY);
+        }
+        if (classDiscussService.topDiscuss(discussId) <= 0) {
+            return JsonData.buildSuccess(null, "置顶成功");
+        } else {
+            return JsonData.buildError("置顶失败");
         }
     }
 }

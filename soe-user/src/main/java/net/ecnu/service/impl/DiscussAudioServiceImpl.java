@@ -1,5 +1,6 @@
 package net.ecnu.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.mapper.DiscussAudioMapper;
 import net.ecnu.model.DiscussAudioDo;
@@ -7,6 +8,7 @@ import net.ecnu.service.DiscussAudioService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @description:
@@ -47,6 +49,12 @@ public class DiscussAudioServiceImpl extends ServiceImpl<DiscussAudioMapper,Disc
 
     public int updateByPrimaryKey(DiscussAudioDo record) {
         return discussAudioMapper.updateByPrimaryKey(record);
+    }
+
+    @Override
+    public List<String> selectByDiscussId(Long discussId) {
+        List<String> discussAudioUrlList = discussAudioMapper.getAudioUrlByDiscussId(discussId);
+        return discussAudioUrlList;
     }
 
 }

@@ -93,4 +93,13 @@
       del_flg = #{delFlg,jdbcType=BOOLEAN}
     where audio_id = #{audioId,jdbcType=BIGINT}
   </update>
+
+  <select id="getAudioUrlByDiscussId" resultType="java.lang.String">
+    select
+      audio_url
+    from
+      discuss_audio
+    where
+      del_flg = 0 and discuss_id = #{discussId}
+  </select>
 </mapper>

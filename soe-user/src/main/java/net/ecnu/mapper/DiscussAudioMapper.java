@@ -3,6 +3,9 @@ package net.ecnu.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import net.ecnu.model.DiscussAudioDo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @description:
@@ -22,4 +25,6 @@ public interface DiscussAudioMapper extends BaseMapper<DiscussAudioDo> {
     int updateByPrimaryKeySelective(DiscussAudioDo record);
 
     int updateByPrimaryKey(DiscussAudioDo record);
+
+    List<String> getAudioUrlByDiscussId(@Param("discussId") Long discussId);
 }
