@@ -32,7 +32,7 @@ public class SignDO implements Serializable {
     /**
      * 用户id：account_no
      */
-    private Integer userId;
+    private String userId;
 
     /**
      * 累计总签到天数

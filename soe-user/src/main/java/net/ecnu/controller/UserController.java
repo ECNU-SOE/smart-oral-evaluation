@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Find;
 import net.ecnu.controller.group.Update;
+import net.ecnu.controller.request.SignReq;
 import net.ecnu.controller.request.UserFilterReq;
 import net.ecnu.controller.request.UserReq;
 import net.ecnu.model.common.PageData;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 @Api(value = "端上用户管理")
 @RestController
@@ -96,8 +98,8 @@ public class UserController {
     }
 
     @ApiOperation("用户签到")
-    @PostMapping("sign")
-    public JsonData sign() {
+    @GetMapping("sign")
+    public JsonData sign() throws ParseException {
         Object data = userService.sign();
         return JsonData.buildSuccess(data);
     }

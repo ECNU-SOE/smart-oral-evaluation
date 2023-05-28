@@ -9,8 +9,11 @@ import com.aliyuncs.IAcsClient;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.generator.config.IFileCreate;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.constant.RolesConst;
+import net.ecnu.controller.request.SignReq;
 import net.ecnu.controller.request.UserFilterReq;
 import net.ecnu.controller.request.UserReq;
 import net.ecnu.enums.BizCodeEnum;
@@ -18,6 +21,7 @@ import net.ecnu.exception.BizException;
 import net.ecnu.manager.UserManager;
 import net.ecnu.mapper.*;
 import net.ecnu.model.SignDO;
+import net.ecnu.model.SignLogDO;
 import net.ecnu.model.UserDO;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.common.PageData;
@@ -48,6 +52,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -274,14 +280,57 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Object sign() {
+    public Object sign() throws ParseException {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
-
-        SignDO signDO = new SignDO();
-        return null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        //获取今天日期
+        Date nowTime = new Date();
+        Date today = sdf.parse(sdf.format(nowTime));
+        //判断用户是否首次签到
+        SignDO signDO = signMapper.selectOne(new QueryWrapper<SignDO>()
+                .eq("user_id", currentAccountNo)
+        );
+        if (signDO==null){
+            //首次签到，先创建签到信息
+            SignDO newSignDO = new SignDO();
+            newSignDO.setUserId(currentAccountNo);
+            newSignDO.setTotalDays(1);
+            newSignDO.setContinueDays(1);
+            newSignDO.setLastSign(nowTime);
+            newSignDO.setResignNum(10);//补签次数，默认为10次
+            int countSign = signMapper.insert(newSignDO);
+            //再插入签到记录
+            SignLogDO newSignLogDO = new SignLogDO();
+            newSignLogDO.setUserId(currentAccountNo);
+            newSignLogDO.setSignTime(nowTime);
+            newSignLogDO.setSignType(1);//1：签到，2：补签
+            int countSignLog = signLogMapper.insert(newSignLogDO);
+            return "签到成功";
+        }else {
+            //非首次签到,判断用户今天是否已签到
+            Date lastSignDay = sdf.parse(sdf.format(signDO.getLastSign()));
+            if (lastSignDay.compareTo(today)==0)
+                throw new BizException(BizCodeEnum.USER_SIGNED);
+            //用户签到，先创建signLog，再更新sign表
+            SignLogDO newSignLogDO = new SignLogDO();
+            newSignLogDO.setUserId(currentAccountNo);
+            newSignLogDO.setSignTime(nowTime);
+            newSignLogDO.setSignType(1);
+            int countSignLog = signLogMapper.insert(newSignLogDO);
+            SignDO newSignDO = new SignDO();
+            BeanUtils.copyProperties(signDO,newSignDO,"total_days","continue_days","last_sign");
+            newSignDO.setLastSign(nowTime);
+            newSignDO.setTotalDays(signDO.getTotalDays()+1);
+            if (isYesterday(lastSignDay,today))
+                newSignDO.setContinueDays(signDO.getContinueDays()+1);
+            else
+                newSignDO.setContinueDays(1);//重置连续签到天数
+            int countSign = signMapper.updateById(newSignDO);
+            return "签到成功";
+        }
     }
 
     private boolean hasOpRight(Integer roleA, Integer roleB) {
@@ -350,6 +399,56 @@ public class UserServiceImpl implements UserService {
             return true;
         return false;
     }
+
+    /**
+     * 判断是否是昨天
+     *
+     * @param oldDate 判断该日期是否是昨天
+     * @return 是 true 不是 false
+     */
+    private boolean isYesterday(Date oldDate,Date newDate) {
+        boolean flag = false;
+        // 先获取年份
+        int year = Integer.parseInt(new SimpleDateFormat("yyyy").format(oldDate));
+
+        // 获取当前年份 和 一年中的第几天
+        int day = getDayNumForYear(oldDate);
+        int currentYear = Integer.parseInt(new SimpleDateFormat("yyyy").format(newDate));
+        int currentDay = getDayNumForYear(newDate);
+        // 计算 如果是去年的
+        if (currentYear - year == 1) {
+            // 如果当前正好是 1月1日 计算去年有多少天，指定时间是否是一年中的最后一天
+            if (currentDay == 1) {
+                int yearDay;
+                if (year % 400 == 0) {
+                    // 世纪闰年
+                    yearDay = 366;
+                } else if (year % 4 == 0 && year % 100 != 0) {
+                    // 普通闰年
+                    yearDay = 366;
+                } else {
+                    // 平年
+                    yearDay = 365;
+                }
+                if (day == yearDay) {
+                    flag = true;
+                }
+            }
+        } else {
+            if (currentDay - day == 1) {
+                flag = true;
+            }
+        }
+        return flag;
+    }
+
+    private Integer getDayNumForYear(Date date) {
+        Calendar ca = Calendar.getInstance();
+        ca.setTime(date);
+        return ca.get(Calendar.DAY_OF_YEAR);
+    }
+
+
 
 }
 

@@ -32,7 +32,7 @@ public class SignLogDO implements Serializable {
     /**
      * 用户id
      */
-    private Integer userId;
+    private String userId;
 
     /**
      * 签到奖励内容
@@ -52,7 +52,7 @@ public class SignLogDO implements Serializable {
     /**
      * 数据创建时间
      */
-    private Date createTime;
+    private Date gmtCreate;
 
 
 }

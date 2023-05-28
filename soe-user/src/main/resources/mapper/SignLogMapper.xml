@@ -9,12 +9,12 @@
         <result column="sign_reward" property="signReward" />
         <result column="sign_time" property="signTime" />
         <result column="sign_type" property="signType" />
-        <result column="create_time" property="createTime" />
+        <result column="gmt_create" property="gmtCreate" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, user_id, sign_reward, sign_time, sign_type, create_time
+        id, user_id, sign_reward, sign_time, sign_type, gmt_create
     </sql>
 
 </mapper>

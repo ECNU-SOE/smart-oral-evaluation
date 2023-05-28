@@ -26,6 +26,7 @@ public enum BizCodeEnum {
     COURSE_UNEXISTS(250010, "课程不存在"),
     COURSE_REPEAT(250011, "课程重复"),
     COURSE_USING(250012, "该课程被班级关联"),
+    USER_SIGNED(250013,"用户已签到"),
 
     /**
      * 语料组相关
