@@ -74,8 +74,6 @@ public class DiscussController {
 
     /**
      * 查询当前话题/回复下的回复
-     * TODO
-     * 回复数未统计,音频数据未返回
      * */
     @GetMapping("/getReplyInfoByCurrent")
     public JsonData getReplyInfoByCurrent(@RequestParam("discussId") String discussId,@RequestParam("pageNum") Integer pageNum,@RequestParam("pageSize") Integer pageSize){
