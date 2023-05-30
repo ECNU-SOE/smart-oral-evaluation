@@ -28,6 +28,8 @@ public class ClassVO implements Serializable {
      */
     private String name;
 
+    private String teacher;
+
     /**
      * 详细描述
      */

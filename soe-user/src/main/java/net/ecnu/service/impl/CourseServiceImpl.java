@@ -51,9 +51,8 @@ public class CourseServiceImpl implements CourseService {
         CourseDO courseDO = courseMapper.selectOne(new QueryWrapper<CourseDO>()
                 .eq("name", courAddReq.getName())
         );
-        if (courseDO!=null)
+        if (courseDO!=null&& !courseDO.getDel())
             throw new BizException(BizCodeEnum.COURSE_REPEAT);
-
         if (Objects.equals(topRole, RolesConst.ROLE_SUPER_ADMIN) || Objects.equals(topRole, RolesConst.ROLE_SYSTEM_ADMIN) || Objects.equals(topRole, RolesConst.ROLE_ADMIN)) {
             CourseDO csDO = new CourseDO();
             BeanUtils.copyProperties(courAddReq, csDO);

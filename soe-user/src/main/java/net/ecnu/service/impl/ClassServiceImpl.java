@@ -72,6 +72,13 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         CourseDO courseDO = courseMapper.selectById(classAddReq.getCourseId());
         if (courseDO == null||courseDO.getDel())
             throw new BizException(BizCodeEnum.COURSE_UNEXISTS);
+
+        //名字重复复校验
+        ClassDO classDO1 = classMapper.selectOne(new QueryWrapper<ClassDO>()
+                .eq("name", classAddReq.getName())
+        );
+        if (classDO1!=null&&!classDO1.getDel())
+            throw new BizException(BizCodeEnum.CLASS_REPEAT);
         //插入数据
         ClassDO classDO = new ClassDO();
         BeanUtils.copyProperties(classAddReq, classDO);
@@ -309,7 +316,13 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         );
         if (classDO == null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
+        UserClassDO userClassDO = userClassMapper.selectOne(new QueryWrapper<UserClassDO>()
+                .eq("class_id", classDO.getId())
+                .eq("r_type", 3)//3:老师
+        );
         ClassVO classVO = new ClassVO();
+        if (userClassDO!=null)
+            classVO.setTeacher(userClassDO.getAccountNo());
         BeanUtils.copyProperties(classDO, classVO);
         return classVO;
     }
