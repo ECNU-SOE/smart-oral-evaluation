@@ -25,7 +25,8 @@
     {
       "name": "soe.jwt.csrf-disabled",
       "type": "java.lang.Boolean",
-      "sourceType": "net.ecnu.model.JwtProperties"
+      "sourceType": "net.ecnu.model.JwtProperties",
+      "defaultValue": true
     },
     {
       "name": "soe.jwt.dev-opening-u-r-i",
@@ -55,7 +56,8 @@
     {
       "name": "soe.jwt.pwd-param-name",
       "type": "java.lang.String",
-      "sourceType": "net.ecnu.model.JwtProperties"
+      "sourceType": "net.ecnu.model.JwtProperties",
+      "defaultValue": "password"
     },
     {
       "name": "soe.jwt.secret",
@@ -70,17 +72,20 @@
     {
       "name": "soe.jwt.token-prefix",
       "type": "java.lang.String",
-      "sourceType": "net.ecnu.model.JwtProperties"
+      "sourceType": "net.ecnu.model.JwtProperties",
+      "defaultValue": "soe-token-"
     },
     {
       "name": "soe.jwt.use-default-controller",
       "type": "java.lang.Boolean",
-      "sourceType": "net.ecnu.model.JwtProperties"
+      "sourceType": "net.ecnu.model.JwtProperties",
+      "defaultValue": true
     },
     {
       "name": "soe.jwt.user-param-name",
       "type": "java.lang.String",
-      "sourceType": "net.ecnu.model.JwtProperties"
+      "sourceType": "net.ecnu.model.JwtProperties",
+      "defaultValue": "username"
     }
   ],
   "hints": []

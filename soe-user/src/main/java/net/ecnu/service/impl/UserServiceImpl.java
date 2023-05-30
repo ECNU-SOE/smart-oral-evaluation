@@ -9,20 +9,23 @@ import com.aliyuncs.IAcsClient;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
-import io.swagger.models.auth.In;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.generator.config.IFileCreate;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.constant.RolesConst;
+import net.ecnu.controller.request.SignReq;
 import net.ecnu.controller.request.UserFilterReq;
 import net.ecnu.controller.request.UserReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.manager.UserManager;
-import net.ecnu.mapper.MyUserDetailsServiceMapper;
-import net.ecnu.mapper.UserMapper;
-import net.ecnu.mapper.UserRoleMapper;
+import net.ecnu.mapper.*;
+import net.ecnu.model.SignDO;
+import net.ecnu.model.SignLogDO;
 import net.ecnu.model.UserDO;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.common.PageData;
+import net.ecnu.model.vo.SignVO;
 import net.ecnu.model.vo.UserVO;
 import net.ecnu.service.UserService;
 import net.ecnu.util.FileUtil;
@@ -45,13 +48,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.path;
 
 
 @Service
@@ -76,6 +83,12 @@ public class UserServiceImpl implements UserService {
     @Resource
     private PasswordEncoder passwordEncoder;
 
+    @Resource
+    private SignMapper signMapper;
+
+    @Resource
+    private SignLogMapper signLogMapper;
+
     @Override
     public Object register(UserReq userReq) {
         //check手机验证码 与 数据库唯一性
@@ -86,6 +99,8 @@ public class UserServiceImpl implements UserService {
         UserDO newUserDO = new UserDO();
         newUserDO.setAccountNo(IDUtil.nextUserId());
         newUserDO.setNickName(userReq.getNickName());
+        String defaultAvatarUrl = "https://img2.woyaogexing.com/2023/05/14/11d01024a840b3f4c3a4e1eda17deb55.png";
+        newUserDO.setAvatarUrl(defaultAvatarUrl);
         newUserDO.setPhone(userReq.getPhone());
 //        //密码加密处理
 //        newUserDO.setSecret("$1$" + CommonUtil.getStringNumRandom(8)); //加密盐
@@ -265,6 +280,135 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(userDO, newUserDo, "del");
         newUserDo.setDel(true);
         return userMapper.updateById(newUserDo);
+    }
+
+    @Override
+    public Object sign() {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+        //获取今天日期
+        LocalDate today  = LocalDate.now();
+        //判断用户是否首次签到
+        SignDO signDO = signMapper.selectOne(new QueryWrapper<SignDO>()
+                .eq("user_id", currentAccountNo)
+        );
+        if (signDO==null){
+            //首次签到，先创建签到信息
+            SignDO newSignDO = new SignDO();
+            newSignDO.setUserId(currentAccountNo);
+            newSignDO.setTotalDays(1);
+            newSignDO.setContinueDays(1);
+            newSignDO.setLastSign(today);
+            newSignDO.setResignNum(10);//补签次数，默认为10次
+            int countSign = signMapper.insert(newSignDO);
+            //再插入签到记录
+            SignLogDO newSignLogDO = new SignLogDO();
+            newSignLogDO.setUserId(currentAccountNo);
+            newSignLogDO.setSignDate(today);
+            newSignLogDO.setSignType(1);//1：签到，2：补签
+            int countSignLog = signLogMapper.insert(newSignLogDO);
+            return "签到成功";
+        }else {
+            //非首次签到,判断用户今天是否已签到
+            LocalDate lastSignDay = signDO.getLastSign();
+            if (lastSignDay.compareTo(today)==0)
+                throw new BizException(BizCodeEnum.USER_SIGNED);
+            //用户签到，先创建signLog，再更新sign表
+            SignLogDO newSignLogDO = new SignLogDO();
+            newSignLogDO.setUserId(currentAccountNo);
+            newSignLogDO.setSignDate(today);
+            newSignLogDO.setSignType(1);
+            int countSignLog = signLogMapper.insert(newSignLogDO);
+            SignDO newSignDO = new SignDO();
+            BeanUtils.copyProperties(signDO,newSignDO,"total_days","continue_days","last_sign");
+            newSignDO.setLastSign(today);
+            newSignDO.setTotalDays(signDO.getTotalDays()+1);
+            if (lastSignDay.until(today, ChronoUnit.DAYS)==1)
+                newSignDO.setContinueDays(signDO.getContinueDays()+1);
+            else
+                newSignDO.setContinueDays(1);//重置连续签到天数
+            int countSign = signMapper.updateById(newSignDO);
+            return "签到成功";
+        }
+    }
+
+    @Override
+    public Object resign(LocalDate resignDate) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+        //获取今天日期
+        LocalDate today = LocalDate.now();
+        //判断用户是否已有签到记录
+        SignDO signDO = signMapper.selectOne(new QueryWrapper<SignDO>()
+                .eq("user_id", currentAccountNo)
+        );
+        if (signDO==null)
+            return "用户暂无签到记录";
+        else{
+            //用户已有签到记录，校验补签日期是否正常
+            //1.补签日期应早于今天
+            if (resignDate.until(today,ChronoUnit.DAYS)<=0)
+                return "补签日期异常";
+            //2.补签日期未签到
+            List<LocalDate> signDates = signLogMapper.getSignDatesDescByAccountNo(currentAccountNo);
+            if (signDates.contains(resignDate))
+                throw new BizException(BizCodeEnum.USER_SIGNED);
+            //无异常，用户补签，先增加signLog表记录
+            SignLogDO newSignLogDO = new SignLogDO();
+            newSignLogDO.setUserId(currentAccountNo);
+            newSignLogDO.setSignDate(resignDate);
+            newSignLogDO.setSignType(2);
+            int countSignLog = signLogMapper.insert(newSignLogDO);
+            //再更新sign表
+            SignDO newSignDO = new SignDO();
+            BeanUtils.copyProperties(signDO,newSignDO,"total_days","continue_days","last_sign");
+            newSignDO.setTotalDays(signDO.getTotalDays()+1);
+            if (resignDate.until(signDO.getLastSign(),ChronoUnit.DAYS)<0)
+                newSignDO.setLastSign(resignDate);
+            else
+                newSignDO.setLastSign(signDO.getLastSign());
+            int continueDays = 0;
+            LocalDate initaialDay;
+            if (signDates.contains(today)){
+                initaialDay = today;
+            } else {
+                initaialDay = today.plusDays(-1);
+            }
+            List<LocalDate> newSignDates = signLogMapper.getSignDatesDescByAccountNo(currentAccountNo);
+            //统计补签后的连续签到时间
+            for (LocalDate date = initaialDay;;date=date.plusDays(-1)){
+                if (newSignDates.contains(date))
+                    continueDays++;
+                else
+                    break;
+            }
+            newSignDO.setContinueDays(continueDays);
+            int countSign = signMapper.updateById(newSignDO);
+            return "补签成功";
+        }
+    }
+
+    @Override
+    public Object signInfo() {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+        //判断用户是否已有签到记录
+        SignDO signDO = signMapper.selectOne(new QueryWrapper<SignDO>()
+                .eq("user_id", currentAccountNo)
+        );
+        if (signDO==null)
+            return "用户暂无签到记录";
+        else {
+            SignVO signVO = new SignVO();
+            BeanUtils.copyProperties(signDO,signVO);
+            return signVO;
+        }
     }
 
     private boolean hasOpRight(Integer roleA, Integer roleB) {

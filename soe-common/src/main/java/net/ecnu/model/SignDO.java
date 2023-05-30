@@ -2,6 +2,8 @@ package net.ecnu.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
+
+import java.time.LocalDate;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
@@ -10,51 +12,49 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 用户-课程 关系表
+ * 
  * </p>
  *
- * @author TGX
- * @since 2023-04-10
+ * @author LYW
+ * @since 2023-05-24
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("user_class")
-public class UserClassDO implements Serializable {
+@TableName("sign")
+public class SignDO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主键id
+     * 主键
      */
       @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    private Integer id;
 
     /**
-     * 用户账号id
+     * 用户id：account_no
      */
-    private String accountNo;
+    private String userId;
 
     /**
-     * 课程id
+     * 累计总签到天数
      */
-    private String classId;
+    private Integer totalDays;
 
     /**
-     * 关系类型	1：学生	2：助教	3：老师	4：管理员
+     * 连续签到天数
      */
-    private Integer rType;
-
-    private Integer status;
+    private Integer continueDays;
 
     /**
-     * 创建时间
+     * 最后一次签到时间
      */
-    private Date gmtCreate;
+    private LocalDate lastSign;
 
     /**
-     * 更新时间
+     * 可补签次数
      */
-    private Date gmtModified;
+    private Integer resignNum;
 
 
 }

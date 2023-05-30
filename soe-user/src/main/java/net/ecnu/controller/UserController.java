@@ -5,17 +5,22 @@ import io.swagger.annotations.ApiOperation;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Find;
 import net.ecnu.controller.group.Update;
+import net.ecnu.controller.request.SignReq;
 import net.ecnu.controller.request.UserFilterReq;
 import net.ecnu.controller.request.UserReq;
 import net.ecnu.model.common.PageData;
 import net.ecnu.service.UserService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.util.Date;
 
 @Api(value = "端上用户管理")
 @RestController
@@ -93,6 +98,27 @@ public class UserController {
             return JsonData.buildSuccess();
         else
             return JsonData.buildError("短信发送错误");
+    }
+
+    @ApiOperation("用户签到")
+    @GetMapping("sign")
+    public JsonData sign() {
+        Object data = userService.sign();
+        return JsonData.buildSuccess(data);
+    }
+
+    @ApiOperation("用户补签")
+    @PostMapping("resign")
+    public JsonData resign(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate resignDate){
+        Object data = userService.resign(resignDate);
+        return JsonData.buildSuccess(data);
+    }
+
+    @ApiOperation("获取签到信息")
+    @GetMapping("sign_info")
+    public JsonData signInfo(){
+        Object data = userService.signInfo();
+        return JsonData.buildSuccess(data);
     }
 
 }

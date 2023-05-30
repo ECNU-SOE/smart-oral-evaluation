@@ -28,6 +28,8 @@ public class ClassVO implements Serializable {
      */
     private String name;
 
+    private String teacher;
+
     /**
      * 详细描述
      */
@@ -48,11 +50,11 @@ public class ClassVO implements Serializable {
 
     private String notice;
 
-    private int stuLimit;
+    private Integer stuLimit;
 
-    private int joinStatus;
+    private Integer joinStatus;
 
-    private int dropStatus;
+    private Integer dropStatus;
 
     private Date gmtCreate;
 

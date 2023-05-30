@@ -2,6 +2,9 @@ package net.ecnu.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import net.ecnu.model.DiscussAudioDo;
+
+import java.util.List;
+
 /**
  * @description:
  * @Author lsy
@@ -25,4 +28,6 @@ public interface DiscussAudioService extends IService<DiscussAudioDo> {
 
     
     int updateByPrimaryKey(DiscussAudioDo record);
+
+    List<String> selectByDiscussId(Long discussId);
 }

@@ -93,6 +93,7 @@
             <artifactId>jjwt</artifactId>
         </dependency>
 
+
         <!--BEGIN Nacos服务注册与配置中心-->
         <!--Hoxton.M2版本之后不再使用Ribbon而是使用spring-cloud-loadbalancer，所以不引入spring-cloud-loadbalancer会报错，
         所以加入spring-cloud-loadbalancer依赖 并且在nacos中排除ribbon依赖，不然loadbalancer无效 -->
