@@ -25,6 +25,8 @@ import javax.annotation.Resource;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -54,10 +56,12 @@ public class SOETest {
     private SignLogMapper signLogMapper;
 
     @Test
-    public void pinyinTest() throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date date1 = sdf.parse("2009-12-31");
-        Date date2 = sdf.parse("2019-01-31");
+    public void pinyinTest() {
+        LocalDate date = LocalDate.of(2023, 6, 1);
+        LocalDate date2 = LocalDate.of(2023,6,1);
+        LocalDate date1 = date.plusDays(-1);
+        System.out.println(date1);
+        System.out.println(date.isAfter(date2));
     }
 
     @Test

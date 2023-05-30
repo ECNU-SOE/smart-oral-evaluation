@@ -12,12 +12,15 @@ import net.ecnu.model.common.PageData;
 import net.ecnu.service.UserService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.util.Date;
 
 @Api(value = "端上用户管理")
 @RestController
@@ -99,8 +102,15 @@ public class UserController {
 
     @ApiOperation("用户签到")
     @GetMapping("sign")
-    public JsonData sign() throws ParseException {
+    public JsonData sign() {
         Object data = userService.sign();
+        return JsonData.buildSuccess(data);
+    }
+
+    @ApiOperation("用户补签")
+    @PostMapping("resign")
+    public JsonData resign(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate resignDate){
+        Object data = userService.resign(resignDate);
         return JsonData.buildSuccess(data);
     }
 

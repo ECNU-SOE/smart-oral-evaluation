@@ -8,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.util.Date;
 
 public interface UserService {
 
@@ -24,5 +26,6 @@ public interface UserService {
     //获取角色的最高角色身份
     Integer getTopRole(String accountNo);
     Object del(String accountNo);
-    Object sign() throws ParseException;
+    Object sign();
+    Object resign(LocalDate resignDate);
 }

@@ -2,6 +2,8 @@ package net.ecnu.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
+
+import java.time.LocalDate;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
@@ -42,7 +44,7 @@ public class SignLogDO implements Serializable {
     /**
      * 签到时间
      */
-    private Date signTime;
+    private LocalDate signDate;
 
     /**
      * 签到类型，1：签到，2：补签

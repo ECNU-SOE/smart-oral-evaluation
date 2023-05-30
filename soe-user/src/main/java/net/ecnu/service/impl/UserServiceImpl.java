@@ -54,6 +54,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -280,15 +282,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Object sign() throws ParseException {
+    public Object sign() {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         //获取今天日期
-        Date nowTime = new Date();
-        Date today = sdf.parse(sdf.format(nowTime));
+        LocalDate today  = LocalDate.now();
         //判断用户是否首次签到
         SignDO signDO = signMapper.selectOne(new QueryWrapper<SignDO>()
                 .eq("user_id", currentAccountNo)
@@ -299,37 +299,95 @@ public class UserServiceImpl implements UserService {
             newSignDO.setUserId(currentAccountNo);
             newSignDO.setTotalDays(1);
             newSignDO.setContinueDays(1);
-            newSignDO.setLastSign(nowTime);
+            newSignDO.setLastSign(today);
             newSignDO.setResignNum(10);//补签次数，默认为10次
             int countSign = signMapper.insert(newSignDO);
             //再插入签到记录
             SignLogDO newSignLogDO = new SignLogDO();
             newSignLogDO.setUserId(currentAccountNo);
-            newSignLogDO.setSignTime(nowTime);
+            newSignLogDO.setSignDate(today);
             newSignLogDO.setSignType(1);//1：签到，2：补签
             int countSignLog = signLogMapper.insert(newSignLogDO);
             return "签到成功";
         }else {
             //非首次签到,判断用户今天是否已签到
-            Date lastSignDay = sdf.parse(sdf.format(signDO.getLastSign()));
+            LocalDate lastSignDay = signDO.getLastSign();
             if (lastSignDay.compareTo(today)==0)
                 throw new BizException(BizCodeEnum.USER_SIGNED);
             //用户签到，先创建signLog，再更新sign表
             SignLogDO newSignLogDO = new SignLogDO();
             newSignLogDO.setUserId(currentAccountNo);
-            newSignLogDO.setSignTime(nowTime);
+            newSignLogDO.setSignDate(today);
             newSignLogDO.setSignType(1);
             int countSignLog = signLogMapper.insert(newSignLogDO);
             SignDO newSignDO = new SignDO();
             BeanUtils.copyProperties(signDO,newSignDO,"total_days","continue_days","last_sign");
-            newSignDO.setLastSign(nowTime);
+            newSignDO.setLastSign(today);
             newSignDO.setTotalDays(signDO.getTotalDays()+1);
-            if (isYesterday(lastSignDay,today))
+            if (lastSignDay.until(today, ChronoUnit.DAYS)==1)
                 newSignDO.setContinueDays(signDO.getContinueDays()+1);
             else
                 newSignDO.setContinueDays(1);//重置连续签到天数
             int countSign = signMapper.updateById(newSignDO);
             return "签到成功";
+        }
+    }
+
+    @Override
+    public Object resign(LocalDate resignDate) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+        //获取今天日期
+        LocalDate today = LocalDate.now();
+        //判断用户是否已有签到记录
+        SignDO signDO = signMapper.selectOne(new QueryWrapper<SignDO>()
+                .eq("user_id", currentAccountNo)
+        );
+        if (signDO==null)
+            return "用户暂无签到记录";
+        else{
+            //用户已有签到记录，校验补签日期是否正常
+            //1.补签日期应早于今天
+            if (resignDate.until(today,ChronoUnit.DAYS)<=0)
+                return "补签日期异常";
+            //2.补签日期未签到
+            List<LocalDate> signDates = signLogMapper.getSignDatesDescByAccountNo(currentAccountNo);
+            if (signDates.contains(resignDate))
+                throw new BizException(BizCodeEnum.USER_SIGNED);
+            //无异常，用户补签，先增加signLog表记录
+            SignLogDO newSignLogDO = new SignLogDO();
+            newSignLogDO.setUserId(currentAccountNo);
+            newSignLogDO.setSignDate(resignDate);
+            newSignLogDO.setSignType(2);
+            int countSignLog = signLogMapper.insert(newSignLogDO);
+            //再更新sign表
+            SignDO newSignDO = new SignDO();
+            BeanUtils.copyProperties(signDO,newSignDO,"total_days","continue_days","last_sign");
+            newSignDO.setTotalDays(signDO.getTotalDays()+1);
+            if (resignDate.until(signDO.getLastSign(),ChronoUnit.DAYS)<0)
+                newSignDO.setLastSign(resignDate);
+            else
+                newSignDO.setLastSign(signDO.getLastSign());
+            int continueDays = 0;
+            LocalDate initaialDay;
+            if (signDates.contains(today)){
+                initaialDay = today;
+            } else {
+                initaialDay = today.plusDays(-1);
+            }
+            List<LocalDate> newSignDates = signLogMapper.getSignDatesDescByAccountNo(currentAccountNo);
+            //统计补签后的连续签到时间
+            for (LocalDate date = initaialDay;;date=date.plusDays(-1)){
+                if (newSignDates.contains(date))
+                    continueDays++;
+                else
+                    break;
+            }
+            newSignDO.setContinueDays(continueDays);
+            int countSign = signMapper.updateById(newSignDO);
+            return "补签成功";
         }
     }
 
@@ -399,56 +457,6 @@ public class UserServiceImpl implements UserService {
             return true;
         return false;
     }
-
-    /**
-     * 判断是否是昨天
-     *
-     * @param oldDate 判断该日期是否是昨天
-     * @return 是 true 不是 false
-     */
-    private boolean isYesterday(Date oldDate,Date newDate) {
-        boolean flag = false;
-        // 先获取年份
-        int year = Integer.parseInt(new SimpleDateFormat("yyyy").format(oldDate));
-
-        // 获取当前年份 和 一年中的第几天
-        int day = getDayNumForYear(oldDate);
-        int currentYear = Integer.parseInt(new SimpleDateFormat("yyyy").format(newDate));
-        int currentDay = getDayNumForYear(newDate);
-        // 计算 如果是去年的
-        if (currentYear - year == 1) {
-            // 如果当前正好是 1月1日 计算去年有多少天，指定时间是否是一年中的最后一天
-            if (currentDay == 1) {
-                int yearDay;
-                if (year % 400 == 0) {
-                    // 世纪闰年
-                    yearDay = 366;
-                } else if (year % 4 == 0 && year % 100 != 0) {
-                    // 普通闰年
-                    yearDay = 366;
-                } else {
-                    // 平年
-                    yearDay = 365;
-                }
-                if (day == yearDay) {
-                    flag = true;
-                }
-            }
-        } else {
-            if (currentDay - day == 1) {
-                flag = true;
-            }
-        }
-        return flag;
-    }
-
-    private Integer getDayNumForYear(Date date) {
-        Calendar ca = Calendar.getInstance();
-        ca.setTime(date);
-        return ca.get(Calendar.DAY_OF_YEAR);
-    }
-
-
 
 }
 

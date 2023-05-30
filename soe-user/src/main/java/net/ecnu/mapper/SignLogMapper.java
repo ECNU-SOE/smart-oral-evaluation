@@ -2,6 +2,10 @@ package net.ecnu.mapper;
 
 import net.ecnu.model.SignLogDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Select;
+
+import java.time.LocalDate;
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +17,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface SignLogMapper extends BaseMapper<SignLogDO> {
 
+    @Select("select sign_date from sign_log where user_id = #{accountNo} order by sign_date desc")
+    List<LocalDate> getSignDatesDescByAccountNo(String accountNo);
 }
