@@ -114,4 +114,11 @@ public class UserController {
         return JsonData.buildSuccess(data);
     }
 
+    @ApiOperation("获取签到信息")
+    @GetMapping("sign_info")
+    public JsonData signInfo(){
+        Object data = userService.signInfo();
+        return JsonData.buildSuccess(data);
+    }
+
 }

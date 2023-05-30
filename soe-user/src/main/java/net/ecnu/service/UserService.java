@@ -28,4 +28,5 @@ public interface UserService {
     Object del(String accountNo);
     Object sign();
     Object resign(LocalDate resignDate);
+    Object signInfo();
 }

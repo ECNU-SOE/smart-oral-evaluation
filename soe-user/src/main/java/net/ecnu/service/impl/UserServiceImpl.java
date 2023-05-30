@@ -25,6 +25,7 @@ import net.ecnu.model.SignLogDO;
 import net.ecnu.model.UserDO;
 import net.ecnu.model.common.LoginUser;
 import net.ecnu.model.common.PageData;
+import net.ecnu.model.vo.SignVO;
 import net.ecnu.model.vo.UserVO;
 import net.ecnu.service.UserService;
 import net.ecnu.util.FileUtil;
@@ -388,6 +389,25 @@ public class UserServiceImpl implements UserService {
             newSignDO.setContinueDays(continueDays);
             int countSign = signMapper.updateById(newSignDO);
             return "补签成功";
+        }
+    }
+
+    @Override
+    public Object signInfo() {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+        //判断用户是否已有签到记录
+        SignDO signDO = signMapper.selectOne(new QueryWrapper<SignDO>()
+                .eq("user_id", currentAccountNo)
+        );
+        if (signDO==null)
+            return "用户暂无签到记录";
+        else {
+            SignVO signVO = new SignVO();
+            BeanUtils.copyProperties(signDO,signVO);
+            return signVO;
         }
     }
 
