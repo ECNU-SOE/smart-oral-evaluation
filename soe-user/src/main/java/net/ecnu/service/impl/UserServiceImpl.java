@@ -411,6 +411,17 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public Object getInfoList(List<String> accountList) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+        List<UserDO> userDOS = userMapper.selectBatchIds(accountList);
+        List<UserVO> userVOS = userDOS.stream().map(this::beanProcess).collect(Collectors.toList());
+        return userVOS;
+    }
+
     private boolean hasOpRight(Integer roleA, Integer roleB) {
         //角色a为管理员，且b不是超管
         if (roleA <= RolesConst.ROLE_ADMIN && !Objects.equals(roleB, RolesConst.ROLE_SUPER_ADMIN))

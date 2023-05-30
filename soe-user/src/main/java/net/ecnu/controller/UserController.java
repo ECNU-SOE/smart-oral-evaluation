@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Api(value = "端上用户管理")
 @RestController
@@ -87,6 +88,13 @@ public class UserController {
                          @RequestParam(value = "size", defaultValue = "50") int size,
                          @RequestBody UserFilterReq userFilterReq) {
         Object data = userService.pageByFilter(userFilterReq, new PageData(cur, size));
+        return JsonData.buildSuccess(data);
+    }
+
+    @ApiOperation("查询info列表")
+    @PostMapping("info_list")
+    public JsonData info_list(@RequestParam("account_list") List<String> accountList) {
+        Object data = userService.getInfoList(accountList);
         return JsonData.buildSuccess(data);
     }
 

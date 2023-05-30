@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 public interface UserService {
 
@@ -29,4 +30,5 @@ public interface UserService {
     Object sign();
     Object resign(LocalDate resignDate);
     Object signInfo();
+    Object getInfoList(List<String> accountList);
 }
