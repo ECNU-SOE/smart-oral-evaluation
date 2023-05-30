@@ -2,6 +2,7 @@ package net.ecnu.model.vo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -87,11 +88,13 @@ public class CpsrcdVO implements Serializable {
     /**
      * 创建时间
      */
+    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
     private Date gmtCreate;
 
     /**
      * 更新时间
      */
+    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
     private Date gmtModified;
 
 

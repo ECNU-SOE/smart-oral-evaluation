@@ -1,5 +1,6 @@
 package net.ecnu.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import net.ecnu.controller.request.CpsgrpReq;
 import net.ecnu.controller.request.CpsgrpFilterReq;
 import net.ecnu.controller.request.TranscriptReq;
@@ -30,6 +31,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
@@ -70,6 +72,9 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
 
     @Autowired
     private ClassMapper classMapper;
+
+    @Autowired
+    private ClassCpsgrpMapper classCpsgrpMapper;
 
 
     @Override
@@ -136,15 +141,35 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
 
     @Override
     public Object pageByFilter(CpsgrpFilterReq cpsgrpFilter, PageData pageData) {
-        //获取分页后的cpsgrpDOS
-        List<CpsgrpDO> cpsgrpDOS = cpsgrpManager.listByFilter(cpsgrpFilter, pageData);
-        //统计过滤后的记录总数
-        int totalCount = cpsgrpManager.countByFilter(cpsgrpFilter);
-        pageData.setTotal(totalCount);
-        //生成处理cpsgrpVOS对象
-        List<CpsgrpVO> cpsgrpVOS = cpsgrpDOS.stream().map(this::beanProcess).collect(Collectors.toList());
-        pageData.setRecords(cpsgrpVOS);
-        //返回分页对象
+        if (!ObjectUtils.isEmpty(cpsgrpFilter.getClassId())) {
+            //查询班级下的语料组 仅classId字段有效 返回所有isPrivate=0的记录（无分页）
+            //TODO 考虑gmtCreate与gmtModified以那个为准
+            List<ClassCpsgrpDO> classCpsgrpDOS = classCpsgrpMapper.selectList(new QueryWrapper<ClassCpsgrpDO>()
+                    .eq("class_id", cpsgrpFilter.getClassId()));
+            Map<String, ClassCpsgrpDO> cpsgrpIdMap = classCpsgrpDOS.stream().collect(
+                    Collectors.toMap(ClassCpsgrpDO::getCpsgrpId, item -> item));
+            //查询cpsgrpDO列表 TODO 过滤出isPrivate=0的cpsgrpDO
+            List<String> cpsgrpIds = classCpsgrpDOS.stream().map(ClassCpsgrpDO::getCpsgrpId).collect(Collectors.toList());
+//            List<CpsgrpDO> cpsgrpDOS = cpsgrpMapper.selectBatchIds(cpsgrpIds);
+            List<CpsgrpDO> cpsgrpDOS = cpsgrpMapper.selectList(
+                    new QueryWrapper<CpsgrpDO>().in("id", cpsgrpIds).eq("is_private", 0));
+            //拷贝classCpsgrpDO的内容到cpsgrpVO中去
+            List<CpsgrpVO> cpsgrpVOS = cpsgrpDOS.stream().map(this::beanProcess).collect(Collectors.toList());
+            cpsgrpVOS.forEach(cpsgrpVO -> BeanUtils.copyProperties(
+                    cpsgrpIdMap.get(cpsgrpVO.getId()), cpsgrpVO, "gmtCreate", "gmtModified"));
+            pageData.setRecords(cpsgrpVOS);
+        } else {
+            //查询所有语料组
+            List<CpsgrpDO> cpsgrpDOS = cpsgrpManager.listByFilter(cpsgrpFilter, pageData);
+            //统计过滤后的记录总数
+            int totalCount = cpsgrpManager.countByFilter(cpsgrpFilter);
+            pageData.setTotal(totalCount);
+            //生成处理cpsgrpVOS对象
+            List<CpsgrpVO> cpsgrpVOS = cpsgrpDOS.stream().map(this::beanProcess).collect(Collectors.toList());
+            List<String> userIds = cpsgrpVOS.stream().map(CpsgrpVO::getCreator).distinct().collect(Collectors.toList());
+            pageData.setRecords(cpsgrpVOS);
+        }
+        //TODO feign远程调用 获取userIds的user信息，将creator用realName进行展示
         return pageData;
     }
 

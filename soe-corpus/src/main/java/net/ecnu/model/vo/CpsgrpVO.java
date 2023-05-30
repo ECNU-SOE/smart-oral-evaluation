@@ -1,5 +1,6 @@
 package net.ecnu.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -45,9 +46,9 @@ public class CpsgrpVO implements Serializable {
     private Integer type;
 
     /**
-     * 难易程度：-1-未知；1～10难度递增
+     * 难易程度：[A~J][0~9]
      */
-    private Integer difficulty;
+    private String difficulty;
 
     /**
      * 公开类型：0-公开；1-私有
@@ -55,13 +56,20 @@ public class CpsgrpVO implements Serializable {
     private Integer isPrivate;
 
     /**
+     * 修改状态：0允许修改、1允许创建者修改、2不允许修改
+     */
+    private Integer modStatus;
+
+    /**
      * 起始时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     private Date startTime;
 
     /**
      * 截止时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     private Date endTime;
 
     /**
@@ -72,11 +80,13 @@ public class CpsgrpVO implements Serializable {
     /**
      * 创建时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     private Date gmtCreate;
 
     /**
      * 更新时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     private Date gmtModified;
 
     /**

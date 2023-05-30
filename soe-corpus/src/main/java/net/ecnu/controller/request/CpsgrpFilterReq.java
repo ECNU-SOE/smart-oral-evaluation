@@ -39,6 +39,11 @@ public class CpsgrpFilterReq {
     private Integer isPrivate;
 
     /**
+     * 修改状态：0允许修改、1允许创建者修改、2不允许修改
+     */
+    private Integer modStatus;
+
+    /**
      * 开始时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

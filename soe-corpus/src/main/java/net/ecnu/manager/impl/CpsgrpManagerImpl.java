@@ -43,11 +43,12 @@ public class CpsgrpManagerImpl implements CpsgrpManager {
         Page<CpsgrpDO> cpsgrpDOPage = cpsgrpMapper.selectPage(
                 new Page<CpsgrpDO>(pageData.getCurrent(), pageData.getSize()),
                 new QueryWrapper<CpsgrpDO>()
-                        .eq(!ObjectUtils.isEmpty(cpsgrpFilter.getClassId()), "class_id", cpsgrpFilter.getClassId())
+//                        .eq(!ObjectUtils.isEmpty(cpsgrpFilter.getClassId()), "class_id", cpsgrpFilter.getClassId())
                         .like(!ObjectUtils.isEmpty(cpsgrpFilter.getTitle()), "title", cpsgrpFilter.getTitle())
                         .like(!ObjectUtils.isEmpty(cpsgrpFilter.getDescription()), "description", cpsgrpFilter.getDescription())
                         .eq(cpsgrpFilter.getType() != null, "type", cpsgrpFilter.getType())
                         .eq(cpsgrpFilter.getIsPrivate() != null, "is_private", cpsgrpFilter.getIsPrivate())
+                        .eq(cpsgrpFilter.getModStatus() != null, "mod_status", cpsgrpFilter.getModStatus())
                         .like(!ObjectUtils.isEmpty(cpsgrpFilter.getDifficulty()), "difficulty", cpsgrpFilter.getDifficulty())
         );
         return cpsgrpDOPage.getRecords();
@@ -56,12 +57,13 @@ public class CpsgrpManagerImpl implements CpsgrpManager {
     @Override
     public int countByFilter(CpsgrpFilterReq cpsgrpFilter) {
         return cpsgrpMapper.selectCount(new QueryWrapper<CpsgrpDO>()
-                .eq(!ObjectUtils.isEmpty(cpsgrpFilter.getClassId()), "class_id", cpsgrpFilter.getClassId())
+//                .eq(!ObjectUtils.isEmpty(cpsgrpFilter.getClassId()), "class_id", cpsgrpFilter.getClassId())
                 .like(!ObjectUtils.isEmpty(cpsgrpFilter.getTitle()), "title", cpsgrpFilter.getTitle())
                 .like(!ObjectUtils.isEmpty(cpsgrpFilter.getDescription()), "description", cpsgrpFilter.getDescription())
                 .eq(cpsgrpFilter.getType() != null, "type", cpsgrpFilter.getType())
                 .eq(cpsgrpFilter.getIsPrivate() != null, "is_private", cpsgrpFilter.getIsPrivate())
-                .eq(cpsgrpFilter.getDifficulty() != null, "difficulty", cpsgrpFilter.getDifficulty())
+                .eq(cpsgrpFilter.getModStatus() != null, "mod_status", cpsgrpFilter.getModStatus())
+                .like(!ObjectUtils.isEmpty(cpsgrpFilter.getDifficulty()), "difficulty", cpsgrpFilter.getDifficulty())
         );
     }
 
