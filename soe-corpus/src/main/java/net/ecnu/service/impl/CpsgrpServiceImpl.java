@@ -150,13 +150,14 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
                     Collectors.toMap(ClassCpsgrpDO::getCpsgrpId, item -> item));
             //查询cpsgrpDO列表 TODO 过滤出isPrivate=0的cpsgrpDO
             List<String> cpsgrpIds = classCpsgrpDOS.stream().map(ClassCpsgrpDO::getCpsgrpId).collect(Collectors.toList());
-//            List<CpsgrpDO> cpsgrpDOS = cpsgrpMapper.selectBatchIds(cpsgrpIds);
-            List<CpsgrpDO> cpsgrpDOS = cpsgrpMapper.selectList(
-                    new QueryWrapper<CpsgrpDO>().in("id", cpsgrpIds).eq("is_private", 0));
+            List<CpsgrpDO> cpsgrpDOS = cpsgrpMapper.selectBatchIds(cpsgrpIds);
+//            List<CpsgrpDO> cpsgrpDOS = cpsgrpMapper.selectList(
+//                    new QueryWrapper<CpsgrpDO>().in("id", cpsgrpIds).eq("is_private", 0));
             //拷贝classCpsgrpDO的内容到cpsgrpVO中去
             List<CpsgrpVO> cpsgrpVOS = cpsgrpDOS.stream().map(this::beanProcess).collect(Collectors.toList());
             cpsgrpVOS.forEach(cpsgrpVO -> BeanUtils.copyProperties(
-                    cpsgrpIdMap.get(cpsgrpVO.getId()), cpsgrpVO, "gmtCreate", "gmtModified"));
+                    cpsgrpIdMap.get(cpsgrpVO.getId()), cpsgrpVO, "gmtCreate", "gmtModified")
+            );
             pageData.setRecords(cpsgrpVOS);
         } else {
             //查询所有语料组
@@ -166,7 +167,13 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
             pageData.setTotal(totalCount);
             //生成处理cpsgrpVOS对象
             List<CpsgrpVO> cpsgrpVOS = cpsgrpDOS.stream().map(this::beanProcess).collect(Collectors.toList());
-            List<String> userIds = cpsgrpVOS.stream().map(CpsgrpVO::getCreator).distinct().collect(Collectors.toList());
+//            List<String> userIds = cpsgrpVOS.stream().map(CpsgrpVO::getCreator).distinct().collect(Collectors.toList());
+            //查询当前语料组被几个所班级使用
+            cpsgrpVOS.forEach(cpsgrpVO -> {
+                Integer classCnt = classCpsgrpMapper.selectCount(
+                        new QueryWrapper<ClassCpsgrpDO>().eq("cpsgrp_id", cpsgrpVO.getId()));
+                cpsgrpVO.setReleaseStatus(classCnt);
+            });
             pageData.setRecords(cpsgrpVOS);
         }
         //TODO feign远程调用 获取userIds的user信息，将creator用realName进行展示

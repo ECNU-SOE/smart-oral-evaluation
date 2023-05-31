@@ -51,6 +51,11 @@ public class CpsgrpVO implements Serializable {
     private String difficulty;
 
     /**
+     * 发布状态：已发布的班级数量
+     */
+    private Integer releaseStatus;
+
+    /**
      * 公开类型：0-公开；1-私有
      */
     private Integer isPrivate;
