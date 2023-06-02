@@ -29,6 +29,6 @@ public interface UserService {
     Object del(String accountNo);
     Object sign();
     Object resign(LocalDate resignDate);
-    Object signInfo();
+    Object signInfo(Integer month);
     Object getInfoList(List<String> accountList);
 }

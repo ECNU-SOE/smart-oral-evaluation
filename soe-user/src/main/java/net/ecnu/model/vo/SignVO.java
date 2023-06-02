@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.List;
 
 
 @Data
@@ -21,5 +21,7 @@ public class SignVO implements Serializable {
     private LocalDate lastSign;
 
     private Integer resignNum;
+
+    private List<LocalDate> signDates;
 
 }

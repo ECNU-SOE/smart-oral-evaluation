@@ -19,4 +19,6 @@ public interface SignLogMapper extends BaseMapper<SignLogDO> {
 
     @Select("select sign_date from sign_log where user_id = #{accountNo} order by sign_date desc")
     List<LocalDate> getSignDatesDescByAccountNo(String accountNo);
+    @Select("select sign_date from sign_log where month(sign_date) = #{month}")
+    List<LocalDate> getSignDatesByMonth(Integer month);
 }

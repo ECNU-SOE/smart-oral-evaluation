@@ -2,6 +2,7 @@ package net.ecnu.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Find;
 import net.ecnu.controller.group.Update;
@@ -124,8 +125,8 @@ public class UserController {
 
     @ApiOperation("获取签到信息")
     @GetMapping("sign_info")
-    public JsonData signInfo(){
-        Object data = userService.signInfo();
+    public JsonData signInfo(@RequestParam(value = "month",required = true) Integer month){
+        Object data = userService.signInfo(month);
         return JsonData.buildSuccess(data);
     }
 
