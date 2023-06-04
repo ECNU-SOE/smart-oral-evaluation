@@ -201,6 +201,7 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
             classDiscussDo.setDiscussContent(discussDto.getDiscussTest());
             classDiscussDo.setForwardId(0L);
             classDiscussDo.setReplyNumber(0);
+            classDiscussDo.setLikeCount(0);
             classDiscussDo.setDelFlg(false);
             //新增回复记录，并回传对应的主键id
             if(classDiscussMapper.insertSelective(classDiscussDo) <= 0){
