@@ -2,17 +2,15 @@ package net.ecnu.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
-import net.ecnu.mapper.ClassMapper;
 import net.ecnu.mapper.ClassDiscussMapper;
+import net.ecnu.mapper.ClassMapper;
 import net.ecnu.mapper.UserMapper;
 import net.ecnu.model.ClassDiscussDo;
 import net.ecnu.model.DiscussAudioDo;
-import net.ecnu.model.UserDO;
 import net.ecnu.model.dto.DiscussDto;
 import net.ecnu.model.dto.ForwardDto;
 import net.ecnu.model.vo.DiscussVo;
@@ -98,14 +96,17 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
             //发布人id
             record.setPublisher(currentAccountNo);
             //新增话题同时获取对应的主键id
-            Integer discussId = classDiscussMapper.insertSelective(record);
+            if(classDiscussMapper.insertSelective(record) <= 0){
+                throw new BizException(BizCodeEnum.DISCUSS_AUDIO_ADD_ERROR);
+            }
             //插入话题对应音频
             List<DiscussAudioDo> audioList = new ArrayList<>();
             for (String url : discussDto.getAudioUrl()) {
                 DiscussAudioDo discussAudioDo = new DiscussAudioDo();
                 discussAudioDo.setAudioUrl(url);
-                discussAudioDo.setDiscussId(discussId.longValue());
+                discussAudioDo.setDiscussId(record.getDiscussId());
                 discussAudioDo.setDelFlg(false);
+                discussAudioDo.setUploadTime(new Date());
                 audioList.add(discussAudioDo);
             }
             if (!discussAudioService.saveBatch(audioList)) {
@@ -199,15 +200,19 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
             classDiscussDo.setPublisher(currentAccountNo);
             classDiscussDo.setDiscussContent(discussDto.getDiscussTest());
             classDiscussDo.setForwardId(0L);
+            classDiscussDo.setReplyNumber(0);
             classDiscussDo.setDelFlg(false);
             //新增回复记录，并回传对应的主键id
-            Integer discussId = classDiscussMapper.insertSelective(classDiscussDo);
+            if(classDiscussMapper.insertSelective(classDiscussDo) <= 0){
+                throw new BizException(BizCodeEnum.DISCUSS_REPLY_ADD_ERROR);
+            }
             //新增对应记录的音频
             List<DiscussAudioDo> audioDoList = new ArrayList<>();
             for (String audioUrl : discussDto.getAudioUrl()) {
                 DiscussAudioDo discussAudioDo = new DiscussAudioDo();
-                discussAudioDo.setDiscussId(discussId.longValue());
+                discussAudioDo.setDiscussId(classDiscussDo.getDiscussId());
                 discussAudioDo.setAudioUrl(audioUrl);
+                discussAudioDo.setUploadTime(new Date());
                 audioDoList.add(discussAudioDo);
             }
             //批量新增音频数据
@@ -229,6 +234,8 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
         ClassDiscussDo record = new ClassDiscussDo();
         //转发评论
         record.setDiscussContent(forwardDto.getDiscussTest());
+        //转发到哪个班级
+        record.setClassId(forwardDto.getClassId());
         //转发的帖子只能是根节点
         record.setIsLeaf(true);
         //转发的帖子的源discussId
@@ -253,10 +260,7 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
         Date sortTime = calendar.getTime();
         classDiscussDo.setDiscussId(discussId);
         classDiscussDo.setSortTime(sortTime);
-        if(classDiscussMapper.updateByPrimaryKeySelective(classDiscussDo) <= 0){
-            return 0;
-        }
-        return 1;
+        return classDiscussMapper.updateByPrimaryKeySelective(classDiscussDo);
     }
 
 }

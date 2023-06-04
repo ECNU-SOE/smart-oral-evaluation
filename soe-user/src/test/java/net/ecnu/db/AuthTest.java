@@ -9,6 +9,7 @@ import net.ecnu.mapper.SystemMapper;
 import net.ecnu.model.authentication.SysApi;
 import net.ecnu.model.authentication.SysApiNode;
 import net.ecnu.model.authentication.tree.DataTreeUtil;
+import net.ecnu.service.authentication.SysUserService;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +41,9 @@ public class AuthTest {
 
     @Resource
     private SystemMapper systemMapper;
+
+    @Resource
+    private SysUserService sysUserService;
 
 
     @Test

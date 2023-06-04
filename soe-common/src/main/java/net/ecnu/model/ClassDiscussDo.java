@@ -2,6 +2,10 @@ package net.ecnu.model;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
@@ -14,10 +18,12 @@ import lombok.Data;
  * 课程讨论表
  */
 @Data
+@TableName(value = "class_discuss")
 public class ClassDiscussDo implements Serializable {
     /**
      * 讨论id
      */
+    @TableId(type = IdType.AUTO)
     private Long discussId;
 
     /**

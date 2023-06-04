@@ -3,7 +3,6 @@ package net.ecnu.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
-import net.ecnu.model.ClassDiscussDo;
 import net.ecnu.model.dto.DiscussDto;
 import net.ecnu.model.dto.ForwardDto;
 import net.ecnu.model.vo.DiscussVo;
@@ -53,7 +52,7 @@ public class DiscussController {
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY);
         }
         classDiscussService.reply(discussDto);
-        return JsonData.buildSuccess();
+        return JsonData.buildSuccess("回复成功");
     }
 
     /**
@@ -61,14 +60,12 @@ public class DiscussController {
      * */
     @GetMapping("/getDiscussInfo")
     public JsonData getReplyInfo(@RequestParam("classId") String classId, @RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize) {
-        if(StringUtils.isEmpty(classId)){
+        if (StringUtils.isEmpty(classId)) {
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY);
         }
-        if(Objects.isNull(pageNum))
-            pageNum = 1;
-        if(Objects.isNull(pageSize))
-            pageSize = 10;
-        Page<DiscussVo> pageList = classDiscussService.getDiscussInfo(classId,pageNum,pageSize);
+        pageNum = Objects.isNull(pageNum) ? 1 : pageNum;
+        pageSize = Objects.isNull(pageSize) ? 10 : pageSize;
+        Page<DiscussVo> pageList = classDiscussService.getDiscussInfo(classId, pageNum, pageSize);
         return JsonData.buildSuccess(pageList);
     }
 
@@ -77,16 +74,12 @@ public class DiscussController {
      * */
     @GetMapping("/getReplyInfoByCurrent")
     public JsonData getReplyInfoByCurrent(@RequestParam("discussId") String discussId,@RequestParam("pageNum") Integer pageNum,@RequestParam("pageSize") Integer pageSize){
-        if(StringUtils.isEmpty(discussId)){
+        if (StringUtils.isEmpty(discussId)) {
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY);
         }
-        if(Objects.isNull(pageNum)){
-            pageNum = 1;
-        }
-        if(Objects.isNull(pageSize)){
-            pageSize = 10;
-        }
-        Page<ReplyInfoVo> pageList = classDiscussService.getReplyInfo(discussId,pageNum,pageSize);
+        pageNum = Objects.isNull(pageNum) ? 1 : pageNum;
+        pageSize = Objects.isNull(pageSize) ? 10 : pageSize;
+        Page<ReplyInfoVo> pageList = classDiscussService.getReplyInfo(discussId, pageNum, pageSize);
         return JsonData.buildSuccess(pageList);
     }
 
@@ -94,14 +87,14 @@ public class DiscussController {
      * 点赞
      * */
     @GetMapping("/addLikes")
-    public JsonData addLikes(@RequestParam String discussId){
+    public JsonData addLikes(@RequestParam("discussId") String discussId){
         if (StringUtils.isEmpty(discussId)) {
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY);
         }
         if (classDiscussService.addLikes(discussId) > 0) {
-            return JsonData.buildSuccess();
+            return JsonData.buildSuccess("点赞成功");
         } else {
-            return JsonData.buildError("更新失败");
+            return JsonData.buildError("点赞失败");
         }
     }
 
@@ -130,9 +123,9 @@ public class DiscussController {
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY);
         }
         if (classDiscussService.topDiscuss(discussId) <= 0) {
-            return JsonData.buildSuccess(null, "置顶成功");
-        } else {
             return JsonData.buildError("置顶失败");
+        } else {
+            return JsonData.buildSuccess(null,"置顶成功");
         }
     }
 }
