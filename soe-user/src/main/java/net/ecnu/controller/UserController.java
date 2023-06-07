@@ -100,8 +100,8 @@ public class UserController {
     }
 
     @ApiOperation("发送短信验证码")
-    @GetMapping("/send/{phone}")
-    public JsonData send(@PathVariable("phone") String phone) {
+    @GetMapping("send")
+    public JsonData send(@RequestParam("phone") String phone) {
         boolean isSend = userService.send(phone);
         if (isSend)
             return JsonData.buildSuccess();
@@ -125,8 +125,8 @@ public class UserController {
 
     @ApiOperation("获取签到信息")
     @GetMapping("sign_info")
-    public JsonData signInfo(@RequestParam(value = "month",required = true) Integer month){
-        Object data = userService.signInfo(month);
+    public JsonData signInfo(@RequestParam(value = "year",required = true) Integer year,@RequestParam(value = "month",required = true) Integer month){
+        Object data = userService.signInfo(year,month);
         return JsonData.buildSuccess(data);
     }
 

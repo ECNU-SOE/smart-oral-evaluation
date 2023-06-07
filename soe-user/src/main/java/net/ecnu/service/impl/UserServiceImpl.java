@@ -393,7 +393,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Object signInfo(Integer month) {
+    public Object signInfo(Integer year,Integer month) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
@@ -407,7 +407,7 @@ public class UserServiceImpl implements UserService {
         else {
             SignVO signVO = new SignVO();
             BeanUtils.copyProperties(signDO,signVO);
-            List<LocalDate> dates = signLogMapper.getSignDatesByMonth(month);
+            List<LocalDate> dates = signLogMapper.getSignDatesByYearAndMonth(year,month);
             signVO.setSignDates(dates);
             return signVO;
         }
