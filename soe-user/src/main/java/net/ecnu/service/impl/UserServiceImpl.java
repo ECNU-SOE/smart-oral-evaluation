@@ -353,7 +353,7 @@ public class UserServiceImpl implements UserService {
             //1.补签日期应早于今天
             if (resignDate.until(today,ChronoUnit.DAYS)<=0)
                 return "补签日期异常";
-            //2.补签日期未签到
+            //2.补签日期已签到
             List<LocalDate> signDates = signLogMapper.getSignDatesDescByAccountNo(currentAccountNo);
             if (signDates.contains(resignDate))
                 throw new BizException(BizCodeEnum.USER_SIGNED);
@@ -407,7 +407,7 @@ public class UserServiceImpl implements UserService {
         else {
             SignVO signVO = new SignVO();
             BeanUtils.copyProperties(signDO,signVO);
-            List<LocalDate> dates = signLogMapper.getSignDatesByYearAndMonth(year,month);
+            List<LocalDate> dates = signLogMapper.getSignDatesByYearAndMonth(currentAccountNo,year,month);
             signVO.setSignDates(dates);
             return signVO;
         }
