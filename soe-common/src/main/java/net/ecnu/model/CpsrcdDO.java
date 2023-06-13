@@ -1,13 +1,23 @@
 package net.ecnu.model;
 
 import java.math.BigDecimal;
+
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
+
 import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.io.Serializable;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import net.ecnu.aop.ListTypeHandler;
+import org.apache.ibatis.type.LongTypeHandler;
 
 /**
  * <p>
@@ -83,16 +93,19 @@ public class CpsrcdDO implements Serializable {
     /**
      * 题目标签
      */
+//    @TableField(typeHandler = ListTypeHandler.class)
     private String tags;
 
     /**
      * 创建时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     private Date gmtCreate;
 
     /**
      * 更新时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     private Date gmtModified;
 
 

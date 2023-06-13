@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * <p>
- *  Mapper 接口
+ * Mapper 接口
  * </p>
  *
  * @author LYW
@@ -19,6 +19,7 @@ public interface SignLogMapper extends BaseMapper<SignLogDO> {
 
     @Select("select sign_date from sign_log where user_id = #{accountNo} order by sign_date desc")
     List<LocalDate> getSignDatesDescByAccountNo(String accountNo);
+
     @Select("select sign_date from sign_log where year(sign_date) = #{arg0} and month(sign_date) = #{arg1}")
-    List<LocalDate> getSignDatesByYearAndMonth(Integer year,Integer month);
+    List<LocalDate> getSignDatesByYearAndMonth(Integer year, Integer month);
 }

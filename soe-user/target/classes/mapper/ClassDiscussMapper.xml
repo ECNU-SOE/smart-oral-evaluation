@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.ecnu.mapper.ClassDiscussMapper">
+  <resultMap id="BaseResultMap" type="net.ecnu.model.ClassDiscussDo">
+    <!--@mbg.generated-->
+    <!--@Table class_discuss-->
+    <id column="discuss_id" jdbcType="BIGINT" property="discussId" />
+    <result column="parent_id" jdbcType="BIGINT" property="parentId" />
+    <result column="class_id" jdbcType="VARCHAR" property="classId" />
+    <result column="publisher" jdbcType="VARCHAR" property="publisher" />
+    <result column="discuss_content" jdbcType="LONGVARCHAR" property="discussContent" />
+    <result column="forward_id" jdbcType="BIGINT" property="forwardId" />
+    <result column="like_count" jdbcType="INTEGER" property="likeCount" />
+    <result column="is_leaf" jdbcType="BOOLEAN" property="isLeaf" />
+    <result column="release_time" jdbcType="TIMESTAMP" property="releaseTime" />
+    <result column="sort_time" jdbcType="TIMESTAMP" property="sortTime" />
+    <result column="del_flg" jdbcType="BOOLEAN" property="delFlg" />
+    <result column="reply_number" jdbcType="INTEGER" property="replyNumber" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    discuss_id, parent_id, class_id, publisher, discuss_content, forward_id, like_count, 
+    is_leaf, release_time, sort_time, del_flg, reply_number
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from class_discuss
+    where discuss_id = #{discussId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    <!--@mbg.generated-->
+    delete from class_discuss
+    where discuss_id = #{discussId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" keyColumn="discuss_id" keyProperty="discussId" parameterType="net.ecnu.model.ClassDiscussDo" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into class_discuss (parent_id, class_id, publisher, 
+      discuss_content, forward_id, like_count, 
+      is_leaf, release_time, sort_time, 
+      del_flg, reply_number)
+    values (#{parentId,jdbcType=BIGINT}, #{classId,jdbcType=VARCHAR}, #{publisher,jdbcType=VARCHAR},
+      #{discussContent,jdbcType=LONGVARCHAR}, #{forwardId,jdbcType=BIGINT}, #{likeCount,jdbcType=INTEGER},
+      #{isLeaf,jdbcType=BOOLEAN}, #{releaseTime,jdbcType=TIMESTAMP}, #{sortTime,jdbcType=TIMESTAMP},
+      #{delFlg,jdbcType=BOOLEAN}, #{replyNumber,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" keyColumn="discuss_id" keyProperty="discussId" parameterType="net.ecnu.model.ClassDiscussDo" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into class_discuss
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="parentId != null">
+        parent_id,
+      </if>
+      <if test="classId != null">
+        class_id,
+      </if>
+      <if test="publisher != null">
+        publisher,
+      </if>
+      <if test="discussContent != null">
+        discuss_content,
+      </if>
+      <if test="forwardId != null">
+        forward_id,
+      </if>
+      <if test="likeCount != null">
+        like_count,
+      </if>
+      <if test="isLeaf != null">
+        is_leaf,
+      </if>
+      <if test="releaseTime != null">
+        release_time,
+      </if>
+      <if test="sortTime != null">
+        sort_time,
+      </if>
+      <if test="delFlg != null">
+        del_flg,
+      </if>
+      <if test="replyNumber != null">
+        reply_number,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="parentId != null">
+        #{parentId,jdbcType=BIGINT},
+      </if>
+      <if test="classId != null">
+        #{classId,jdbcType=VARCHAR},
+      </if>
+      <if test="publisher != null">
+        #{publisher,jdbcType=VARCHAR},
+      </if>
+      <if test="discussContent != null">
+        #{discussContent,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="forwardId != null">
+        #{forwardId,jdbcType=BIGINT},
+      </if>
+      <if test="likeCount != null">
+        #{likeCount,jdbcType=INTEGER},
+      </if>
+      <if test="isLeaf != null">
+        #{isLeaf,jdbcType=BOOLEAN},
+      </if>
+      <if test="releaseTime != null">
+        #{releaseTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sortTime != null">
+        #{sortTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlg != null">
+        #{delFlg,jdbcType=BOOLEAN},
+      </if>
+      <if test="replyNumber != null">
+        #{replyNumber,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="net.ecnu.model.ClassDiscussDo">
+    <!--@mbg.generated-->
+    update class_discuss
+    <set>
+      <if test="parentId != null">
+        parent_id = #{parentId,jdbcType=BIGINT},
+      </if>
+      <if test="classId != null">
+        class_id = #{classId,jdbcType=VARCHAR},
+      </if>
+      <if test="publisher != null">
+        publisher = #{publisher,jdbcType=VARCHAR},
+      </if>
+      <if test="discussContent != null">
+        discuss_content = #{discussContent,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="forwardId != null">
+        forward_id = #{forwardId,jdbcType=BIGINT},
+      </if>
+      <if test="likeCount != null">
+        like_count = #{likeCount,jdbcType=INTEGER},
+      </if>
+      <if test="isLeaf != null">
+        is_leaf = #{isLeaf,jdbcType=BOOLEAN},
+      </if>
+      <if test="releaseTime != null">
+        release_time = #{releaseTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sortTime != null">
+        sort_time = #{sortTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlg != null">
+        del_flg = #{delFlg,jdbcType=BOOLEAN},
+      </if>
+      <if test="replyNumber != null">
+        reply_number = #{replyNumber,jdbcType=INTEGER},
+      </if>
+    </set>
+    where discuss_id = #{discussId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="net.ecnu.model.ClassDiscussDo">
+    <!--@mbg.generated-->
+    update class_discuss
+    set parent_id = #{parentId,jdbcType=BIGINT},
+      class_id = #{classId,jdbcType=VARCHAR},
+      publisher = #{publisher,jdbcType=VARCHAR},
+      discuss_content = #{discussContent,jdbcType=LONGVARCHAR},
+      forward_id = #{forwardId,jdbcType=BIGINT},
+      like_count = #{likeCount,jdbcType=INTEGER},
+      is_leaf = #{isLeaf,jdbcType=BOOLEAN},
+      release_time = #{releaseTime,jdbcType=TIMESTAMP},
+      sort_time = #{sortTime,jdbcType=TIMESTAMP},
+      del_flg = #{delFlg,jdbcType=BOOLEAN},
+      reply_number = #{replyNumber,jdbcType=INTEGER}
+    where discuss_id = #{discussId,jdbcType=BIGINT}
+  </update>
+  <update id="addLikes">
+    update
+      class_discuss
+    set
+      like_count = like_count + 1
+    where
+      discuss_id = #{discussId} and del_flg = 0
+  </update>
+</mapper>

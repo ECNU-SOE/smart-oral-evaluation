@@ -6,8 +6,10 @@ import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Update;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class CpsrcdReq {
@@ -74,7 +76,7 @@ public class CpsrcdReq {
     /**
      * 题目标签
      */
-    private String tags;
+    private List<String> tags;
 
 
 }
