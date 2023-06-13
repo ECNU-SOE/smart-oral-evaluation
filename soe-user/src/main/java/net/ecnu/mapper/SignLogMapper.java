@@ -22,4 +22,6 @@ public interface SignLogMapper extends BaseMapper<SignLogDO> {
 
     @Select("select sign_date from sign_log where year(sign_date) = #{arg0} and month(sign_date) = #{arg1}")
     List<LocalDate> getSignDatesByYearAndMonth(Integer year, Integer month);
+    @Select("select sign_date from sign_log where user_id = #{arg0} and year(sign_date) = #{arg1} and month(sign_date) = #{arg2}")
+    List<LocalDate> getSignDatesByYearAndMonth(String userId,Integer year,Integer month);
 }

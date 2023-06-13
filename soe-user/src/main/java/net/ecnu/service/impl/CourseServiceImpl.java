@@ -57,7 +57,7 @@ public class CourseServiceImpl implements CourseService {
             CourseDO csDO = new CourseDO();
             BeanUtils.copyProperties(courAddReq, csDO);
             if (csDO.getPicture()==null|| StringUtils.isBlank(csDO.getPicture()))
-                csDO.setPicture("https://img2.woyaogexing.com/2023/05/13/c898da777fb886a1aa9e2ae07a9e2296.jpg");
+                csDO.setPicture("https://img2.woyaogexing.com/2023/06/11/a41b884fdf4586ea956595c5ea58c2ff.jpg");
             csDO.setId(IDUtil.nextCourseId());
             csDO.setCreator(currentAccountNo);
             csDO.setDel(false);

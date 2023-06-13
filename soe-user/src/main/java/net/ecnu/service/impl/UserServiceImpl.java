@@ -354,7 +354,7 @@ public class UserServiceImpl implements UserService {
             //1.补签日期应早于今天
             if (resignDate.until(today, ChronoUnit.DAYS) <= 0)
                 return "补签日期异常";
-            //2.补签日期未签到
+            //2.补签日期已签到
             List<LocalDate> signDates = signLogMapper.getSignDatesDescByAccountNo(currentAccountNo);
             if (signDates.contains(resignDate))
                 throw new BizException(BizCodeEnum.USER_SIGNED);
@@ -399,22 +399,19 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
-        //查询当前用户的signDO
-        SignDO signDO = signMapper.selectOne(new QueryWrapper<SignDO>().eq("user_id", currentAccountNo));
-        if (signDO == null) return "用户暂无签到记录";
-
-        //聚合签到信息
-        SignVO signVO = new SignVO();
-        BeanUtils.copyProperties(signDO, signVO);
-//
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month - 1, 1);
-        Date firstDay = calendar.getTime();//该年月第一天
-        calendar.set(year, month - 1, 31);
-        Date lastDay = calendar.getTime();//该年月最后一天
-        List<SignLogDO> sign_date = signLogMapper.selectList(new QueryWrapper<SignLogDO>()
-                .gt("sign_date", firstDay).lt("sign_date", lastDay));
-        return signVO;
+        //判断用户是否已有签到记录
+        SignDO signDO = signMapper.selectOne(new QueryWrapper<SignDO>()
+                .eq("user_id", currentAccountNo)
+        );
+        if (signDO==null)
+            return "用户暂无签到记录";
+        else {
+            SignVO signVO = new SignVO();
+            BeanUtils.copyProperties(signDO,signVO);
+            List<LocalDate> dates = signLogMapper.getSignDatesByYearAndMonth(currentAccountNo,year,month);
+            signVO.setSignDates(dates);
+            return signVO;
+        }
     }
 
     @Override

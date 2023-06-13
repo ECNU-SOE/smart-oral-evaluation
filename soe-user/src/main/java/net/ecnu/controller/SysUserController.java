@@ -153,6 +153,8 @@ public class SysUserController {
     public JsonData pwdchange(@RequestParam String oldPass,
                               @RequestParam String newPass) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
+        oldPass = oldPass.trim();
+        newPass = newPass.trim();
         sysuserService.changePwd(currentAccountNo, oldPass, newPass);
         return JsonData.buildSuccess("修改密码成功!");
     }
