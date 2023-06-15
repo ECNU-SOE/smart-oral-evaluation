@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -83,7 +84,7 @@ public class CpsrcdVO implements Serializable {
     /**
      * 题目标签
      */
-    private String tags;
+    private List<String> tags;
 
     /**
      * 创建时间

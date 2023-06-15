@@ -1,5 +1,6 @@
 package net.ecnu.service.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import net.ecnu.controller.request.TopicReq;
 import net.ecnu.enums.BizCodeEnum;
@@ -88,6 +89,9 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, TopicDO> implemen
     private CpsrcdVO beanProcess(CpsrcdDO cpsrcdDO) {
         CpsrcdVO cpsrcdVO = new CpsrcdVO();
         BeanUtils.copyProperties(cpsrcdDO, cpsrcdVO);
+        //tags单独处理String->List<String>
+        List<String> tags = JSONUtil.parseArray(cpsrcdDO.getTags()).toList(String.class);
+        cpsrcdVO.setTags(tags);
         return cpsrcdVO;
     }
 }
