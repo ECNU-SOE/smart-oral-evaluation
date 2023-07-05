@@ -52,7 +52,6 @@ public class UserManagerImpl implements UserManager {
     public List<UserDO> pageByFilter(UserFilterReq userFilterReq, PageData pageData) {
         return userMapper.selectPage(new Page<UserDO>(pageData.getCurrent(), pageData.getSize()),
                 new QueryWrapper<UserDO>()
-                        .eq(!ObjectUtils.isEmpty(userFilterReq.getAccountNo()), "account_no", userFilterReq.getAccountNo())
                         .eq(!ObjectUtils.isEmpty(userFilterReq.getIdentifyId()), "identify_id", userFilterReq.getIdentifyId())
                         .like(!ObjectUtils.isEmpty(userFilterReq.getNickName()), "nick_name", userFilterReq.getNickName())
                         .like(!ObjectUtils.isEmpty(userFilterReq.getRealName()), "real_name", userFilterReq.getRealName())
@@ -68,7 +67,6 @@ public class UserManagerImpl implements UserManager {
     @Override
     public int countByFilter(UserFilterReq userFilterReq) {
         return userMapper.selectCount(new QueryWrapper<UserDO>()
-                .eq(!ObjectUtils.isEmpty(userFilterReq.getAccountNo()), "account_no", userFilterReq.getAccountNo())
                 .eq(!ObjectUtils.isEmpty(userFilterReq.getIdentifyId()), "identify_id", userFilterReq.getIdentifyId())
                 .like(!ObjectUtils.isEmpty(userFilterReq.getNickName()), "nick_name", userFilterReq.getNickName())
                 .like(!ObjectUtils.isEmpty(userFilterReq.getRealName()), "real_name", userFilterReq.getRealName())

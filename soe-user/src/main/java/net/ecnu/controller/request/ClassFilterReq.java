@@ -16,6 +16,7 @@ public class ClassFilterReq {
      */
     private String courseId;
 
+    private String cpsgrpId;
 
     /**
      * 课程名

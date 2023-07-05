@@ -92,12 +92,6 @@ public class UserController {
         return JsonData.buildSuccess(data);
     }
 
-    @ApiOperation("查询info列表")
-    @PostMapping("info_list")
-    public JsonData info_list(@RequestParam("account_list") List<String> accountList) {
-        Object data = userService.getInfoList(accountList);
-        return JsonData.buildSuccess(data);
-    }
 
     @ApiOperation("发送短信验证码")
     @GetMapping("send")

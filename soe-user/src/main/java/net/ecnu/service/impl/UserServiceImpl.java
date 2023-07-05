@@ -10,10 +10,8 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.generator.config.IFileCreate;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.constant.RolesConst;
-import net.ecnu.controller.request.SignReq;
 import net.ecnu.controller.request.UserFilterReq;
 import net.ecnu.controller.request.UserReq;
 import net.ecnu.enums.BizCodeEnum;
@@ -53,8 +51,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -152,12 +148,28 @@ public class UserServiceImpl implements UserService {
         if (!checkPermission(currentAccountNo)) {
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         }
-        List<UserDO> userDOS = userManager.pageByFilter(userFilterReq, pageData);
-        int total = userManager.countByFilter(userFilterReq);
-        pageData.setTotal(total);
-        List<UserVO> userVOS = userDOS.stream().map(this::beanProcess).collect(Collectors.toList());
-        pageData.setRecords(userVOS);
-        return pageData;
+        //根据accountNos是否为空做条件查询还是按列表查询
+        if (userFilterReq.getAccountNos()==null||userFilterReq.getAccountNos().size()==0){
+            //条件查询
+            List<UserDO> userDOS = userManager.pageByFilter(userFilterReq, pageData);
+            int total = userManager.countByFilter(userFilterReq);
+            pageData.setTotal(total);
+            List<UserVO> userVOS = userDOS.stream().map(this::beanProcess).collect(Collectors.toList());
+            pageData.setRecords(userVOS);
+            System.out.println("路劲a");
+            if (userFilterReq.getAccountNos()==null)
+                System.out.println("原因a");
+            if (userFilterReq.getAccountNos().size()==0)
+                System.out.println("原因b");
+            return pageData;
+        }
+        else {
+            //按accountNos列表查询
+            List<UserDO> userDOS = userMapper.selectBatchIds(userFilterReq.getAccountNos());
+            List<UserVO> userVOS = userDOS.stream().map(this::beanProcess).collect(Collectors.toList());
+            System.out.println("路径b");
+            return userVOS;
+        }
     }
 
     @Override
@@ -414,16 +426,6 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Override
-    public Object getInfoList(List<String> accountList) {
-        String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if (StringUtils.isBlank(currentAccountNo)) {
-            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
-        }
-        List<UserDO> userDOS = userMapper.selectBatchIds(accountList);
-        List<UserVO> userVOS = userDOS.stream().map(this::beanProcess).collect(Collectors.toList());
-        return userVOS;
-    }
 
     private boolean hasOpRight(Integer roleA, Integer roleB) {
         //角色a为管理员，且b不是超管

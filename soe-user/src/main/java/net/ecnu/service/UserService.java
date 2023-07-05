@@ -30,5 +30,4 @@ public interface UserService {
     Object sign();
     Object resign(LocalDate resignDate);
     Object signInfo(Integer year,Integer month);
-    Object getInfoList(List<String> accountList);
 }

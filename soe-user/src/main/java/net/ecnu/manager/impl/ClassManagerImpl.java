@@ -27,6 +27,7 @@ public class ClassManagerImpl implements ClassManager {
                 new QueryWrapper<ClassDO>()
                         .eq(!ObjectUtils.isEmpty(classFilter.getId()),"id",classFilter.getId())
                         .eq(!ObjectUtils.isEmpty(classFilter.getCourseId()),"course_id",classFilter.getCourseId())
+                        .eq(!ObjectUtils.isEmpty(classFilter.getCpsgrpId()),"cpsgrp_id",classFilter.getCpsgrpId())
                         .like(!ObjectUtils.isEmpty(classFilter.getName()),"name",classFilter.getName())
                         .like(!ObjectUtils.isEmpty(classFilter.getDescription()),"description",classFilter.getDescription())
                         .eq(!ObjectUtils.isEmpty(classFilter.getCreator()),"creator",classFilter.getCreator())
