@@ -45,6 +45,8 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     @Autowired
     private ClassMapper classMapper;
     @Autowired
+    private ClassCpsgrpMapper classCpsgrpMapper;
+    @Autowired
     private CourseMapper courseMapper;
     @Autowired
     private ClassManager classManager;
@@ -129,18 +131,42 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
 
     @Override
     public Object pageByFilter(ClassFilterReq classFilter, PageData pageData) {
-        List<ClassDO> classDOS = classManager.pageByFilter(classFilter, pageData);
-        int total = classManager.countByFilter(classFilter);
-        pageData.setTotal(total);
-        List<ClassVO> classVOS = classDOS.stream().map(this::beanProcess).collect(Collectors.toList());
-        classVOS.forEach(classVO->{
-            //向classVO中部分聚合courseDO属性
-            CourseDO courseDO = courseMapper.selectById(classVO.getCourseId());
-            if (courseDO == null) throw new BizException(BizCodeEnum.COURSE_UNEXISTS);
-            classVO.setCourseName(courseDO.getName());
-        });
-        pageData.setRecords(classVOS);
-        return pageData;
+        if (classFilter.getCpsgrpId()==null||StringUtils.isBlank(classFilter.getCpsgrpId())){
+            //cpsgrp为空，按条件查询
+            List<ClassDO> classDOS = classManager.pageByFilter(classFilter, pageData);
+            int total = classManager.countByFilter(classFilter);
+            pageData.setTotal(total);
+            List<ClassVO> classVOS = classDOS.stream().map(this::beanProcess).collect(Collectors.toList());
+            classVOS.forEach(classVO->{
+                //向classVO中部分聚合courseDO属性
+                CourseDO courseDO = courseMapper.selectById(classVO.getCourseId());
+                if (courseDO == null) throw new BizException(BizCodeEnum.COURSE_UNEXISTS);
+                classVO.setCourseName(courseDO.getName());
+            });
+            pageData.setRecords(classVOS);
+            return pageData;
+        }else {
+            //cpsgrp不为空，按cpsgrp查询
+            List<ClassCpsgrpDO> classCpsgrpDos = classCpsgrpMapper.selectList(new QueryWrapper<ClassCpsgrpDO>()
+                    .eq("cpsgrp_id", classFilter.getCpsgrpId())
+            );
+            if (classCpsgrpDos.size()==0)
+                return "暂无使用此套语料组的班级";
+            List<String> classIds = classCpsgrpDos.stream().map(ClassCpsgrpDO::getClassId).collect(Collectors.toList());
+            List<ClassDO> classDOS = classMapper.selectBatchIds(classIds);
+            int total = classIds.size();
+            List<ClassVO> classVOS = classDOS.stream().map(this::beanProcess).collect(Collectors.toList());
+            classVOS.forEach(classVO->{
+                //向classVO中部分聚合courseDO属性
+                CourseDO courseDO = courseMapper.selectById(classVO.getCourseId());
+                if (courseDO == null) throw new BizException(BizCodeEnum.COURSE_UNEXISTS);
+                classVO.setCourseName(courseDO.getName());
+            });
+            pageData.setRecords(classVOS);
+            return pageData;
+        }
+
+
     }
 
     @Override
