@@ -205,14 +205,18 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
                 return userClassMapper.insert(userClassDO1);
             } else {
                 //token的accountNo与请求体的accountNo不同，给别人选课
-                Integer roleA = userService.getTopRole(currentAccountNo);
-                Integer roleB = userService.getTopRole(usrClassAddReq.getAccountNo());
-                if (hasAddOrDelRight(roleA, roleB)) {
+                Integer role = userService.getTopRole(currentAccountNo);
+                if (role<RolesConst.ROLE_ADMIN){//系统管理员及以上直接选课
                     UserClassDO userClassDO1 = new UserClassDO();
                     BeanUtils.copyProperties(usrClassAddReq, userClassDO1);
                     return userClassMapper.insert(userClassDO1);
-                } else {
-                    throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+                }else {//老师给自己所在班级选课
+                    UserClassDO userClassDo = userClassManager.getByAccountNoAndClassId(currentAccountNo, usrClassAddReq.getClassId());
+                    if (userClassDo==null||userClassDo.getRType()==1||userClassDo.getRType()==2)//1：学生，2：助教
+                        throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+                    UserClassDO userClassDO1 = new UserClassDO();
+                    BeanUtils.copyProperties(usrClassAddReq, userClassDO1);
+                    return userClassMapper.insert(userClassDO1);
                 }
             }
         }
@@ -233,12 +237,14 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
             return userClassMapper.deleteById(id);
         } else {
             //删除别人选课信息
-            Integer role_A = userService.getTopRole(currentAccountNo);
-            Integer role_B = userService.getTopRole(userClassDO.getAccountNo());
-            if (hasAddOrDelRight(role_A, role_B)) {
+            Integer role = userService.getTopRole(currentAccountNo);
+            if (role<RolesConst.ROLE_ADMIN) {
                 return userClassMapper.deleteById(id);
             } else {
-                throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+                UserClassDO userClassDo = userClassManager.getByAccountNoAndClassId(currentAccountNo, userClassDO.getClassId());
+                if (userClassDo==null||userClassDo.getRType()==1||userClassDo.getRType()==2)//1：学生，2：助教
+                    throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+                return userClassMapper.deleteById(id);
             }
         }
     }
@@ -459,33 +465,6 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         UserClassVO userClassVO = new UserClassVO();
         BeanUtils.copyProperties(userDO,userClassVO,"gmtCreate");
         return userClassVO;
-    }
-
-
-    //角色A是否有为角色B添加/删除课程的权限
-    private Boolean hasAddOrDelRight(Integer role_A, Integer role_B) {
-        switch (role_A) {
-            case 1:
-                return true;
-            case 2:
-                if (role_B > 2)
-                    return true;
-            case 3:
-                if (role_B > 3)
-                    return true;
-            case 4:
-                if (role_B > 4)
-                    return true;
-            case 5:
-                if (role_B > 5)
-                    return true;
-            case 6:
-                if (role_B > 6)
-                    return true;
-            case 7:
-                return role_B == 7;
-        }
-        return false;
     }
 
     //角色A是否有查看角色B的选课列表的权限
