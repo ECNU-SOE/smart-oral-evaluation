@@ -49,6 +49,12 @@ public class ClassController {
         return JsonData.buildSuccess(data);
     }
 
+    @PostMapping("add_user_batch")
+    public JsonData add_user_batch(@RequestBody @Validated(Create.class) UsrClassAddBatchReq usrClassAddBatchReq) {
+        Object data = classService.addUsrClassBatch(usrClassAddBatchReq);
+        return JsonData.buildSuccess(data);
+    }
+
     @GetMapping("del")
     public JsonData del(@RequestParam String id) {
         Object data = classService.del(id);

@@ -24,6 +24,7 @@ public interface ClassService extends IService<ClassDO> {
     Object pageByFilter(ClassFilterReq classFilter, PageData pageData);
 
     Object addUsrClass(UsrClassAddReq usrClassAddReq);
+    Object addUsrClassBatch(UsrClassAddBatchReq usrClassAddBatchReq);
 
     Object delUsrClass(String id);
     Object addTest(TestAddReq testAddReq);

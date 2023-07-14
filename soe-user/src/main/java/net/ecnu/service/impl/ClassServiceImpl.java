@@ -175,14 +175,6 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
         if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
-        //判断请求的用户正确性
-        UserDO userDO = userMapper.selectById(usrClassAddReq.getAccountNo());
-        if (userDO == null)
-            throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
-        //判断请求的班级正确性
-        ClassDO classDO = classMapper.selectById(usrClassAddReq.getClassId());
-        if (classDO == null)
-            throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
         //判断是否重复选课
         UserClassDO userClassDO = userClassManager.getByAccountNoAndClassId(usrClassAddReq.getAccountNo(),
                 usrClassAddReq.getClassId());
@@ -220,6 +212,44 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
                 }
             }
         }
+    }
+
+    @Override
+    public Object addUsrClassBatch(UsrClassAddBatchReq usrClassAddBatchReq) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+        //权限判断
+        boolean hasRight = false;
+        Integer role = userService.getTopRole(currentAccountNo);
+        if (role<RolesConst.ROLE_ADMIN)
+            hasRight = true;
+        UserClassDO currentDo = userClassManager.getByAccountNoAndClassId(currentAccountNo, usrClassAddBatchReq.getClassId());
+        if (currentDo!=null&&(currentDo.getRType()==3||currentDo.getRType()==4))//3老师 4管理员
+            hasRight = true;
+        if (!hasRight)
+            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+
+        //判断是否重复选课
+        for (int i = 0;i<usrClassAddBatchReq.getAccountNoList().size();i++){
+            UserClassDO userClassDO = userClassManager.getByAccountNoAndClassId(usrClassAddBatchReq.getAccountNoList().get(i), usrClassAddBatchReq.getClassId());
+            if (userClassDO!=null)
+                return "用户"+userClassDO.getAccountNo()+"重复选课";
+        }
+        if (usrClassAddBatchReq.getAccountNoList().size()==0)
+            return "未选择用户";
+        //批量添加用户
+        int count = 0;
+        for (int i = 0;i<usrClassAddBatchReq.getAccountNoList().size();i++){
+            UserClassDO userClassDO = new UserClassDO();
+            userClassDO.setAccountNo(usrClassAddBatchReq.getAccountNoList().get(i));
+            userClassDO.setClassId(usrClassAddBatchReq.getClassId());
+            userClassDO.setRType(1);//默认为学生
+            userClassMapper.insert(userClassDO);
+            count++;
+        }
+        return count;
     }
 
     @Override

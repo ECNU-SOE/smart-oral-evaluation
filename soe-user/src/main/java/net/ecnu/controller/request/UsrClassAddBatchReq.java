@@ -5,16 +5,14 @@ import lombok.Data;
 import net.ecnu.controller.group.Create;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Data
-public class UsrClassAddReq {
+public class UsrClassAddBatchReq {
 
-    private String accountNo;
+    private List<String> accountNoList;
 
     @NotBlank(message = "班级号不能为空",groups = {Create.class})
     private String classId;
-
-    @JsonProperty("rType")
-    private Integer rType;
 
 }
