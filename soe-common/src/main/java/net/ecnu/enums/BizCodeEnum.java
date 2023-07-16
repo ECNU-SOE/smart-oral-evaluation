@@ -50,7 +50,15 @@ public enum BizCodeEnum {
     /**
      * 参数异常
      */
-    PARAM_CANNOT_BE_EMPTY(350000, "参数不能为空");
+    PARAM_CANNOT_BE_EMPTY(350000, "参数不能为空"),
+
+    /**
+     * 错题异常
+     * **/
+    MISTAKE_CLEAN_ERROR(400000,"清除错题异常"),
+    MISTAKE_ADD_WRONG_NUM_ERROR(400001,"增加错误次数异常")
+
+    ;
     @Getter
     private final int code;
 
