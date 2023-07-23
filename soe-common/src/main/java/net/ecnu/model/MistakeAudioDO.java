@@ -1,8 +1,12 @@
 package net.ecnu.model;
 
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
  * @description:
@@ -13,11 +17,13 @@ import lombok.NoArgsConstructor;
     * 语音评测错题表
     */
 @Data
+@Accessors(chain = true)
 @NoArgsConstructor
 public class MistakeAudioDO {
     /**
     * 错题id
     */
+    @TableId(type = IdType.AUTO)
     private Long mistakeId;
 
     /**

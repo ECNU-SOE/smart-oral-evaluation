@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -153,6 +154,32 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
             }
             mistakeAnswerVO.setResultMsg("回答错误");
             return mistakeAnswerVO;
+        }
+    }
+
+    /**
+     * 判断语音对错方法
+     * @param userId 用户唯一id
+     * @param cpsrcdId 语料快照id
+     * @param suggestedScore 用户该题得分
+     * @param questionScore 该题总分
+     * **/
+    @Override
+    public Boolean isAddInErrorBook(String userId,String cpsrcdId,Integer questionType,Double suggestedScore,Double questionScore){
+        Double resultRate = suggestedScore / questionScore;
+        if (resultRate >= PASS_RATE) {
+            //回答成功
+            return true;
+        } else {
+            //回答失败，将该题加入用户的错题集
+            MistakeAudioDO record = new MistakeAudioDO();
+            record.setCreateTime(new Date()).setCpsrcdId(cpsrcdId).setErrorSum(1)
+                    .setUserId(userId).setUpdateTime(new Date()).setMistakeType(questionType)
+                    .setDelFlg(false);
+            if (mistakeAudioMapper.insertSelective(record) <= 0) {
+                throw new BizException(BizCodeEnum.MISTAKE_ADD_ERROR);
+            }
+            return false;
         }
     }
 

@@ -56,8 +56,8 @@ public enum BizCodeEnum {
      * 错题异常
      * **/
     MISTAKE_CLEAN_ERROR(400000,"清除错题异常"),
-    MISTAKE_ADD_WRONG_NUM_ERROR(400001,"增加错误次数异常")
-
+    MISTAKE_ADD_WRONG_NUM_ERROR(400001,"增加错误次数异常"),
+    MISTAKE_ADD_ERROR(400002,"错题添加异常")
     ;
     @Getter
     private final int code;

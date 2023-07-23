@@ -47,4 +47,6 @@ public interface MistakeAudioService {
     List<MistakesVO> getMistake(MistakesDto mistakesDto);
 
     MistakeAnswerVO checkAnswer(MistakeAnswerDto mistakeAnswer);
+
+    Boolean isAddInErrorBook(String userId,String cpsrcdId,Integer questionType,Double suggestedScore,Double questionScore);
 }
