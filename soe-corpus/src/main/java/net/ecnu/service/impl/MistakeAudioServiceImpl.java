@@ -118,6 +118,7 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
             Integer typeNum = Objects.isNull(mistakeTypeVO.getMistakeNum()) ? 0 : mistakeTypeVO.getMistakeNum();
             mistakeTypeVO.setMistakeNum(typeNum);
         }
+        mistakeDetailVO.setEachMistakeTypeNumber(mistakeTypeVOList);
         mistakeDetailVO.setMistakeTotalNumber(total);
         mistakeDetailVO.setStubbornMistakeNumber(stubbornMistakeNumber);
         return  mistakeDetailVO;

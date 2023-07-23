@@ -309,7 +309,7 @@
 
   <select id="getCpsrcdIdByUserIdAndMistakeType" resultType="java.lang.String">
     select
-      cpsgrp_id
+      cpsrcd_id
     from
       mistake_audio
     where
@@ -339,8 +339,8 @@
     from
       cpsrcd
     where
-      del_flg = 0 and id in
-    <foreach collection="cpsrcdIdList" item="cpsrcdId" index="(" close=")" separator=",">
+      id in
+    <foreach collection="cpsrcdIdList" item="cpsrcdId" open="(" close=")" separator=",">
       #{cpsrcdId,jdbcType=VARCHAR}
     </foreach>
   </select>
