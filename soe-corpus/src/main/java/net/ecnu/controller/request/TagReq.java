@@ -18,8 +18,6 @@ public class TagReq {
     @NotEmpty(message = "name can't be null in create",groups = {Create.class})
     private String name;
 
-    private Integer time;
-
     private Double weight;
 
     private Integer category;

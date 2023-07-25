@@ -18,8 +18,8 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("cpsrcd_tag")
-public class CpsrcdTagDO implements Serializable {
+@TableName("tagging")
+public class TaggingDO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,9 +28,10 @@ public class CpsrcdTagDO implements Serializable {
 
     private Integer tagId;
 
-    private String cpsrcdId;
+    private String entityId;
 
-    private Date gmtCreate;
+    private Integer entityType;
+
 
 
 }

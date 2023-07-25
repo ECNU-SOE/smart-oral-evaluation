@@ -28,7 +28,6 @@ public class TagManagerImpl implements TagManager {
         return tagMapper.selectCount(new QueryWrapper<TagDO>()
                 .eq(!ObjectUtils.isEmpty(tagReq.getId()), "id", tagReq.getId())
                 .eq(!ObjectUtils.isEmpty(tagReq.getName()), "name", tagReq.getName())
-                .eq(!ObjectUtils.isEmpty(tagReq.getTime()), "time", tagReq.getTime())
                 .eq(!ObjectUtils.isEmpty(tagReq.getWeight()), "weight", tagReq.getWeight())
                 .eq(!ObjectUtils.isEmpty(tagReq.getCategory()), "category", tagReq.getCategory())
         );
@@ -41,7 +40,6 @@ public class TagManagerImpl implements TagManager {
                 new QueryWrapper<TagDO>()
                         .eq(!ObjectUtils.isEmpty(tagReq.getId()), "id", tagReq.getId())
                         .eq(!ObjectUtils.isEmpty(tagReq.getName()), "name", tagReq.getName())
-                        .eq(!ObjectUtils.isEmpty(tagReq.getTime()), "time", tagReq.getTime())
                         .eq(!ObjectUtils.isEmpty(tagReq.getWeight()), "weight", tagReq.getWeight())
                         .eq(!ObjectUtils.isEmpty(tagReq.getCategory()), "category", tagReq.getCategory())
         );

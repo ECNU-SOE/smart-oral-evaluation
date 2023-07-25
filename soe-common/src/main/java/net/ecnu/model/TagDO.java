@@ -28,15 +28,9 @@ public class TagDO implements Serializable {
 
     private String name;
 
-    private Integer time;
-
     private Double weight;
 
     private Integer category;
-
-    private Date gmtCreate;
-
-    private Date gmtModified;
 
 
 }

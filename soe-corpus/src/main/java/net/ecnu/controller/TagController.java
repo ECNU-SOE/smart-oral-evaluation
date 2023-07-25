@@ -3,9 +3,7 @@ package net.ecnu.controller;
 
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Update;
-import net.ecnu.controller.request.CpsgrpFilterReq;
-import net.ecnu.controller.request.CpsgrpReq;
-import net.ecnu.controller.request.CpsrcdTagReq;
+import net.ecnu.controller.request.TaggingReq;
 import net.ecnu.controller.request.TagReq;
 import net.ecnu.model.common.PageData;
 import net.ecnu.service.TagService;
@@ -54,9 +52,9 @@ public class TagController {
         return JsonData.buildSuccess(data);
     }
 
-    @PostMapping("add_tag")
-    public JsonData addTag(@RequestBody CpsrcdTagReq cpsrcdTagReq) {
-        Object data = tagService.addTag(cpsrcdTagReq);
+    @PostMapping("add_tagging")
+    public JsonData addTagging(@RequestBody TaggingReq taggingReq) {
+        Object data = tagService.addTagging(taggingReq);
         return JsonData.buildSuccess(data);
     }
 }
