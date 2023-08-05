@@ -1,6 +1,6 @@
 package net.ecnu.service;
 
-import net.ecnu.controller.request.CpsrcdTagReq;
+import net.ecnu.controller.request.TaggingReq;
 import net.ecnu.controller.request.TagReq;
 import net.ecnu.model.TagDO;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -20,6 +20,6 @@ public interface TagService extends IService<TagDO> {
     Object delete(Integer id);
     Object update(TagReq tagReq);
     Object list(TagReq tagReq, PageData pageData);
-    Object addTag(CpsrcdTagReq cpsrcdTagReq);
+    Object addTagging(TaggingReq taggingReq);
 
 }

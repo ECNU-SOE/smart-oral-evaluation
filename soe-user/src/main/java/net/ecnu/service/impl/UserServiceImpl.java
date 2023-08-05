@@ -156,11 +156,6 @@ public class UserServiceImpl implements UserService {
             pageData.setTotal(total);
             List<UserVO> userVOS = userDOS.stream().map(this::beanProcess).collect(Collectors.toList());
             pageData.setRecords(userVOS);
-            System.out.println("路劲a");
-            if (userFilterReq.getAccountNos()==null)
-                System.out.println("原因a");
-            if (userFilterReq.getAccountNos().size()==0)
-                System.out.println("原因b");
             return pageData;
         }
         else {
