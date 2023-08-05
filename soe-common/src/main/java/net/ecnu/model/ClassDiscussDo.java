@@ -3,15 +3,13 @@ package net.ecnu.model;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
  * @description:
  * @Author lsy
- * @Date 2023/5/28 14:32
+ * @Date 2023/8/5 9:31
  */
 
 /**
@@ -23,7 +21,6 @@ public class ClassDiscussDo implements Serializable {
     /**
      * 讨论id
      */
-    @TableId(type = IdType.AUTO)
     private Long discussId;
 
     /**
@@ -40,6 +37,11 @@ public class ClassDiscussDo implements Serializable {
      * 发布人
      */
     private String publisher;
+
+    /**
+     * 话题标题
+     */
+    private String discussTitle;
 
     /**
      * 话题内容
@@ -80,6 +82,4 @@ public class ClassDiscussDo implements Serializable {
      * 回复数
      */
     private Integer replyNumber;
-
-    private static final long serialVersionUID = 1L;
 }

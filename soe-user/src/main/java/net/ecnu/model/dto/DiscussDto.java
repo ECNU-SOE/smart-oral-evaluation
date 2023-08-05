@@ -14,6 +14,8 @@ import java.util.List;
 @Accessors(chain = true)
 public class DiscussDto {
 
+    private String discussTitle;
+
     private String discussTest;
 
     private List<String> audioUrl;

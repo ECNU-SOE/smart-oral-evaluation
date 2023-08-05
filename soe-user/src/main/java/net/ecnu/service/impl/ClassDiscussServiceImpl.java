@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.enums.BizCodeEnum;
+import net.ecnu.enums.ClassRoleTypeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.mapper.ClassDiscussMapper;
 import net.ecnu.mapper.ClassMapper;
@@ -18,10 +19,12 @@ import net.ecnu.model.vo.ReplyInfoVo;
 import net.ecnu.service.ClassDiscussService;
 import net.ecnu.service.DiscussAudioService;
 import net.ecnu.util.RequestParamUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -83,7 +86,15 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
         try {
             String currentAccountNo = RequestParamUtil.currentAccountNo();
             ClassDiscussDo record = new ClassDiscussDo();
-            record.setDiscussContent(discussDto.getDiscussTest());
+            //话题标题
+            record.setDiscussTitle(StringUtils.isEmpty(discussDto.getDiscussTitle()) ? "" : discussDto.getDiscussTitle());
+            //话题内容
+            if (!StringUtils.isEmpty(discussDto.getDiscussTest())) {
+                record.setDiscussContent(discussDto.getDiscussTest());
+            } else {
+                log.info("添加话题内容异常：话题内容不能为空，入参discussDto：{}", JSON.toJSON(discussDto));
+                throw new BizException(BizCodeEnum.DISCUSS_AUDIO_ADD_ERROR.getCode(), "话题内容不能为空");
+            }
             //该话题插入后，即为根节点
             record.setIsLeaf(true);
             //没有父节点,默认为父节点为0
@@ -96,7 +107,7 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
             //发布人id
             record.setPublisher(currentAccountNo);
             //新增话题同时获取对应的主键id
-            if(classDiscussMapper.insertSelective(record) <= 0){
+            if (classDiscussMapper.insertSelective(record) <= 0) {
                 throw new BizException(BizCodeEnum.DISCUSS_AUDIO_ADD_ERROR);
             }
             //插入话题对应音频
@@ -137,11 +148,22 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
             BeanUtils.copyProperties(record, discussVo);
             //该话题为转发贴
             if (record.getForwardId() != 0L) {
+                //获取转发贴数据
                 ClassDiscussDo classDiscussDo = classDiscussMapper.selectByPrimaryKey(record.getForwardId());
+                //查询该贴的转发班级次数
                 DiscussVo forwardVo = new DiscussVo();
                 BeanUtils.copyProperties(classDiscussDo, forwardVo);
+                //获取转发贴的发布人姓名以及班级身份
+                String publisherName = getPublisherInfo(forwardVo.getPublisher());
+                forwardVo.setPublisherName(publisherName);
                 discussVo.setForwardDiscuss(forwardVo);
             }
+            //获取话题的发布人姓名以及班级身份
+            String publisherName = getPublisherInfo(record.getPublisher());
+            //转发班级次数
+            Integer publishClassesNum = classDiscussMapper.selectPublishClassesNum(record.getDiscussId());
+            discussVo.setPublisherName(publisherName);
+            discussVo.setPublishClassesNum(publishClassesNum);
             //获取该话题的上传音频
             List<String> audioUrlList = discussAudioService.selectByDiscussId(record.getDiscussId());
             discussVo.setAudioList(audioUrlList);
@@ -151,6 +173,22 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
         }
         resultPage.setRecords(discussVoList);
         return resultPage;
+    }
+
+    /**
+     * 获取话题的发布人姓名以及班级身份方法
+     * @param publisher 发布人id（user.account_no）
+     * **/
+    public String getPublisherInfo(String publisher){
+        Map<String,Object> publisherInfoMap = classDiscussMapper.getPublisherInfo(publisher);
+        String publisherName;
+        if (!CollectionUtils.isEmpty(publisherInfoMap) && publisherInfoMap.size() > 0) {
+            Object roleType = publisherInfoMap.get("roleType");
+            publisherName = String.valueOf(publisherInfoMap.get("userName")) + "(" + ClassRoleTypeEnum.getMsgByCode(Integer.valueOf(roleType.toString())) + ")";
+        } else {
+            publisherName = "用户" + publisher;
+        }
+        return publisherName;
     }
 
     @Override

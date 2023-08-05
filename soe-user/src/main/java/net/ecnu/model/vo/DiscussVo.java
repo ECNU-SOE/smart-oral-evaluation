@@ -26,9 +26,24 @@ public class DiscussVo {
     private String classId;
 
     /**
-     * 发布人
+     * 发布人Code
      */
     private String publisher;
+
+    /**
+     * 发布人姓名 + 班级角色
+     * **/
+    private String publisherName;
+
+    /**
+     * 话题标题
+     * **/
+    private String discussTitle;
+
+    /**
+     * 转发班级数
+     * **/
+    private Integer publishClassesNum;
 
     /**
      * 话题内容
