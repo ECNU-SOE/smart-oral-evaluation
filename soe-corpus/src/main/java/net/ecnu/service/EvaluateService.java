@@ -16,7 +16,7 @@ public interface EvaluateService {
 
 //    File convert_tgx(MultipartFile audio);
 
-    Object evaluateByXF(File audio, String refText, String pinyin, String evalMode);
+    Object evaluateByXF(File audio, String refText, String pinyin, String evalMode,String cpsrcdId);
 
     Object evaluateByXF2(File convertAudio, String refText, String pinyin, String category);
 

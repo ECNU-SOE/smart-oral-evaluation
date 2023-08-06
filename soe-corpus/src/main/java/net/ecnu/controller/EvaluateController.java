@@ -44,11 +44,13 @@ public class EvaluateController {
     public JsonData eval_xf(@RequestParam(value = "audio", required = true) MultipartFile audio,
                             @RequestParam(value = "refText", required = true) String refText,
                             @RequestParam(value = "category", required = true) String category,
-                            @RequestParam(value = "pinyin", required = false) String pinyin) {
+                            @RequestParam(value = "pinyin", required = false) String pinyin,
+                            @RequestParam(value = "cpsrcdId",required = false) String cpsrcdId
+                            ) {
         long startTime = System.currentTimeMillis();
         File convertAudio = evaluateService.convert_lyw(audio);
         System.out.println("语音格式转换耗时：" + (System.currentTimeMillis() - startTime) + "ms");
-        Object data = evaluateService.evaluateByXF(convertAudio, refText, pinyin, category);
+        Object data = evaluateService.evaluateByXF(convertAudio, refText, pinyin, category,cpsrcdId);
         return JsonData.buildSuccess(data);
     }
 

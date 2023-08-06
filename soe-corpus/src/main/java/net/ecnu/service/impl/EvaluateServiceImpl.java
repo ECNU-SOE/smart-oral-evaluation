@@ -85,6 +85,9 @@ public class EvaluateServiceImpl implements EvaluateService {
     @Autowired
     private EvalRecordMapper evalRecordMapper;
 
+    @Autowired
+    private MistakeAudioServiceImpl mistakeAudioService;
+
     @Override
     public Object evaluate(File file, String refText, String pinyin, long evalMode) {
 //        File file = FileUtil.transferToFile(audio);
@@ -220,9 +223,8 @@ public class EvaluateServiceImpl implements EvaluateService {
      * 语音评测（讯飞版）
      */
     @Override
-    public Object evaluateByXF(File audio, String refText, String pinyin, String category) {
+    public Object evaluateByXF(File audio, String refText, String pinyin, String category,String cpsrcdId) {
         System.out.println("text:" + refText);
-
         String authUrl = getAuthUrl(hostUrl, apiKey, apiSecret);// 构建鉴权url
         //将url中的 schema http://和https://分别替换为ws:// 和 wss://
         String url = authUrl.replace("http://", "ws://").replace("https://", "wss://");
@@ -243,6 +245,15 @@ public class EvaluateServiceImpl implements EvaluateService {
         }
         //新增评测记录evalRecord
         Object evalJsonRes = ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
+
+        //若cpsrcdId不为空，则调用错题记录逻辑
+        if (cpsrcdId!=null){
+            JSONObject resJson = (JSONObject) ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
+            JSONObject sentenceInfo = (JSONObject) ((JSONObject) resJson.get("rec_paper")).get(category);
+            JSONObject totalSocre = (JSONObject) sentenceInfo.get("total_score");
+            System.out.println(totalSocre);
+        }
+
         EvalRecordDO evalRecordDO = new EvalRecordDO();
         evalRecordDO.setAlgRes(evalJsonRes.toString());
         evalRecordMapper.insert(evalRecordDO);
