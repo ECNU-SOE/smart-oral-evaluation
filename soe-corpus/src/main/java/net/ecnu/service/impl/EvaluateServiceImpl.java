@@ -247,12 +247,12 @@ public class EvaluateServiceImpl implements EvaluateService {
         Object evalJsonRes = ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
 
         //若cpsrcdId不为空，则调用错题记录逻辑
-//        if (cpsrcdId!=null){
-//            JSONObject resJson = (JSONObject) ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
-//            JSONObject sentenceInfo = (JSONObject) ((JSONObject) resJson.get("rec_paper")).get(category);
-//            Double totalSocre = Double.parseDouble(sentenceInfo.get("total_score").toString());
-//            System.out.println(totalSocre);
-//        }
+        if (cpsrcdId!=null){
+            JSONObject resJson = (JSONObject) ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
+            JSONObject sentenceInfo = (JSONObject) ((JSONObject) resJson.get("rec_paper")).get(category);
+            Double totalSocre = Double.parseDouble(sentenceInfo.get("total_score").toString());
+            System.out.println("总分"+totalSocre);
+        }
 
         EvalRecordDO evalRecordDO = new EvalRecordDO();
         evalRecordDO.setAlgRes(evalJsonRes.toString());
