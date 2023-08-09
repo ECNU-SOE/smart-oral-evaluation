@@ -1,5 +1,6 @@
 package net.ecnu.service;
 
+import net.ecnu.controller.request.TagFilterReq;
 import net.ecnu.controller.request.TaggingReq;
 import net.ecnu.controller.request.TagReq;
 import net.ecnu.model.TagDO;
@@ -19,7 +20,8 @@ public interface TagService extends IService<TagDO> {
     Object create(TagReq tagReq);
     Object delete(Integer id);
     Object update(TagReq tagReq);
-    Object list(TagReq tagReq, PageData pageData);
+    Object list(TagFilterReq tagFilterReq, PageData pageData);
     Object addTagging(TaggingReq taggingReq);
+    Object listEntityTags(String entityId);
 
 }

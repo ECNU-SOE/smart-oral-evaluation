@@ -7,6 +7,8 @@ import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitReque
 import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitResponse;
 import com.tencentcloudapi.soe.v20180724.models.WordRsp;
 import net.ecnu.constant.SOEConst;
+import net.ecnu.enums.BizCodeEnum;
+import net.ecnu.exception.BizException;
 import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.mapper.CpsgrpMapper;
 import net.ecnu.mapper.EvalRecordMapper;
@@ -16,10 +18,12 @@ import net.ecnu.model.vo.EvalResultVO;
 import net.ecnu.service.EvaluateService;
 import net.ecnu.util.CommonUtil;
 import net.ecnu.util.FileUtil;
+import net.ecnu.util.RequestParamUtil;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -251,7 +255,11 @@ public class EvaluateServiceImpl implements EvaluateService {
             JSONObject resJson = (JSONObject) ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
             JSONObject sentenceInfo = (JSONObject) ((JSONObject) resJson.get("rec_paper")).get(category);
             Double totalSocre = Double.parseDouble(sentenceInfo.get("total_score").toString());
-            System.out.println("总分"+totalSocre);
+            String currentAccountNo = RequestParamUtil.currentAccountNo();
+            if (StringUtils.isBlank(currentAccountNo)) {
+                throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+            }
+            Boolean isAdded = mistakeAudioService.isAddInErrorBook(currentAccountNo, cpsrcdId, 0, totalSocre, 100.00);
         }
 
         EvalRecordDO evalRecordDO = new EvalRecordDO();

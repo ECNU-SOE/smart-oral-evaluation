@@ -1,6 +1,7 @@
 package net.ecnu.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import net.ecnu.controller.request.TagFilterReq;
 import net.ecnu.controller.request.TaggingReq;
 import net.ecnu.controller.request.TagReq;
 import net.ecnu.manager.TagManager;
@@ -9,6 +10,7 @@ import net.ecnu.mapper.TaggingMapper;
 import net.ecnu.model.TaggingDO;
 import net.ecnu.model.TagDO;
 import net.ecnu.mapper.TagMapper;
+import net.ecnu.model.UserDO;
 import net.ecnu.model.common.PageData;
 import net.ecnu.service.TagService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -66,13 +69,23 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
         return tagMapper.updateById(tagDO);
     }
 
+
+
     @Override
-    public Object list(TagReq tagReq, PageData pageData) {
-        int i = tagManager.countByFilter(tagReq);
-        pageData.setTotal(i);
-        List<TagDO> tagDOS = tagManager.listByFilter(tagReq, pageData);
-        pageData.setRecords(tagDOS);
-        return pageData;
+    public Object list(TagFilterReq tagFilterReq, PageData pageData) {
+        if (tagFilterReq.getIds()==null||tagFilterReq.getIds().size()==0){
+            //条件查询
+            List<TagDO> tagDOS = tagManager.pageByFilter(tagFilterReq,pageData);
+            int total = tagManager.countByFilter(tagFilterReq);
+            pageData.setTotal(total);
+            pageData.setRecords(tagDOS);
+            return pageData;
+        }
+        else {
+            //按照tagIds查询
+            List<TagDO> tagDOS = tagMapper.selectBatchIds(tagFilterReq.getIds());
+            return tagDOS;
+        }
     }
 
     @Override
@@ -87,6 +100,17 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
         BeanUtils.copyProperties(taggingReq, taggingDO);
         return taggingMapper.insert(taggingDO);
 
+    }
+
+    @Override
+    public Object listEntityTags(String entityId) {
+        List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>()
+                .eq("entity_id", entityId)
+        );
+        if (taggingDOS.size()==0)
+            return "该对象暂无标签";
+        List<Integer> tagIds = taggingDOS.stream().map(TaggingDO::getTagId).collect(Collectors.toList());
+        return tagIds;
     }
 
 

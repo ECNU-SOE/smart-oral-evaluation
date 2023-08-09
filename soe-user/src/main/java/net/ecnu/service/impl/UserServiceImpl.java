@@ -162,7 +162,6 @@ public class UserServiceImpl implements UserService {
             //按accountNos列表查询
             List<UserDO> userDOS = userMapper.selectBatchIds(userFilterReq.getAccountNos());
             List<UserVO> userVOS = userDOS.stream().map(this::beanProcess).collect(Collectors.toList());
-            System.out.println("路径b");
             return userVOS;
         }
     }

@@ -3,6 +3,7 @@ package net.ecnu.controller;
 
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Update;
+import net.ecnu.controller.request.TagFilterReq;
 import net.ecnu.controller.request.TaggingReq;
 import net.ecnu.controller.request.TagReq;
 import net.ecnu.model.common.PageData;
@@ -47,14 +48,19 @@ public class TagController {
     @PostMapping("list")
     public JsonData list(@RequestParam(value = "cur", defaultValue = "1") int cur,
                          @RequestParam(value = "size", defaultValue = "10") int size,
-                         @RequestBody TagReq tagReq) {
-        Object data = tagService.list(tagReq, new PageData(cur, size));
+                         @RequestBody TagFilterReq tagFilterReq) {
+        Object data = tagService.list(tagFilterReq, new PageData(cur, size));
         return JsonData.buildSuccess(data);
     }
 
     @PostMapping("add_tagging")
     public JsonData addTagging(@RequestBody TaggingReq taggingReq) {
         Object data = tagService.addTagging(taggingReq);
+        return JsonData.buildSuccess(data);
+    }
+    @PostMapping("list_ent_tags")
+    public JsonData listEntityTags(@RequestParam String entityId) {
+        Object data = tagService.listEntityTags(entityId);
         return JsonData.buildSuccess(data);
     }
 }
