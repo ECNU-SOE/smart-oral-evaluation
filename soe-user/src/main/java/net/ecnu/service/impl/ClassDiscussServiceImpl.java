@@ -111,17 +111,19 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
                 throw new BizException(BizCodeEnum.DISCUSS_AUDIO_ADD_ERROR);
             }
             //插入话题对应音频
-            List<DiscussAudioDo> audioList = new ArrayList<>();
-            for (String url : discussDto.getAudioUrl()) {
-                DiscussAudioDo discussAudioDo = new DiscussAudioDo();
-                discussAudioDo.setAudioUrl(url);
-                discussAudioDo.setDiscussId(record.getDiscussId());
-                discussAudioDo.setDelFlg(false);
-                discussAudioDo.setUploadTime(new Date());
-                audioList.add(discussAudioDo);
-            }
-            if (!discussAudioService.saveBatch(audioList)) {
-                throw new BizException(BizCodeEnum.DISCUSS_AUDIO_ADD_ERROR);
+            if (!CollectionUtils.isEmpty(discussDto.getAudioUrl())) {
+                List<DiscussAudioDo> audioList = new ArrayList<>();
+                for (String url : discussDto.getAudioUrl()) {
+                    DiscussAudioDo discussAudioDo = new DiscussAudioDo();
+                    discussAudioDo.setAudioUrl(url);
+                    discussAudioDo.setDiscussId(record.getDiscussId());
+                    discussAudioDo.setDelFlg(false);
+                    discussAudioDo.setUploadTime(new Date());
+                    audioList.add(discussAudioDo);
+                }
+                if (!discussAudioService.saveBatch(audioList)) {
+                    throw new BizException(BizCodeEnum.DISCUSS_AUDIO_ADD_ERROR);
+                }
             }
             return true;
         } catch (Exception e) {
@@ -166,7 +168,9 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
             discussVo.setPublishClassesNum(publishClassesNum);
             //获取该话题的上传音频
             List<String> audioUrlList = discussAudioService.selectByDiscussId(record.getDiscussId());
-            discussVo.setAudioList(audioUrlList);
+            if (!CollectionUtils.isEmpty(audioUrlList)) {
+                discussVo.setAudioList(audioUrlList);
+            }
             //获取回复数
             discussVo.setReplyNumber(record.getReplyNumber() > 999 ? 999 : record.getReplyNumber());
             discussVoList.add(discussVo);
@@ -208,7 +212,9 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
             replyInfoVo.setReplyNumber(record.getReplyNumber() > 999 ? 999 : record.getReplyNumber());
             //获得该回复上传的音频
             List<String> audioUrlList = discussAudioService.selectByDiscussId(record.getDiscussId());
-            replyInfoVo.setAudioList(audioUrlList);
+            if (!CollectionUtils.isEmpty(audioUrlList)) {
+                replyInfoVo.setAudioList(audioUrlList);
+            }
             replyInfoVoList.add(replyInfoVo);
         }
         replyInfoPage.setRecords(replyInfoVoList);
@@ -247,15 +253,17 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
             }
             //新增对应记录的音频
             List<DiscussAudioDo> audioDoList = new ArrayList<>();
-            for (String audioUrl : discussDto.getAudioUrl()) {
-                DiscussAudioDo discussAudioDo = new DiscussAudioDo();
-                discussAudioDo.setDiscussId(classDiscussDo.getDiscussId());
-                discussAudioDo.setAudioUrl(audioUrl);
-                discussAudioDo.setUploadTime(new Date());
-                audioDoList.add(discussAudioDo);
+            if(!CollectionUtils.isEmpty(discussDto.getAudioUrl())){
+                for (String audioUrl : discussDto.getAudioUrl()) {
+                    DiscussAudioDo discussAudioDo = new DiscussAudioDo();
+                    discussAudioDo.setDiscussId(classDiscussDo.getDiscussId());
+                    discussAudioDo.setAudioUrl(audioUrl);
+                    discussAudioDo.setUploadTime(new Date());
+                    audioDoList.add(discussAudioDo);
+                }
+                //批量新增音频数据
+                discussAudioService.saveBatch(audioDoList);
             }
-            //批量新增音频数据
-            discussAudioService.saveBatch(audioDoList);
             //更新父节点
             classDiscussMapper.updateByPrimaryKeySelective(parentDiscuss);
         } catch (Exception e) {
