@@ -81,7 +81,6 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Boolean addDiscuss(DiscussDto discussDto) {
         try {
             String currentAccountNo = RequestParamUtil.currentAccountNo();
@@ -222,7 +221,6 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void reply(DiscussDto discussDto) {
         try {
             String currentAccountNo = RequestParamUtil.currentAccountNo();
