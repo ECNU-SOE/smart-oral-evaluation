@@ -91,7 +91,9 @@ public class DiscussController {
         if (StringUtils.isEmpty(discussId)) {
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY);
         }
-        if (classDiscussService.addLikes(discussId) > 0) {
+        //磁盘满了，创建不了表，暂时先写这，不影响原流程
+        Integer likeFlag = 0;
+        if (classDiscussService.addLikes(discussId,likeFlag) > 0) {
             return JsonData.buildSuccess("点赞成功");
         } else {
             return JsonData.buildError("点赞失败");

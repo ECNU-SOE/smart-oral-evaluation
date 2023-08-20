@@ -2,7 +2,14 @@ package net.ecnu.mapper;
 
 import net.ecnu.model.ClassCpsgrpDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import net.ecnu.model.dto.StatisticsDto;
+import net.ecnu.model.vo.ClassCpsgrpInfoVo;
+import net.ecnu.model.vo.StatisticsVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 /**
  * <p>
@@ -15,4 +22,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface ClassCpsgrpMapper extends BaseMapper<ClassCpsgrpDO> {
 
+    List<ClassCpsgrpInfoVo> getCpsgrpInfoByCourseId(@Param("courseId") String courseId,@Param("currentTypeId") Integer currentTypeId);
+
+    List<StatisticsVo> getStatisticsInfo(@Param("statisticsDto") StatisticsDto statisticsDto);
 }

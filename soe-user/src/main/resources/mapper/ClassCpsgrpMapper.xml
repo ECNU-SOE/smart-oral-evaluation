@@ -18,4 +18,42 @@
         class_id, cpsgrp_id, type, start_time, end_time, gmt_create, gmt_modified
     </sql>
 
+    <select id="getCpsgrpInfoByCourseId" resultType="net.ecnu.model.vo.ClassCpsgrpInfoVo">
+        SELECT
+            DISTINCT cc.cpsgrp_id,
+            cps.description
+        FROM
+            class c
+        LEFT JOIN
+            class_cpsgrp cc ON cc.class_id = c.id and cc.type = #{currentTypeId,jdbcType=INTEGER}
+        LEFT JOIN
+            cpsgrp cps ON cc.cpsgrp_id = cps.id and cps.del = 0
+        WHERE
+            c.course_id = #{courseId,jdbcType=VARCHAR} and c.del = 0
+            and cc.cpsgrp_id is NOT NULL
+    </select>
+
+    <select id="getStatisticsInfo" resultType="net.ecnu.model.vo.StatisticsVo">
+        SELECT
+            c.id AS classId,
+            c.description AS className,
+            count(uc.account_no) AS studentNums,
+            AVG(t.pron_completion) AS pronCompletionAverage,
+            AVG(t.pron_accuracy) AS pronAccuracyAverage,
+            AVG(t.pron_fluency) AS pronFluencyAverage,
+            AVG(t.suggested_score) AS suggestedScoreAverage
+        FROM
+            class c
+        LEFT JOIN
+            class_cpsgrp cc ON cc.class_id = c.id and cc.cpsgrp_id = #{statisticsDto.cpsgrpId,jdbcType=VARCHAR} and cc.type = #{statisticsDto.type,jdbcType=INTEGER}
+        LEFT JOIN
+            user_class uc ON uc.class_id = c.id and uc.status = 1 and uc.r_type = 1
+        LEFT JOIN
+            transcript t ON t.respondent = uc.account_no
+        WHERE
+            c.course_id = #{statisticsDto.courseId,jdbcType=VARCHAR} and c.del = 0 and t.account_no IS NOT NULL
+        ORDER BY suggestedScoreAverage DESC
+        GROUP BY c.id
+    </select>
+
 </mapper>

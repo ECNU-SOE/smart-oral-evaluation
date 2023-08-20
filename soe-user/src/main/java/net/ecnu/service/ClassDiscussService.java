@@ -32,7 +32,7 @@ public interface ClassDiscussService {
     
     int updateByPrimaryKey(ClassDiscussDo record);
 
-    int addLikes(String discussId);
+    int addLikes(String discussId,Integer likeFlag);
 
     Boolean addDiscuss(DiscussDto discussDto);
 

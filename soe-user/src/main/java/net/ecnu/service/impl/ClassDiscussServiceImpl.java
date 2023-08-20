@@ -76,7 +76,7 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
     }
 
     @Override
-    public int addLikes(String discussId) {
+    public int addLikes(String discussId,Integer likeFlag) {
         return classDiscussMapper.addLikes(discussId);
     }
 
