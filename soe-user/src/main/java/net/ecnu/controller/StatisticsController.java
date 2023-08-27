@@ -1,7 +1,9 @@
 package net.ecnu.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.enums.CpsgrpTypeEnum;
+import net.ecnu.exception.BizException;
 import net.ecnu.model.dto.StatisticsDto;
 import net.ecnu.model.vo.ClassCpsgrpInfoVo;
 import net.ecnu.model.vo.StatisticsVo;
@@ -12,6 +14,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,9 +71,14 @@ public class StatisticsController {
         return JsonData.buildSuccess(resultMap);
     }
 
+    /**
+     * 导出班级下每次测验的学生成绩
+     * **/
     @GetMapping("/exportExcel")
-    public JsonData exportExcel(@RequestParam("classId") String classId) {
-
-        return JsonData.buildSuccess();
+    public void exportExcel(@RequestParam("classId") String classId,@RequestParam("cpsgrpId") String cpsgrpId, HttpServletResponse response) {
+        if (StringUtils.isEmpty(classId)) {
+            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY);
+        }
+        statisticsService.exportExcel(classId,cpsgrpId,response);
     }
 }

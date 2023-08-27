@@ -5,6 +5,7 @@ import net.ecnu.model.dto.StatisticsDto;
 import net.ecnu.model.vo.ClassCpsgrpInfoVo;
 import net.ecnu.model.vo.StatisticsVo;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -19,4 +20,6 @@ public interface StatisticsService {
 
 
     List<ClassCpsgrpInfoVo> getCpsgrpInfoByCourseId(String courseId,Integer currentTypeId);
+
+    void exportExcel(String classId,String cpsgrpId, HttpServletResponse response);
 }

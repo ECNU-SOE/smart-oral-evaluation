@@ -57,7 +57,13 @@ public enum BizCodeEnum {
      * **/
     MISTAKE_CLEAN_ERROR(400000,"清除错题异常"),
     MISTAKE_ADD_WRONG_NUM_ERROR(400001,"增加错误次数异常"),
-    MISTAKE_ADD_ERROR(400002,"错题添加异常")
+    MISTAKE_ADD_ERROR(400002,"错题添加异常"),
+
+    /**
+     * Excel模板异常
+     * **/
+    EXCEL_ERROR(500000,"Excel异常报错"),
+    EXCEL_TEMPLATE_IS_NOT_EXIST(500001,"Excel模板不存在")
     ;
     @Getter
     private final int code;
