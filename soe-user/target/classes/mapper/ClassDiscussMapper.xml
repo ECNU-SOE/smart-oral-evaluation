@@ -8,6 +8,7 @@
     <result column="parent_id" jdbcType="BIGINT" property="parentId" />
     <result column="class_id" jdbcType="VARCHAR" property="classId" />
     <result column="publisher" jdbcType="VARCHAR" property="publisher" />
+    <result column="discuss_title" jdbcType="VARCHAR" property="discussTitle" />
     <result column="discuss_content" jdbcType="LONGVARCHAR" property="discussContent" />
     <result column="forward_id" jdbcType="BIGINT" property="forwardId" />
     <result column="like_count" jdbcType="INTEGER" property="likeCount" />
@@ -17,14 +18,89 @@
     <result column="del_flg" jdbcType="BOOLEAN" property="delFlg" />
     <result column="reply_number" jdbcType="INTEGER" property="replyNumber" />
   </resultMap>
+  <sql id="Example_Where_Clause">
+    <!--@mbg.generated-->
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <!--@mbg.generated-->
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    discuss_id, parent_id, class_id, publisher, discuss_content, forward_id, like_count, 
-    is_leaf, release_time, sort_time, del_flg, reply_number
+    discuss_id, parent_id, class_id, publisher, discuss_title, discuss_content, forward_id,
+    like_count, is_leaf, release_time, sort_time, del_flg, reply_number
   </sql>
+  <select id="selectByExample" parameterType="net.ecnu.model.ClassDiscussDoExample" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from class_discuss
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     <!--@mbg.generated-->
-    select 
+    select
     <include refid="Base_Column_List" />
     from class_discuss
     where discuss_id = #{discussId,jdbcType=BIGINT}
@@ -34,16 +110,25 @@
     delete from class_discuss
     where discuss_id = #{discussId,jdbcType=BIGINT}
   </delete>
+  <delete id="deleteByExample" parameterType="net.ecnu.model.ClassDiscussDoExample">
+    <!--@mbg.generated-->
+    delete from class_discuss
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
   <insert id="insert" keyColumn="discuss_id" keyProperty="discussId" parameterType="net.ecnu.model.ClassDiscussDo" useGeneratedKeys="true">
     <!--@mbg.generated-->
-    insert into class_discuss (parent_id, class_id, publisher, 
-      discuss_content, forward_id, like_count, 
-      is_leaf, release_time, sort_time, 
-      del_flg, reply_number)
+    insert into class_discuss (parent_id, class_id, publisher,
+      discuss_title, discuss_content, forward_id,
+      like_count, is_leaf, release_time,
+      sort_time, del_flg, reply_number
+      )
     values (#{parentId,jdbcType=BIGINT}, #{classId,jdbcType=VARCHAR}, #{publisher,jdbcType=VARCHAR},
-      #{discussContent,jdbcType=LONGVARCHAR}, #{forwardId,jdbcType=BIGINT}, #{likeCount,jdbcType=INTEGER},
-      #{isLeaf,jdbcType=BOOLEAN}, #{releaseTime,jdbcType=TIMESTAMP}, #{sortTime,jdbcType=TIMESTAMP},
-      #{delFlg,jdbcType=BOOLEAN}, #{replyNumber,jdbcType=INTEGER})
+      #{discussTitle,jdbcType=VARCHAR}, #{discussContent,jdbcType=LONGVARCHAR}, #{forwardId,jdbcType=BIGINT},
+      #{likeCount,jdbcType=INTEGER}, #{isLeaf,jdbcType=BOOLEAN}, #{releaseTime,jdbcType=TIMESTAMP},
+      #{sortTime,jdbcType=TIMESTAMP}, #{delFlg,jdbcType=BOOLEAN}, #{replyNumber,jdbcType=INTEGER}
+      )
   </insert>
   <insert id="insertSelective" keyColumn="discuss_id" keyProperty="discussId" parameterType="net.ecnu.model.ClassDiscussDo" useGeneratedKeys="true">
     <!--@mbg.generated-->
@@ -57,6 +142,9 @@
       </if>
       <if test="publisher != null">
         publisher,
+      </if>
+      <if test="discussTitle != null">
+        discuss_title,
       </if>
       <if test="discussContent != null">
         discuss_content,
@@ -93,6 +181,9 @@
       <if test="publisher != null">
         #{publisher,jdbcType=VARCHAR},
       </if>
+      <if test="discussTitle != null">
+        #{discussTitle,jdbcType=VARCHAR},
+      </if>
       <if test="discussContent != null">
         #{discussContent,jdbcType=LONGVARCHAR},
       </if>
@@ -119,6 +210,81 @@
       </if>
     </trim>
   </insert>
+  <select id="countByExample" parameterType="net.ecnu.model.ClassDiscussDoExample" resultType="java.lang.Long">
+    <!--@mbg.generated-->
+    select count(*) from class_discuss
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    <!--@mbg.generated-->
+    update class_discuss
+    <set>
+      <if test="record.discussId != null">
+        discuss_id = #{record.discussId,jdbcType=BIGINT},
+      </if>
+      <if test="record.parentId != null">
+        parent_id = #{record.parentId,jdbcType=BIGINT},
+      </if>
+      <if test="record.classId != null">
+        class_id = #{record.classId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.publisher != null">
+        publisher = #{record.publisher,jdbcType=VARCHAR},
+      </if>
+      <if test="record.discussTitle != null">
+        discuss_title = #{record.discussTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="record.discussContent != null">
+        discuss_content = #{record.discussContent,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="record.forwardId != null">
+        forward_id = #{record.forwardId,jdbcType=BIGINT},
+      </if>
+      <if test="record.likeCount != null">
+        like_count = #{record.likeCount,jdbcType=INTEGER},
+      </if>
+      <if test="record.isLeaf != null">
+        is_leaf = #{record.isLeaf,jdbcType=BOOLEAN},
+      </if>
+      <if test="record.releaseTime != null">
+        release_time = #{record.releaseTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.sortTime != null">
+        sort_time = #{record.sortTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.delFlg != null">
+        del_flg = #{record.delFlg,jdbcType=BOOLEAN},
+      </if>
+      <if test="record.replyNumber != null">
+        reply_number = #{record.replyNumber,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    <!--@mbg.generated-->
+    update class_discuss
+    set discuss_id = #{record.discussId,jdbcType=BIGINT},
+      parent_id = #{record.parentId,jdbcType=BIGINT},
+      class_id = #{record.classId,jdbcType=VARCHAR},
+      publisher = #{record.publisher,jdbcType=VARCHAR},
+      discuss_title = #{record.discussTitle,jdbcType=VARCHAR},
+      discuss_content = #{record.discussContent,jdbcType=LONGVARCHAR},
+      forward_id = #{record.forwardId,jdbcType=BIGINT},
+      like_count = #{record.likeCount,jdbcType=INTEGER},
+      is_leaf = #{record.isLeaf,jdbcType=BOOLEAN},
+      release_time = #{record.releaseTime,jdbcType=TIMESTAMP},
+      sort_time = #{record.sortTime,jdbcType=TIMESTAMP},
+      del_flg = #{record.delFlg,jdbcType=BOOLEAN},
+      reply_number = #{record.replyNumber,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
   <update id="updateByPrimaryKeySelective" parameterType="net.ecnu.model.ClassDiscussDo">
     <!--@mbg.generated-->
     update class_discuss
@@ -131,6 +297,9 @@
       </if>
       <if test="publisher != null">
         publisher = #{publisher,jdbcType=VARCHAR},
+      </if>
+      <if test="discussTitle != null">
+        discuss_title = #{discussTitle,jdbcType=VARCHAR},
       </if>
       <if test="discussContent != null">
         discuss_content = #{discussContent,jdbcType=LONGVARCHAR},
@@ -165,6 +334,7 @@
     set parent_id = #{parentId,jdbcType=BIGINT},
       class_id = #{classId,jdbcType=VARCHAR},
       publisher = #{publisher,jdbcType=VARCHAR},
+      discuss_title = #{discussTitle,jdbcType=VARCHAR},
       discuss_content = #{discussContent,jdbcType=LONGVARCHAR},
       forward_id = #{forwardId,jdbcType=BIGINT},
       like_count = #{likeCount,jdbcType=INTEGER},
@@ -175,6 +345,8 @@
       reply_number = #{replyNumber,jdbcType=INTEGER}
     where discuss_id = #{discussId,jdbcType=BIGINT}
   </update>
+
+
   <update id="addLikes">
     update
       class_discuss
@@ -183,4 +355,25 @@
     where
       discuss_id = #{discussId} and del_flg = 0
   </update>
+
+  <select id="getPublisherInfo" resultType="java.util.Map">
+    SELECT
+        IFNULL(uc.r_type,1) AS roleType,
+        IFNULL(u.real_name,u.account_no) AS userName
+    FROM
+        user_class uc
+    INNER JOIN
+        user u ON u.account_no = uc.account_no and u.del = 0
+    WHERE
+        uc.account_no = #{publisher,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectPublishClassesNum" resultType="java.lang.Integer">
+    select
+	  IFNULL(count(DISTINCT class_id),0)
+    from
+        class_discuss
+    where
+      forward_id = #{forwardId} and del_flg = 0
+  </select>
 </mapper>

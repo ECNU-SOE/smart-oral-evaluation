@@ -110,4 +110,10 @@ public class ClassController {
         Object data = classService.delTest(id);
         return JsonData.buildSuccess(data);
     }
+    //发布语料组到班级
+    @PostMapping("add_cpsgrp")
+    public JsonData add_cpsgrp(@RequestBody @Validated(Create.class) ClassCpsgrpReq classCpsgrpReq) {
+        Object data = classService.addCpsgrp(classCpsgrpReq);
+        return JsonData.buildSuccess(data);
+    }
 }
