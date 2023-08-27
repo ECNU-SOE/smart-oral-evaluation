@@ -1,14 +1,31 @@
 package net.ecnu.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
+import net.ecnu.enums.BizCodeEnum;
+import net.ecnu.exception.BizException;
 import net.ecnu.mapper.ClassCpsgrpMapper;
+import net.ecnu.model.dto.ClassScoreInfoDto;
+import net.ecnu.model.dto.CourseClassCpsgrpInfoDto;
 import net.ecnu.model.dto.StatisticsDto;
 import net.ecnu.model.vo.ClassCpsgrpInfoVo;
 import net.ecnu.model.vo.StatisticsVo;
 import net.ecnu.service.StatisticsService;
+import net.ecnu.util.ExcelUtil;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -19,11 +36,15 @@ import java.util.stream.Collectors;
  * @Author lsy
  * @Date 2023/8/20 10:37
  */
+@Slf4j
 @Service
 public class StatisticsServiceImpl implements StatisticsService {
 
     @Resource
     private ClassCpsgrpMapper classCpsgrpMapper;
+
+    @Value("${class.score.info.template}")
+    private String classScoreInfoTemplate;
 
     @Override
     public Page<StatisticsVo> getStatisticsInfo(StatisticsDto statisticsDto) {
@@ -87,4 +108,99 @@ public class StatisticsServiceImpl implements StatisticsService {
         List<ClassCpsgrpInfoVo> classCpsgrpInfoVos = classCpsgrpMapper.getCpsgrpInfoByCourseId(courseId, currentTypeId);
         return classCpsgrpInfoVos;
     }
+
+    @Override
+    public void exportExcel(String classId,String cpsgrpId, HttpServletResponse response) {
+        log.info("开始导出班级成绩Excel，入参classId:{}", JSON.toJSON(classId));
+        File file = new File(classScoreInfoTemplate);
+        if (!file.isFile()) {
+            throw new BizException(BizCodeEnum.EXCEL_TEMPLATE_IS_NOT_EXIST);
+        }
+        try {
+            //获取班级下学生指定作业的成绩
+            CourseClassCpsgrpInfoDto courseClassCpsgrpInfoDto = classCpsgrpMapper.getClassCpsgrpInfo(classId,cpsgrpId);
+            List<ClassScoreInfoDto> classScoreInfoDtos = classCpsgrpMapper.getClassScoreInfo(classId,cpsgrpId);
+            Workbook workbook = ExcelUtil.getWorkbook(classScoreInfoTemplate);
+            /*CellStyle promptStyle = workbook.createCellStyle();
+            //设置字体
+            Font promptFont = workbook.createFont();
+            promptFont.setFontName("微软雅黑");
+            promptStyle.setFont(promptFont);*/
+            Sheet sheet = workbook.getSheetAt(0);
+            sheet.autoSizeColumn(1);
+            sheet.autoSizeColumn(1, true);
+            //课程名称
+            sheet.getRow(3).getCell(2).setCellValue(courseClassCpsgrpInfoDto.getCourseName());
+            //课程开始、结束时间
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String startTime = courseClassCpsgrpInfoDto.getCourseStartTime().toInstant()
+                    .atZone(ZoneId.systemDefault()).toLocalDateTime().format(formatter);
+            String endTime = courseClassCpsgrpInfoDto.getCourseEndTime().toInstant()
+                    .atZone(ZoneId.systemDefault()).toLocalDateTime().format(formatter);
+            sheet.getRow(3).getCell(7).setCellValue(startTime);
+            sheet.getRow(3).getCell(10).setCellValue(endTime);
+            //班级名称
+            sheet.getRow(4).getCell(2).setCellValue(courseClassCpsgrpInfoDto.getClassName());
+            //授课老师,未找到对应字段，暂时为空
+            sheet.getRow(4).getCell(7).setCellValue("");
+            //学生人数
+            sheet.getRow(4).getCell(10).setCellValue(String.valueOf(courseClassCpsgrpInfoDto.getStudentNums()));
+            //作业名称
+            sheet.getRow(5).getCell(2).setCellValue(courseClassCpsgrpInfoDto.getCpsgrpName());
+            //填充表格字段
+            fillStudentScoreInfo(7,sheet,classScoreInfoDtos);
+            String fileName = courseClassCpsgrpInfoDto.getClassName() + "-" + courseClassCpsgrpInfoDto.getCpsgrpName() + ".xlsx";
+            String gFileName = URLEncoder.encode(fileName, "UTF-8");
+            // 定义输出类型
+            response.setContentType("application/vnd.ms-excel");
+            response.addHeader("Content-Disposition", "attachment;filename=" + gFileName);
+            //定义为默认展示第一个sheet
+            workbook.setActiveSheet(0);
+            // 获取输出流
+            OutputStream out = response.getOutputStream();
+            workbook.write(out);
+            out.close();
+        } catch (Exception e) {
+            log.info("导出Excel失败，异常信息：{}",JSON.toJSON(e.getMessage()));
+            throw new BizException(BizCodeEnum.EXCEL_ERROR.getCode(),"导出Excel失败,请联系管理员");
+        }
+    }
+
+    /**
+     * 填充学生成绩数据
+     * @param rowLine 开始行数
+     * @param sheet sheet页对象
+     * @param classScoreInfoDtos 需要填充的表格内容
+     * **/
+    public void fillStudentScoreInfo(Integer rowLine,Sheet sheet,List<ClassScoreInfoDto> classScoreInfoDtos){
+        int index = 0;
+        for (ClassScoreInfoDto classScoreInfoDto : classScoreInfoDtos) {
+            CellRangeAddress studentNameRange = new CellRangeAddress(rowLine + index, rowLine + index, 0, 1);
+            sheet.addMergedRegion(studentNameRange);
+            //学生姓名
+            sheet.getRow(rowLine + index).createCell(0).setCellValue(classScoreInfoDto.getStudentName());
+            //性别
+            sheet.getRow(rowLine + index).createCell(2).setCellValue(classScoreInfoDto.getSex());
+            //完整度得分
+            CellRangeAddress completeRange = new CellRangeAddress(rowLine + index, rowLine + index, 3, 4);
+            sheet.addMergedRegion(completeRange);
+            sheet.getRow(rowLine + index).createCell(3).setCellValue(classScoreInfoDto.getPronCompletionScore());
+            //准确度得分
+            CellRangeAddress pronAccuracyRange = new CellRangeAddress(rowLine + index, rowLine + index, 5, 6);
+            sheet.addMergedRegion(pronAccuracyRange);
+            sheet.getRow(rowLine + index).createCell(5).setCellValue(classScoreInfoDto.getPronAccuracyScore());
+            //流畅度得分
+            CellRangeAddress pronFluencyRange = new CellRangeAddress(rowLine + index,rowLine + index,7,8);
+            sheet.addMergedRegion(pronFluencyRange);
+            sheet.getRow(rowLine + index).createCell(7).setCellValue(classScoreInfoDto.getPronFluencyScore());
+            //综合得分
+            CellRangeAddress suggestedScoreRange = new CellRangeAddress(rowLine + index,rowLine + index,9,10);
+            sheet.addMergedRegion(suggestedScoreRange);
+            sheet.getRow(rowLine + index).createCell(9).setCellValue(classScoreInfoDto.getSuggestedScoreScore());
+            //排名
+            sheet.getRow(rowLine + index).createCell(11).setCellValue(index + 1);
+            index++;
+        }
+    }
+
 }

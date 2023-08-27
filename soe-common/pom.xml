@@ -93,6 +93,18 @@
             <artifactId>jjwt</artifactId>
         </dependency>
 
+        <!--excel处理工具-->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.17</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>3.17</version>
+        </dependency>
+
 
         <!--BEGIN Nacos服务注册与配置中心-->
         <!--Hoxton.M2版本之后不再使用Ribbon而是使用spring-cloud-loadbalancer，所以不引入spring-cloud-loadbalancer会报错，

@@ -2,6 +2,8 @@ package net.ecnu.mapper;
 
 import net.ecnu.model.ClassCpsgrpDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import net.ecnu.model.dto.ClassScoreInfoDto;
+import net.ecnu.model.dto.CourseClassCpsgrpInfoDto;
 import net.ecnu.model.dto.StatisticsDto;
 import net.ecnu.model.vo.ClassCpsgrpInfoVo;
 import net.ecnu.model.vo.StatisticsVo;
@@ -25,4 +27,8 @@ public interface ClassCpsgrpMapper extends BaseMapper<ClassCpsgrpDO> {
     List<ClassCpsgrpInfoVo> getCpsgrpInfoByCourseId(@Param("courseId") String courseId,@Param("currentTypeId") Integer currentTypeId);
 
     List<StatisticsVo> getStatisticsInfo(@Param("statisticsDto") StatisticsDto statisticsDto);
+
+    List<ClassScoreInfoDto> getClassScoreInfo(@Param("classId") String classId,@Param("cpsgrpId") String cpsgrpId);
+
+    CourseClassCpsgrpInfoDto getClassCpsgrpInfo(@Param("classId") String classId,@Param("cpsgrpId") String cpsgrpId);
 }
