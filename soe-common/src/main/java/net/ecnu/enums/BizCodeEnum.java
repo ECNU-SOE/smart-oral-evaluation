@@ -35,6 +35,11 @@ public enum BizCodeEnum {
     CPSGRP_NOT_EXIST(260002, "语料组不存在"),
 
     /**
+     * corpus快照相关
+     * **/
+    CPSRCD_NOT_EXIST(265001,"题目不存在"),
+
+    /**
      * 语料相关
      */
     CORPUS_DEL_ERROR(270001, "删除语料异常"),

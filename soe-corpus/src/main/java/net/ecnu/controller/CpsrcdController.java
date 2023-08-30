@@ -9,6 +9,7 @@ import net.ecnu.model.vo.CpsrcdVO;
 import net.ecnu.service.CpsrcdService;
 import net.ecnu.service.TopicService;
 import net.ecnu.util.JsonData;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +47,18 @@ public class CpsrcdController {
     public JsonData del(@RequestParam(value = "cpsrcdId", required = true) String cpsrcdId) {
         Object data = cpsrcdService.del(cpsrcdId);
         return JsonData.buildSuccess(data);
+    }
+
+    /**
+     * 查询自提
+     * **/
+    @GetMapping("/getCpsrcdDetail")
+    public JsonData getCpsrcdDetail(@RequestParam("cpsrcdId") String cpsrcdId) {
+        if (StringUtils.isEmpty(cpsrcdId)) {
+            return JsonData.buildError("子题id不能为空");
+        }
+        CpsrcdVO cpsrcdVO = cpsrcdService.getCpsrcdDetail(cpsrcdId);
+        return JsonData.buildSuccess(cpsrcdVO);
     }
 }
 

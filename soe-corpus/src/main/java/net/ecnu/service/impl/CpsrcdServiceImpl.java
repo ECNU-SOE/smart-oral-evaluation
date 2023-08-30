@@ -12,6 +12,7 @@ import net.ecnu.model.CpsgrpDO;
 import net.ecnu.model.CpsrcdDO;
 import net.ecnu.mapper.CpsrcdMapper;
 import net.ecnu.model.TopicDO;
+import net.ecnu.model.vo.CpsrcdVO;
 import net.ecnu.service.CpsrcdService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.service.OssService;
@@ -24,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.yaml.snakeyaml.util.ArrayUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -88,6 +90,17 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
         if (cpsrcdDO == null) throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         int i = cpsrcdMapper.deleteById(cpsrcdId);
         return i;
+    }
+
+    @Override
+    public CpsrcdVO getCpsrcdDetail(String cpsrcdId) {
+        CpsrcdVO cpsrcdVO = new CpsrcdVO();
+        CpsrcdDO cpsrcdDO = cpsrcdMapper.selectById(cpsrcdId);
+        if (Objects.isNull(cpsrcdDO)) {
+            throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
+        }
+        BeanUtils.copyProperties(cpsrcdDO,cpsrcdVO);
+        return cpsrcdVO;
     }
 
 
