@@ -28,6 +28,7 @@ public interface ClassService extends IService<ClassDO> {
 
     Object delUsrClass(String id);
     Object addTest(TestAddReq testAddReq);
+    Object addCpsgrp(ClassCpsgrpReq classCpsgrpReq);
 
     Object delTest(String id);
 

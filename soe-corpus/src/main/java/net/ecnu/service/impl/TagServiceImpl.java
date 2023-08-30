@@ -110,7 +110,8 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
         if (taggingDOS.size()==0)
             return "该对象暂无标签";
         List<Integer> tagIds = taggingDOS.stream().map(TaggingDO::getTagId).collect(Collectors.toList());
-        return tagIds;
+        List<TagDO> tagDOS = tagMapper.selectBatchIds(tagIds);
+        return tagDOS;
     }
 
 

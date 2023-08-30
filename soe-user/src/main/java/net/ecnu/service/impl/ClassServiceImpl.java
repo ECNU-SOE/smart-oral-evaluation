@@ -317,6 +317,24 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     }
 
     @Override
+    public Object addCpsgrp(ClassCpsgrpReq classCpsgrpReq) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+        ClassCpsgrpDO classCpsgrpDO = classCpsgrpMapper.selectOne(new QueryWrapper<ClassCpsgrpDO>()
+                .eq("class_id", classCpsgrpReq.getClassId())
+                .eq("cpsgrp_id", classCpsgrpReq.getCpsgrpId())
+        );
+        if (classCpsgrpDO!=null)
+            return "该语料组已存在";
+        ClassCpsgrpDO classCpsgrpDO1 = new ClassCpsgrpDO();
+        BeanUtils.copyProperties(classCpsgrpReq,classCpsgrpDO1);
+        int total = classCpsgrpMapper.insert(classCpsgrpDO1);
+        return "插入成功，共计影响了"+total+"行";
+    }
+
+    @Override
     public Object delTest(String id) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         if (StringUtils.isBlank(currentAccountNo)) {

@@ -6,11 +6,11 @@ import net.ecnu.controller.request.TopicReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.manager.TopicManager;
-import net.ecnu.mapper.CpsgrpMapper;
-import net.ecnu.mapper.CpsrcdMapper;
+import net.ecnu.mapper.*;
 import net.ecnu.model.CpsrcdDO;
+import net.ecnu.model.TagDO;
+import net.ecnu.model.TaggingDO;
 import net.ecnu.model.TopicDO;
-import net.ecnu.mapper.TopicMapper;
 import net.ecnu.model.vo.CpsrcdVO;
 import net.ecnu.model.vo.TopicVO;
 import net.ecnu.service.TopicService;
@@ -40,6 +40,10 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, TopicDO> implemen
     @Autowired
     private TopicMapper topicMapper;
 
+    @Autowired
+    private TagMapper tagMapper;
+    @Autowired
+    private TaggingMapper taggingMapper;
     @Autowired
     private CpsrcdMapper cpsrcdMapper;
 
@@ -90,8 +94,16 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, TopicDO> implemen
         CpsrcdVO cpsrcdVO = new CpsrcdVO();
         BeanUtils.copyProperties(cpsrcdDO, cpsrcdVO);
         //tags单独处理String->List<String>
-        List<String> tags = JSONUtil.parseArray(cpsrcdDO.getTags()).toList(String.class);
-        cpsrcdVO.setTags(tags);
+//        List<String> tags = JSONUtil.parseArray(cpsrcdDO.getTags()).toList(String.class);
+        List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>()
+                .eq("entity_id", cpsrcdDO.getId())
+        );
+        if (taggingDOS.size()!=0){
+            List<Integer> tagIds = taggingDOS.stream().map(TaggingDO::getTagId).collect(Collectors.toList());
+            List<TagDO> tagDOS = tagMapper.selectBatchIds(tagIds);
+            List<String> tagNames = tagDOS.stream().map(TagDO::getName).collect(Collectors.toList());
+            cpsrcdVO.setTags(tagNames);
+        }
         return cpsrcdVO;
     }
 }
