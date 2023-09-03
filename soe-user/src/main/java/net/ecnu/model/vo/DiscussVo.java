@@ -61,6 +61,11 @@ public class DiscussVo {
     private Boolean isLeaf;
 
     /**
+     * 该用户是否对该帖点过赞
+     * **/
+    private Boolean isLike;
+
+    /**
      * 发布时间
      */
     private Date releaseTime;

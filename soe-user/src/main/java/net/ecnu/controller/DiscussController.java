@@ -5,6 +5,7 @@ import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.model.dto.DiscussDto;
 import net.ecnu.model.dto.ForwardDto;
+import net.ecnu.model.dto.ReplyInfoReq;
 import net.ecnu.model.vo.DiscussVo;
 import net.ecnu.model.vo.ReplyInfoVo;
 import net.ecnu.service.ClassDiscussService;
@@ -70,6 +71,20 @@ public class DiscussController {
     }
 
     /**
+     * 查询班级下讨论的内容，不包含回复，支持排序
+     * **/
+    @PostMapping("/getDiscussInfo")
+    public JsonData getReplyInfo(@RequestBody ReplyInfoReq replyInfoReq) {
+        if(StringUtils.isEmpty(replyInfoReq.getClassId())){
+            return JsonData.buildError("班级id不能为空");
+        }
+        replyInfoReq.setPageNum(Objects.isNull(replyInfoReq.getPageNum()) ? 1 : replyInfoReq.getPageNum());
+        replyInfoReq.setPageSize(Objects.isNull(replyInfoReq.getPageSize()) ? 10 : replyInfoReq.getPageSize());
+        Page<DiscussVo> page = classDiscussService.getDiscussInfo(replyInfoReq);
+        return JsonData.buildSuccess(page);
+    }
+
+    /**
      * 查询当前话题/回复下的回复
      * */
     @GetMapping("/getReplyInfoByCurrent")
@@ -87,17 +102,14 @@ public class DiscussController {
      * 点赞
      * */
     @GetMapping("/addLikes")
-    public JsonData addLikes(@RequestParam("discussId") String discussId){
+    public JsonData addLikes(@RequestParam("discussId") String discussId, @RequestParam("likeFlag") Integer likeFlag) {
         if (StringUtils.isEmpty(discussId)) {
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY);
         }
+        //为空则默认为0，0-点赞，1-取消点赞
+        likeFlag = Objects.isNull(likeFlag) ? 0 : likeFlag;
         //磁盘满了，创建不了表，暂时先写这，不影响原流程
-        Integer likeFlag = 0;
-        if (classDiscussService.addLikes(discussId,likeFlag) > 0) {
-            return JsonData.buildSuccess("点赞成功");
-        } else {
-            return JsonData.buildError("点赞失败");
-        }
+        return classDiscussService.addLikes(discussId, likeFlag);
     }
 
     /**

@@ -9,22 +9,26 @@ import net.ecnu.enums.ClassRoleTypeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.mapper.ClassDiscussMapper;
 import net.ecnu.mapper.ClassMapper;
+import net.ecnu.mapper.DiscussLikeMapper;
 import net.ecnu.mapper.UserMapper;
 import net.ecnu.model.ClassDiscussDo;
 import net.ecnu.model.DiscussAudioDo;
+import net.ecnu.model.DiscussLike;
 import net.ecnu.model.dto.DiscussDto;
 import net.ecnu.model.dto.ForwardDto;
+import net.ecnu.model.dto.ReplyInfoReq;
 import net.ecnu.model.vo.DiscussVo;
 import net.ecnu.model.vo.ReplyInfoVo;
 import net.ecnu.service.ClassDiscussService;
 import net.ecnu.service.DiscussAudioService;
+import net.ecnu.util.JsonData;
 import net.ecnu.util.RequestParamUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.CollectionUtils;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -40,11 +44,10 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
     @Resource
     private ClassDiscussMapper classDiscussMapper;
     @Resource
-    private ClassMapper classMapper;
-    @Resource
     private DiscussAudioService discussAudioService;
     @Resource
-    private UserMapper userMapper;
+    private DiscussLikeMapper discussLikeMapper;
+
 
     public int deleteByPrimaryKey(Long discussId) {
         return classDiscussMapper.deleteByPrimaryKey(discussId);
@@ -76,8 +79,22 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
     }
 
     @Override
-    public int addLikes(String discussId,Integer likeFlag) {
-        return classDiscussMapper.addLikes(discussId);
+    public JsonData addLikes(String discussId, Integer likeFlag) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if(discussLikeMapper.isExistLikesRecord(Integer.valueOf(discussId),currentAccountNo) > 0){
+            classDiscussMapper.addLikes(discussId);
+            DiscussLike discussLike = new DiscussLike();
+            discussLike.setDiscussId(Integer.valueOf(discussId).longValue());
+            discussLike.setUserId(currentAccountNo);
+            discussLike.setCreateTime(new Date());
+            discussLike.setDelFlg(false);
+            if (discussLikeMapper.insertSelective(discussLike) < 0) {
+                throw new BizException(BizCodeEnum.DISCUSS_LIKES_ERROR.getCode(),"新增点赞记录异常");
+            }
+            return JsonData.buildSuccess(null,"点赞成功");
+        }else{
+            return JsonData.buildError("重复点赞");
+        }
     }
 
     @Override
@@ -178,16 +195,80 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
         return resultPage;
     }
 
+    @Override
+    public Page<DiscussVo> getDiscussInfo(ReplyInfoReq replyInfoReq) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        LambdaQueryWrapper<ClassDiscussDo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(ClassDiscussDo::getClassId, replyInfoReq.getClassId())
+                .eq(ClassDiscussDo::getParentId, 0).eq(ClassDiscussDo::getDelFlg, 0);
+        /*按点赞数排序,不传则默认降序*/
+        if (Objects.nonNull(replyInfoReq.getSortByLikes()) && replyInfoReq.getSortByLikes().intValue() == 0) {
+            lambdaQueryWrapper.orderByDesc(ClassDiscussDo::getLikeCount);
+        } else if (Objects.nonNull(replyInfoReq.getSortByLikes()) && replyInfoReq.getSortByLikes().intValue() == 1) {
+            lambdaQueryWrapper.orderByAsc(ClassDiscussDo::getLikeCount);
+        }
+        /*按发布顺序排序，不传则默认降序*/
+        if (Objects.isNull(replyInfoReq.getSortByTime()) || replyInfoReq.getSortByTime().intValue() == 0) {
+            lambdaQueryWrapper.orderByDesc(ClassDiscussDo::getSortTime);
+        } else if (replyInfoReq.getSortByTime().intValue() == 1) {
+            lambdaQueryWrapper.orderByAsc(ClassDiscussDo::getSortTime);
+        }
+        Page<ClassDiscussDo> courseDiscussDoPage = classDiscussMapper.selectPage(new Page<>(replyInfoReq.getPageNum(), replyInfoReq.getPageSize()), lambdaQueryWrapper);
+        Page<DiscussVo> resultPage = new Page<>();
+        BeanUtils.copyProperties(courseDiscussDoPage, resultPage);
+        List<DiscussVo> discussVoList = new ArrayList<>();
+        //检查是否是转发的帖子
+        for (ClassDiscussDo record : courseDiscussDoPage.getRecords()) {
+            DiscussVo discussVo = new DiscussVo();
+            BeanUtils.copyProperties(record, discussVo);
+            //该话题为转发贴
+            if (record.getForwardId() != 0L) {
+                //获取转发贴数据
+                ClassDiscussDo classDiscussDo = classDiscussMapper.selectByPrimaryKey(record.getForwardId());
+                //查询该贴的转发班级次数
+                DiscussVo forwardVo = new DiscussVo();
+                BeanUtils.copyProperties(classDiscussDo, forwardVo);
+                //获取转发贴的发布人姓名以及班级身份
+                String publisherName = getPublisherInfo(forwardVo.getPublisher());
+                forwardVo.setPublisherName(publisherName);
+                discussVo.setForwardDiscuss(forwardVo);
+            }
+            //获取话题的发布人姓名以及班级身份
+            String publisherName = getPublisherInfo(record.getPublisher());
+            //转发班级次数
+            Integer publishClassesNum = classDiscussMapper.selectPublishClassesNum(record.getDiscussId());
+            discussVo.setPublisherName(publisherName);
+            discussVo.setPublishClassesNum(publishClassesNum);
+            //获取该话题的上传音频
+            List<String> audioUrlList = discussAudioService.selectByDiscussId(record.getDiscussId());
+            if (!CollectionUtils.isEmpty(audioUrlList)) {
+                discussVo.setAudioList(audioUrlList);
+            }
+            //获取回复数
+            discussVo.setReplyNumber(record.getReplyNumber() > 999 ? 999 : record.getReplyNumber());
+            //判断该用户是否对该贴点过赞
+            if(discussLikeMapper.isExistLikesRecord(discussVo.getDiscussId().intValue(),currentAccountNo) > 0){
+                discussVo.setIsLike(true);
+            }else{
+                discussVo.setIsLike(false);
+            }
+            discussVoList.add(discussVo);
+        }
+        resultPage.setRecords(discussVoList);
+        return resultPage;
+    }
+
     /**
      * 获取话题的发布人姓名以及班级身份方法
+     *
      * @param publisher 发布人id（user.account_no）
-     * **/
-    public String getPublisherInfo(String publisher){
-        Map<String,Object> publisherInfoMap = classDiscussMapper.getPublisherInfo(publisher);
+     **/
+    public String getPublisherInfo(String publisher) {
+        Map<String, Object> publisherInfoMap = classDiscussMapper.getPublisherInfo(publisher);
         String publisherName;
         if (!CollectionUtils.isEmpty(publisherInfoMap) && publisherInfoMap.size() > 0) {
             Object roleType = publisherInfoMap.get("roleType");
-            publisherName = String.valueOf(publisherInfoMap.get("userName")) + "(" + ClassRoleTypeEnum.getMsgByCode(Integer.valueOf(roleType.toString())) + ")";
+            publisherName = publisherInfoMap.get("userName") + "(" + ClassRoleTypeEnum.getMsgByCode(Integer.valueOf(roleType.toString())) + ")";
         } else {
             publisherName = "用户" + publisher;
         }
@@ -198,15 +279,15 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
     public Page<ReplyInfoVo> getReplyInfo(String discussId, Integer pageNum, Integer pageSize) {
         //获取以discussId为父节点的讨论记录
         LambdaQueryWrapper<ClassDiscussDo> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ClassDiscussDo::getParentId,discussId).eq(ClassDiscussDo::getDelFlg,0)
+        wrapper.eq(ClassDiscussDo::getParentId, discussId).eq(ClassDiscussDo::getDelFlg, 0)
                 .orderByDesc(ClassDiscussDo::getReleaseTime);
         Page<ClassDiscussDo> courseDiscussDoPage = classDiscussMapper.selectPage(new Page<>(pageNum, pageSize), wrapper);
         Page<ReplyInfoVo> replyInfoPage = new Page<>();
-        BeanUtils.copyProperties(courseDiscussDoPage,replyInfoPage);
+        BeanUtils.copyProperties(courseDiscussDoPage, replyInfoPage);
         List<ReplyInfoVo> replyInfoVoList = new ArrayList<>();
         for (ClassDiscussDo record : courseDiscussDoPage.getRecords()) {
             ReplyInfoVo replyInfoVo = new ReplyInfoVo();
-            BeanUtils.copyProperties(record,replyInfoVo);
+            BeanUtils.copyProperties(record, replyInfoVo);
             //回复数
             replyInfoVo.setReplyNumber(record.getReplyNumber() > 999 ? 999 : record.getReplyNumber());
             //获得该回复上传的音频
@@ -246,12 +327,12 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
             classDiscussDo.setLikeCount(0);
             classDiscussDo.setDelFlg(false);
             //新增回复记录，并回传对应的主键id
-            if(classDiscussMapper.insertSelective(classDiscussDo) <= 0){
+            if (classDiscussMapper.insertSelective(classDiscussDo) <= 0) {
                 throw new BizException(BizCodeEnum.DISCUSS_REPLY_ADD_ERROR);
             }
             //新增对应记录的音频
             List<DiscussAudioDo> audioDoList = new ArrayList<>();
-            if(!CollectionUtils.isEmpty(discussDto.getAudioUrl())){
+            if (!CollectionUtils.isEmpty(discussDto.getAudioUrl())) {
                 for (String audioUrl : discussDto.getAudioUrl()) {
                     DiscussAudioDo discussAudioDo = new DiscussAudioDo();
                     discussAudioDo.setDiscussId(classDiscussDo.getDiscussId());
@@ -273,7 +354,7 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
 
     @Override
     public int forward(ForwardDto forwardDto) {
-        log.info("转发话题入参:{}",JSON.toJSON(forwardDto));
+        log.info("转发话题入参:{}", JSON.toJSON(forwardDto));
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         //创建一条转发记录
         ClassDiscussDo record = new ClassDiscussDo();
@@ -301,7 +382,7 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
     public int topDiscuss(Long discussId) {
         ClassDiscussDo classDiscussDo = new ClassDiscussDo();
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2100,1,1,1,0);
+        calendar.set(2100, 1, 1, 1, 0);
         Date sortTime = calendar.getTime();
         classDiscussDo.setDiscussId(discussId);
         classDiscussDo.setSortTime(sortTime);

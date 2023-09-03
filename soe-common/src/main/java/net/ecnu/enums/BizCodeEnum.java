@@ -51,6 +51,7 @@ public enum BizCodeEnum {
      * */
     DISCUSS_AUDIO_ADD_ERROR(280001,"添加话题异常"),
     DISCUSS_REPLY_ADD_ERROR(280002,"回复异常"),
+    DISCUSS_LIKES_ERROR(280003,"点赞异常"),
 
     /**
      * 参数异常

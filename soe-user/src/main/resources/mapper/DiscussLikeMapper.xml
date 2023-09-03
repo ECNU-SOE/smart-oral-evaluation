@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.ecnu.mapper.DiscussLikeMapper">
+  <resultMap id="BaseResultMap" type="net.ecnu.model.DiscussLike">
+    <!--@mbg.generated-->
+    <!--@Table discuss_like-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="discuss_id" jdbcType="BIGINT" property="discussId" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="del_flg" jdbcType="BOOLEAN" property="delFlg" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <!--@mbg.generated-->
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <!--@mbg.generated-->
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, discuss_id, user_id, create_time, del_flg
+  </sql>
+  <select id="selectByExample" parameterType="net.ecnu.model.DiscussLikeExample" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from discuss_like
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from discuss_like
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    <!--@mbg.generated-->
+    delete from discuss_like
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="net.ecnu.model.DiscussLikeExample">
+    <!--@mbg.generated-->
+    delete from discuss_like
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="net.ecnu.model.DiscussLike" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into discuss_like (discuss_id, user_id, create_time, 
+      del_flg)
+    values (#{discussId,jdbcType=BIGINT}, #{userId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{delFlg,jdbcType=BOOLEAN})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="net.ecnu.model.DiscussLike" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into discuss_like
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="discussId != null">
+        discuss_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="delFlg != null">
+        del_flg,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="discussId != null">
+        #{discussId,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlg != null">
+        #{delFlg,jdbcType=BOOLEAN},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="net.ecnu.model.DiscussLikeExample" resultType="java.lang.Long">
+    <!--@mbg.generated-->
+    select count(*) from discuss_like
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    <!--@mbg.generated-->
+    update discuss_like
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.discussId != null">
+        discuss_id = #{record.discussId,jdbcType=BIGINT},
+      </if>
+      <if test="record.userId != null">
+        user_id = #{record.userId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.delFlg != null">
+        del_flg = #{record.delFlg,jdbcType=BOOLEAN},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    <!--@mbg.generated-->
+    update discuss_like
+    set id = #{record.id,jdbcType=BIGINT},
+      discuss_id = #{record.discussId,jdbcType=BIGINT},
+      user_id = #{record.userId,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      del_flg = #{record.delFlg,jdbcType=BOOLEAN}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="net.ecnu.model.DiscussLike">
+    <!--@mbg.generated-->
+    update discuss_like
+    <set>
+      <if test="discussId != null">
+        discuss_id = #{discussId,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="delFlg != null">
+        del_flg = #{delFlg,jdbcType=BOOLEAN},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="net.ecnu.model.DiscussLike">
+    <!--@mbg.generated-->
+    update discuss_like
+    set discuss_id = #{discussId,jdbcType=BIGINT},
+      user_id = #{userId,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      del_flg = #{delFlg,jdbcType=BOOLEAN}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="isExistLikesRecord" resultType="int">
+    select
+      count(id)
+    from
+      discuss_like
+    where
+      del_flg = 0
+    and
+      user_id = #{currentAccountNo,jdbcType=VARCHAR}
+    and
+      discuss_id = #{discussId,jdbcType=INTEGER}
+  </select>
+</mapper>

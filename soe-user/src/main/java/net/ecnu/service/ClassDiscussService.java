@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import net.ecnu.model.ClassDiscussDo;
 import net.ecnu.model.dto.DiscussDto;
 import net.ecnu.model.dto.ForwardDto;
+import net.ecnu.model.dto.ReplyInfoReq;
 import net.ecnu.model.vo.DiscussVo;
 import net.ecnu.model.vo.ReplyInfoVo;
+import net.ecnu.util.JsonData;
 
 /**
  * @description:
@@ -32,11 +34,13 @@ public interface ClassDiscussService {
     
     int updateByPrimaryKey(ClassDiscussDo record);
 
-    int addLikes(String discussId,Integer likeFlag);
+    JsonData addLikes(String discussId, Integer likeFlag);
 
     Boolean addDiscuss(DiscussDto discussDto);
 
     Page<DiscussVo> getDiscussInfo(String classId, Integer pageNum, Integer pageSize);
+
+    Page<DiscussVo> getDiscussInfo(ReplyInfoReq replyInfoReq);
 
     Page<ReplyInfoVo> getReplyInfo(String discussId, Integer pageNum, Integer pageSize);
 

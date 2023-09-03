@@ -50,7 +50,7 @@ public class CpsrcdController {
     }
 
     /**
-     * 查询自提
+     * 查询子题
      * **/
     @GetMapping("/getCpsrcdDetail")
     public JsonData getCpsrcdDetail(@RequestParam("cpsrcdId") String cpsrcdId) {
