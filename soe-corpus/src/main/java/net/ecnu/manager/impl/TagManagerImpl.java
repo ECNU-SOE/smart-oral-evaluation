@@ -27,7 +27,7 @@ public class TagManagerImpl implements TagManager {
     @Override
     public int countByFilter(TagFilterReq tagFilterReq) {
         return tagMapper.selectCount(new QueryWrapper<TagDO>()
-                .eq(!ObjectUtils.isEmpty(tagFilterReq.getName()), "name", tagFilterReq.getName())
+                .like(!ObjectUtils.isEmpty(tagFilterReq.getName()), "name", tagFilterReq.getName())
                 .eq(!ObjectUtils.isEmpty(tagFilterReq.getWeight()), "weight", tagFilterReq.getWeight())
                 .eq(!ObjectUtils.isEmpty(tagFilterReq.getCategory()), "category", tagFilterReq.getCategory())
         );
@@ -38,7 +38,7 @@ public class TagManagerImpl implements TagManager {
         Page<TagDO> tagDOPage = tagMapper.selectPage(
                 new Page<TagDO>(pageData.getCurrent(), pageData.getSize()),
                 new QueryWrapper<TagDO>()
-                        .eq(!ObjectUtils.isEmpty(tagFilterReq.getName()), "name", tagFilterReq.getName())
+                        .like(!ObjectUtils.isEmpty(tagFilterReq.getName()), "name", tagFilterReq.getName())
                         .eq(!ObjectUtils.isEmpty(tagFilterReq.getWeight()), "weight", tagFilterReq.getWeight())
                         .eq(!ObjectUtils.isEmpty(tagFilterReq.getCategory()), "category", tagFilterReq.getCategory())
         );
