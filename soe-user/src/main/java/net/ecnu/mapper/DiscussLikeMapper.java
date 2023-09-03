@@ -67,4 +67,6 @@ public interface DiscussLikeMapper {
      * 检查该用户是否有过对该帖的点赞记录
      * **/
     int isExistLikesRecord(@Param("discussId") Integer discussId,@Param("currentAccountNo") String currentAccountNo);
+
+    int logicDeleteLikesRecord(@Param("discussId") String discussId,@Param("currentAccountNo") String currentAccountNo);
 }

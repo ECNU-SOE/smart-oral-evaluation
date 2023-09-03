@@ -376,4 +376,13 @@
     where
       forward_id = #{forwardId} and del_flg = 0
   </select>
+
+  <update id="reduceLikes">
+    update
+      class_discuss
+    set
+      like_count = like_count - 1
+    where
+      discuss_id = #{discussId} and del_flg = 0
+  </update>
 </mapper>

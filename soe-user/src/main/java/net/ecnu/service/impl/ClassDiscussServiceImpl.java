@@ -81,20 +81,32 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
     @Override
     public JsonData addLikes(String discussId, Integer likeFlag) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        if(discussLikeMapper.isExistLikesRecord(Integer.valueOf(discussId),currentAccountNo) > 0){
-            classDiscussMapper.addLikes(discussId);
-            DiscussLike discussLike = new DiscussLike();
-            discussLike.setDiscussId(Integer.valueOf(discussId).longValue());
-            discussLike.setUserId(currentAccountNo);
-            discussLike.setCreateTime(new Date());
-            discussLike.setDelFlg(false);
-            if (discussLikeMapper.insertSelective(discussLike) < 0) {
-                throw new BizException(BizCodeEnum.DISCUSS_LIKES_ERROR.getCode(),"新增点赞记录异常");
+        int record = discussLikeMapper.isExistLikesRecord(Integer.valueOf(discussId), currentAccountNo);
+        if (record == 0 && likeFlag.intValue() == 0) {
+            //点赞
+            if (likeFlag.intValue() == 0) {
+                classDiscussMapper.addLikes(discussId);
+                DiscussLike discussLike = new DiscussLike();
+                discussLike.setDiscussId(Integer.valueOf(discussId).longValue());
+                discussLike.setUserId(currentAccountNo);
+                discussLike.setCreateTime(new Date());
+                discussLike.setDelFlg(false);
+                if (discussLikeMapper.insertSelective(discussLike) < 0) {
+                    throw new BizException(BizCodeEnum.DISCUSS_LIKES_ERROR.getCode(), "新增点赞记录异常");
+                }
+                return JsonData.buildSuccess(null, "点赞成功");
             }
-            return JsonData.buildSuccess(null,"点赞成功");
-        }else{
+        } else if (record > 0 && likeFlag.intValue() == 0) {
             return JsonData.buildError("重复点赞");
+        } else if (record > 0 && likeFlag.intValue() == 1) {
+            //取消点赞
+            classDiscussMapper.reduceLikes(discussId);
+            discussLikeMapper.logicDeleteLikesRecord(discussId, currentAccountNo);
+            return JsonData.buildSuccess(null, "取消点赞成功");
+        } else {
+            return JsonData.buildError("取消点赞失败，该用户没有对该贴点赞");
         }
+        return JsonData.buildError("点赞异常,请联系管理员");
     }
 
     @Override
