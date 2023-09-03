@@ -84,7 +84,9 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
         else {
             //按照tagIds查询
             List<TagDO> tagDOS = tagMapper.selectBatchIds(tagFilterReq.getIds());
-            return tagDOS;
+            pageData.setTotal(tagDOS.size());
+            pageData.setRecords(tagDOS);
+            return pageData;
         }
     }
 
