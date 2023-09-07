@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.ecnu.mapper.MistakeAudioMapper">
+  <resultMap id="BaseResultMap" type="net.ecnu.model.MistakeAudioDO">
+    <!--@mbg.generated-->
+    <!--@Table mistake_audio-->
+    <id column="mistake_id" jdbcType="BIGINT" property="mistakeId" />
+    <result column="cpsrcd_id" jdbcType="VARCHAR" property="cpsrcdId" />
+    <result column="mistake_type" jdbcType="INTEGER" property="mistakeType" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="error_sum" jdbcType="INTEGER" property="errorSum" />
+    <result column="del_flg" jdbcType="BOOLEAN" property="delFlg" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <!--@mbg.generated-->
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <!--@mbg.generated-->
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    mistake_id, cpsrcd_id, mistake_type, user_id, error_sum, del_flg, create_time, update_time
+  </sql>
+  <select id="selectByExample" parameterType="net.ecnu.model.MistakeAudioDOExample" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from mistake_audio
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from mistake_audio
+    where mistake_id = #{mistakeId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    <!--@mbg.generated-->
+    delete from mistake_audio
+    where mistake_id = #{mistakeId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="net.ecnu.model.MistakeAudioDOExample">
+    <!--@mbg.generated-->
+    delete from mistake_audio
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" keyColumn="mistake_id" keyProperty="mistakeId" parameterType="net.ecnu.model.MistakeAudioDO" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into mistake_audio (cpsrcd_id, mistake_type, user_id, 
+      error_sum, del_flg, create_time, 
+      update_time)
+    values (#{cpsrcdId,jdbcType=VARCHAR}, #{mistakeType,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR}, 
+      #{errorSum,jdbcType=INTEGER}, #{delFlg,jdbcType=BOOLEAN}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" keyColumn="mistake_id" keyProperty="mistakeId" parameterType="net.ecnu.model.MistakeAudioDO" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into mistake_audio
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="cpsrcdId != null">
+        cpsrcd_id,
+      </if>
+      <if test="mistakeType != null">
+        mistake_type,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="errorSum != null">
+        error_sum,
+      </if>
+      <if test="delFlg != null">
+        del_flg,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="cpsrcdId != null">
+        #{cpsrcdId,jdbcType=VARCHAR},
+      </if>
+      <if test="mistakeType != null">
+        #{mistakeType,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="errorSum != null">
+        #{errorSum,jdbcType=INTEGER},
+      </if>
+      <if test="delFlg != null">
+        #{delFlg,jdbcType=BOOLEAN},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="net.ecnu.model.MistakeAudioDOExample" resultType="java.lang.Long">
+    <!--@mbg.generated-->
+    select count(*) from mistake_audio
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    <!--@mbg.generated-->
+    update mistake_audio
+    <set>
+      <if test="record.mistakeId != null">
+        mistake_id = #{record.mistakeId,jdbcType=BIGINT},
+      </if>
+      <if test="record.cpsrcdId != null">
+        cpsrcd_id = #{record.cpsrcdId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mistakeType != null">
+        mistake_type = #{record.mistakeType,jdbcType=INTEGER},
+      </if>
+      <if test="record.userId != null">
+        user_id = #{record.userId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.errorSum != null">
+        error_sum = #{record.errorSum,jdbcType=INTEGER},
+      </if>
+      <if test="record.delFlg != null">
+        del_flg = #{record.delFlg,jdbcType=BOOLEAN},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    <!--@mbg.generated-->
+    update mistake_audio
+    set mistake_id = #{record.mistakeId,jdbcType=BIGINT},
+      cpsrcd_id = #{record.cpsrcdId,jdbcType=VARCHAR},
+      mistake_type = #{record.mistakeType,jdbcType=INTEGER},
+      user_id = #{record.userId,jdbcType=VARCHAR},
+      error_sum = #{record.errorSum,jdbcType=INTEGER},
+      del_flg = #{record.delFlg,jdbcType=BOOLEAN},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="net.ecnu.model.MistakeAudioDO">
+    <!--@mbg.generated-->
+    update mistake_audio
+    <set>
+      <if test="cpsrcdId != null">
+        cpsrcd_id = #{cpsrcdId,jdbcType=VARCHAR},
+      </if>
+      <if test="mistakeType != null">
+        mistake_type = #{mistakeType,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="errorSum != null">
+        error_sum = #{errorSum,jdbcType=INTEGER},
+      </if>
+      <if test="delFlg != null">
+        del_flg = #{delFlg,jdbcType=BOOLEAN},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where mistake_id = #{mistakeId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="net.ecnu.model.MistakeAudioDO">
+    <!--@mbg.generated-->
+    update mistake_audio
+    set cpsrcd_id = #{cpsrcdId,jdbcType=VARCHAR},
+      mistake_type = #{mistakeType,jdbcType=INTEGER},
+      user_id = #{userId,jdbcType=VARCHAR},
+      error_sum = #{errorSum,jdbcType=INTEGER},
+      del_flg = #{delFlg,jdbcType=BOOLEAN},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where mistake_id = #{mistakeId,jdbcType=BIGINT}
+  </update>
+
+  <select id="selectMistakeTotal" resultType="java.lang.Integer">
+    select
+      count(*)
+    from
+      mistake_audio
+    where
+      user_id = #{userId,jdbcType=VARCHAR} and del_flg = 0
+  </select>
+
+  <select id="selectStubbornMistakeNumber" resultType="java.lang.Integer">
+    select
+      count(*)
+    from
+      mistake_audio
+    where user_id = #{userId,jdbcType=VARCHAR} and error_sum > 1 and  del_flg = 0
+  </select>
+
+
+  <select id="selectEachMistakeTypeData" resultType="net.ecnu.model.vo.MistakeTypeVO">
+    select
+      count(mistake_id) AS mistakeNum,
+      mistake_type AS mistakeTypeCode
+    from
+      mistake_audio
+    where
+      del_flg = 0 and user_id = #{userId,jdbcType=VARCHAR}
+    group by user_id,mistake_type
+  </select>
+
+  <select id="selectEachMistakeTypeDataNearWeek" resultType="net.ecnu.model.vo.MistakeTypeVO">
+    select
+      count(mistake_id) AS mistakeNum,
+      mistake_type AS mistakeTypeCode
+    from
+      mistake_audio
+    where
+      del_flg = 0 and user_id = #{userId,jdbcType=VARCHAR}
+      and create_time BETWEEN DATE_SUB(NOW(), INTERVAL 7 DAY) AND NOW()
+    group by user_id,mistake_type
+  </select>
+
+  <select id="getCpsrcdIdByUserIdAndMistakeType" resultType="java.lang.String">
+    select
+      cpsrcd_id
+    from
+      mistake_audio
+    where
+      del_flg = 0 and user_id = #{userId,jdbcType=VARCHAR}
+      and mistake_type = #{mistakeTypeCode,jdbcType=INTEGER}
+    <if test="oneWeekKey.intValue() != 0">
+      and create_time BETWEEN DATE_SUB(NOW(), INTERVAL 7 DAY) AND NOW()
+    </if>
+  </select>
+
+  <select id="getMistakesInfo" resultType="net.ecnu.model.vo.MistakesVO">
+    select
+      id AS cpsrcdId,
+      corpus_id AS corpusId,
+      cpsgrp_id AS cpsgrpId,
+      topic_id AS topicId,
+      c_num AS cNum,
+      eval_mode AS evalModel,
+      type AS type,
+      difficulty AS difficulty,
+      word_weight AS wordWeight,
+      score AS score,
+      pinyin AS pinyin,
+      ref_text AS refText,
+      audio_url AS audioUrl,
+      tags AS tags
+    from
+      cpsrcd
+    where
+      id in
+    <foreach collection="cpsrcdIdList" item="cpsrcdId" open="(" close=")" separator=",">
+      #{cpsrcdId,jdbcType=VARCHAR}
+    </foreach>
+  </select>
+
+  <update id="cleanMistakeByCpsrcdId">
+    update
+      mistake_audio
+    set
+      del_flg = 1
+    where del_flg = 0 and user_id = #{userId,jdbcType=VARCHAR}
+      and cpsrcd_id = #{cpsrcdId,jdbcType=VARCHAR}
+  </update>
+
+  <update id="addWrongNumByCpsrcdId">
+    update
+      mistake_audio
+    set
+      error_sum = error_sum + 1
+    where del_flg = 0 and user_id = #{userId,jdbcType=VARCHAR}
+      and cpsrcd_id = #{cpsrcdId,jdbcType=VARCHAR}
+  </update>
+
+
+</mapper>

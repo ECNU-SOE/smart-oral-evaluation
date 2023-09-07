@@ -85,7 +85,7 @@ public class CpsgrpController {
      * 存储答题题报告
      */
     @PostMapping("save_transcript")
-    public JsonData saveTranscript(@RequestBody @Validated TranscriptReq transcriptReq) {
+    public JsonData saveTranscript(@RequestBody @Validated(Create.class) TranscriptReq transcriptReq) {
         Object data = transcriptService.save(transcriptReq);//生成报告
         return JsonData.buildSuccess(data);
     }
