@@ -63,15 +63,10 @@ public class TranscriptServiceImpl extends ServiceImpl<TranscriptMapper, Transcr
     @Override
     public Object getTranscript(TranscriptReq transcriptReq) {
         //获取登录用户信息
-        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        //if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        //校验参数
-        CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(transcriptReq.getCpsgrpId());
-        if (cpsgrpDO == null) throw new BizException(BizCodeEnum.CPSGRP_NOT_EXIST);
-        //查询用户指定cpsgrpId的题目组的报告列表
+        //查询用户的所有题目组的报告列表
+        //TODO 支持按照参数查询
         List<TranscriptDO> transcriptDOS = transcriptMapper.selectList(new QueryWrapper<TranscriptDO>()
-                .eq("cpsgrp_id", transcriptReq.getCpsgrpId())
                 .eq("respondent", currentAccountNo));
         return transcriptDOS;
     }

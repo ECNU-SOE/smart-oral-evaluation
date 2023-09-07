@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.ecnu.mapper.ClassCpsgrpMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="net.ecnu.model.ClassCpsgrpDO">
+        <id column="class_id" property="classId" />
+        <result column="cpsgrp_id" property="cpsgrpId" />
+        <result column="type" property="type" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        class_id, cpsgrp_id, type, start_time, end_time, gmt_create, gmt_modified
+    </sql>
+
+    <select id="getCpsgrpInfoByCourseId" resultType="net.ecnu.model.vo.ClassCpsgrpInfoVo">
+        SELECT
+            DISTINCT cc.cpsgrp_id,
+            cps.description
+        FROM
+            class c
+        LEFT JOIN
+            class_cpsgrp cc ON cc.class_id = c.id and cc.type = #{currentTypeId,jdbcType=INTEGER}
+        LEFT JOIN
+            cpsgrp cps ON cc.cpsgrp_id = cps.id and cps.del = 0
+        WHERE
+            c.course_id = #{courseId,jdbcType=VARCHAR} and c.del = 0
+            and cc.cpsgrp_id is NOT NULL
+    </select>
+
+    <select id="getStatisticsInfo" resultType="net.ecnu.model.vo.StatisticsVo">
+        SELECT
+            c.id AS classId,
+            c.description AS className,
+            count(uc.account_no) AS studentNums,
+            AVG(t.pron_completion) AS pronCompletionAverage,
+            AVG(t.pron_accuracy) AS pronAccuracyAverage,
+            AVG(t.pron_fluency) AS pronFluencyAverage,
+            AVG(t.suggested_score) AS suggestedScoreAverage
+        FROM
+            class c
+        LEFT JOIN
+            class_cpsgrp cc ON cc.class_id = c.id and cc.cpsgrp_id = #{statisticsDto.cpsgrpId,jdbcType=VARCHAR} and cc.type = #{statisticsDto.type,jdbcType=INTEGER}
+        LEFT JOIN
+            user_class uc ON uc.class_id = c.id and uc.status = 1 and uc.r_type = 1
+        LEFT JOIN
+            transcript t ON t.respondent = uc.account_no
+        WHERE
+            c.course_id = #{statisticsDto.courseId,jdbcType=VARCHAR} and c.del = 0 and t.account_no IS NOT NULL
+        ORDER BY suggestedScoreAverage DESC
+        GROUP BY c.id
+    </select>
+
+    <select id="getClassScoreInfo" resultType="net.ecnu.model.dto.ClassScoreInfoDto">
+        SELECT
+            u.real_name AS studentName,
+            if(u.sex > 0, '男','女') AS sex,
+            t.pron_completion AS pronCompletionScore,
+            t.pron_accuracy AS pronAccuracyScore,
+            t.pron_fluency AS pronFluencyScore,
+            t.suggested_score AS suggestedScoreScore
+        FROM
+            user_class uc
+        LEFT JOIN
+            user u ON uc.account_no = u.account_no
+        LEFT JOIN
+            transcript t ON t.respondent = u.account_no and t.cpsgrp_id = #{cpsgrpId,jdbcType=VARCHAR}
+        WHERE
+            uc.class_id = #{classId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getClassCpsgrpInfo" resultType="net.ecnu.model.dto.CourseClassCpsgrpInfoDto">
+        SELECT
+          c.name AS className,
+          co.name AS courseName,
+          c.start_time AS courseStartTime,
+          c.end_time AS courseEndTime,
+          COUNT(uc.account_no) AS studentNums,
+          cps.description AS cpsgrpName
+        FROM
+          class c
+        LEFT JOIN
+          course co ON co.id = c.course_id and co.del = 0
+        LEFT JOIN
+          user_class uc ON uc.class_id = #{classId,jdbcType=VARCHAR}
+        LEFT JOIN
+          cpsgrp cps ON cps.id = #{cpsgrpId,jdbcType=VARCHAR} and cps.class_id = #{classId,jdbcType=VARCHAR} and cps.del = 0
+        WHERE
+          c.id = #{classId,jdbcType=VARCHAR} and c.del = 0
+    </select>
+
+</mapper>
