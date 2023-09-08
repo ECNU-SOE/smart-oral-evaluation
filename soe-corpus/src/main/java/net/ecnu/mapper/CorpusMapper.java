@@ -3,6 +3,7 @@ package net.ecnu.mapper;
 import net.ecnu.model.CorpusDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * <p>
@@ -15,4 +16,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface CorpusMapper extends BaseMapper<CorpusDO> {
 
+    @Select("select * from corpus order by rand() limit 1")
+    CorpusDO getRandomCorpus();
 }

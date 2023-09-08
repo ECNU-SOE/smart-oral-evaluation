@@ -70,6 +70,11 @@ public class CorpusController {
         return JsonData.buildSuccess("更新语料成功！");
     }
 
+    @GetMapping("rand")
+    public JsonData rand() {
+        Object data = corpusService.random();
+        return JsonData.buildSuccess(data);
+    }
 
 }
 

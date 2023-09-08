@@ -34,6 +34,8 @@ public class CorpusServiceImpl extends ServiceImpl<CorpusMapper, CorpusDO> imple
 
     @Autowired
     private CorpusManager corpusManager;
+    @Autowired
+    private CorpusMapper corpusMapper;
 
 
     @Override
@@ -66,6 +68,14 @@ public class CorpusServiceImpl extends ServiceImpl<CorpusMapper, CorpusDO> imple
     @Override
     public void updateCorpusInfo(CorpusReq corpusReq) {
         corpusManager.updateCorpusInfo(corpusReq);
+    }
+
+    @Override
+    public Object random() {
+        CorpusDO randomCorpus = corpusMapper.getRandomCorpus();
+        if (randomCorpus==null)
+            return "暂无语料";
+        return randomCorpus;
     }
 
 }
