@@ -1,8 +1,10 @@
 package net.ecnu.mapper;
 
+import net.ecnu.model.CorpusDO;
 import net.ecnu.model.CpsrcdDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * <p>
@@ -14,4 +16,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface CpsrcdMapper extends BaseMapper<CpsrcdDO> {
+    @Select("select * from cpsrcd order by rand() limit 1")
+    CpsrcdDO getRandomCpsrcd();
 }

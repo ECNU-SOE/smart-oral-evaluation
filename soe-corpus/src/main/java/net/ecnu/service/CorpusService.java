@@ -15,5 +15,5 @@ public interface CorpusService {
 
     void updateCorpusInfo(CorpusReq corpusReq);
 
-    Object random();
+    Object random(Integer entityType);
 }

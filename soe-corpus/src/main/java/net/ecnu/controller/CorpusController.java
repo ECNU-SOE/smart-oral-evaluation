@@ -71,8 +71,8 @@ public class CorpusController {
     }
 
     @GetMapping("rand")
-    public JsonData rand() {
-        Object data = corpusService.random();
+    public JsonData rand(@RequestParam(value = "entityType",required = false) Integer entityType) {
+        Object data = corpusService.random(entityType);
         return JsonData.buildSuccess(data);
     }
 
