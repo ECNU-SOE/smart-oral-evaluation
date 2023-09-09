@@ -7,18 +7,23 @@ import net.ecnu.exception.BizException;
 //import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.mapper.CpsgrpMapper;
 import net.ecnu.model.CpsgrpDO;
+import net.ecnu.model.CpsrcdDO;
 import net.ecnu.model.TranscriptDO;
 import net.ecnu.mapper.TranscriptMapper;
 import net.ecnu.model.common.LoginUser;
+import net.ecnu.model.vo.CpsrcdVO;
+import net.ecnu.model.vo.TranscriptVO;
 import net.ecnu.service.TranscriptService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.RequestParamUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -63,16 +68,22 @@ public class TranscriptServiceImpl extends ServiceImpl<TranscriptMapper, Transcr
     @Override
     public Object getTranscript(TranscriptReq transcriptReq) {
         //获取登录用户信息
-        //LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        //if (loginUser == null) throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        //校验参数
-        CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(transcriptReq.getCpsgrpId());
-        if (cpsgrpDO == null) throw new BizException(BizCodeEnum.CPSGRP_NOT_EXIST);
-        //查询用户指定cpsgrpId的题目组的报告列表
+        //查询用户的所有题目组的报告列表
+        //TODO 支持按照条件参数查询：排序方式、分数区间等
         List<TranscriptDO> transcriptDOS = transcriptMapper.selectList(new QueryWrapper<TranscriptDO>()
-                .eq("cpsgrp_id", transcriptReq.getCpsgrpId())
                 .eq("respondent", currentAccountNo));
-        return transcriptDOS;
+        //转换成VO对象返回
+        List<TranscriptVO> transcriptVOS = transcriptDOS.stream().map(this::beanProcess).collect(Collectors.toList());
+        return transcriptVOS;
+    }
+
+    /**
+     * TranscriptDO->TranscriptVO
+     */
+    private TranscriptVO beanProcess(TranscriptDO transcriptDO) {
+        TranscriptVO transcriptVO = new TranscriptVO();
+        BeanUtils.copyProperties(transcriptDO, transcriptVO);
+        return transcriptVO;
     }
 }

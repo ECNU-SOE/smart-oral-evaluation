@@ -87,4 +87,5 @@ public class CorpusManagerImpl implements CorpusManager {
             throw new BizException(BizCodeEnum.CORPUS_UPDATE_ERROR);
         }
     }
+
 }

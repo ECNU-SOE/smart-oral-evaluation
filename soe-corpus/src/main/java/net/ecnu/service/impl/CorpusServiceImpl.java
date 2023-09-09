@@ -9,7 +9,9 @@ import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.manager.CorpusManager;
 import net.ecnu.mapper.CorpusMapper;
+import net.ecnu.mapper.CpsrcdMapper;
 import net.ecnu.model.CorpusDO;
+import net.ecnu.model.CpsrcdDO;
 import net.ecnu.model.common.PageData;
 import net.ecnu.service.CorpusService;
 import net.ecnu.util.IDUtil;
@@ -34,6 +36,10 @@ public class CorpusServiceImpl extends ServiceImpl<CorpusMapper, CorpusDO> imple
 
     @Autowired
     private CorpusManager corpusManager;
+    @Autowired
+    private CorpusMapper corpusMapper;
+    @Autowired
+    private CpsrcdMapper cpsrcdMapper;
 
 
     @Override
@@ -68,4 +74,18 @@ public class CorpusServiceImpl extends ServiceImpl<CorpusMapper, CorpusDO> imple
         corpusManager.updateCorpusInfo(corpusReq);
     }
 
+    @Override
+    public Object random(Integer entityType) {
+        if (entityType==null||entityType==1){
+            CorpusDO randomCorpus = corpusMapper.getRandomCorpus();
+            if (randomCorpus==null)
+                return "暂无语料";
+            return randomCorpus;
+        }else {
+            CpsrcdDO randomCpsrcd = cpsrcdMapper.getRandomCpsrcd();
+            if (randomCpsrcd == null)
+                return "暂无语料";
+            return randomCpsrcd;
+        }
+    }
 }

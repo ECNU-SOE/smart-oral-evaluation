@@ -70,6 +70,11 @@ public class CorpusController {
         return JsonData.buildSuccess("更新语料成功！");
     }
 
+    @GetMapping("rand")
+    public JsonData rand(@RequestParam(value = "entityType",required = false) Integer entityType) {
+        Object data = corpusService.random(entityType);
+        return JsonData.buildSuccess(data);
+    }
 
 }
 

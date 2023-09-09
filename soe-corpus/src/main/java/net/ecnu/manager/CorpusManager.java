@@ -16,4 +16,5 @@ public interface CorpusManager {
     void delCorpusInfo(String corpusId);
 
     void updateCorpusInfo(CorpusReq corpusReq);
+
 }

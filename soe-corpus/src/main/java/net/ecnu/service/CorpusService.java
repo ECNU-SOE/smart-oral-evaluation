@@ -14,4 +14,6 @@ public interface CorpusService {
     void delCorpusInfo(String corpusId);
 
     void updateCorpusInfo(CorpusReq corpusReq);
+
+    Object random(Integer entityType);
 }
