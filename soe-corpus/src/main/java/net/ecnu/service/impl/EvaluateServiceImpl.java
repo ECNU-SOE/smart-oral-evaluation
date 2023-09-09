@@ -251,7 +251,7 @@ public class EvaluateServiceImpl implements EvaluateService {
         Object evalJsonRes = ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
 
         //若cpsrcdId不为空，则调用错题记录逻辑
-        if (cpsrcdId!=null){
+        if (cpsrcdId != null) {
             JSONObject resJson = (JSONObject) ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
             JSONObject sentenceInfo = (JSONObject) ((JSONObject) resJson.get("rec_paper")).get(category);
             Double totalSocre = Double.parseDouble(sentenceInfo.get("total_score").toString());
@@ -259,7 +259,7 @@ public class EvaluateServiceImpl implements EvaluateService {
             if (StringUtils.isBlank(currentAccountNo)) {
                 throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
             }
-            Boolean isAdded = mistakeAudioService.isAddInErrorBook(currentAccountNo, cpsrcdId, 0, totalSocre, 100.00);
+            mistakeAudioService.isAddInErrorBook(currentAccountNo, cpsrcdId, totalSocre, 100.00);
         }
 
         EvalRecordDO evalRecordDO = new EvalRecordDO();

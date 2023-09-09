@@ -83,4 +83,6 @@ public interface MistakeAudioMapper {
     int cleanMistakeByCpsrcdId(@Param("userId") String userId,@Param("cpsrcdId") String cpsrcdId);
 
     int addWrongNumByCpsrcdId(@Param("userId") String userId,@Param("cpsrcdId") String cpsrcdId);
+
+    Integer getQuestionType(@Param("cpsrcdId") String cpsrcdId);
 }

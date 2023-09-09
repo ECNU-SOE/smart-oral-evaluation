@@ -48,5 +48,5 @@ public interface MistakeAudioService {
 
     MistakeAnswerVO checkAnswer(MistakeAnswerDto mistakeAnswer);
 
-    Boolean isAddInErrorBook(String userId,String cpsrcdId,Integer questionType,Double suggestedScore,Double questionScore);
+    Boolean isAddInErrorBook(String userId,String cpsrcdId,Double suggestedScore,Double questionScore);
 }

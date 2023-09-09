@@ -166,13 +166,18 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
      * @param questionScore 该题总分
      * **/
     @Override
-    public Boolean isAddInErrorBook(String userId,String cpsrcdId,Integer questionType,Double suggestedScore,Double questionScore){
+    public Boolean isAddInErrorBook(String userId,String cpsrcdId,Double suggestedScore,Double questionScore){
         Double resultRate = suggestedScore / questionScore;
         if (resultRate >= PASS_RATE) {
             //回答成功
             return true;
         } else {
             //回答失败，将该题加入用户的错题集
+            Integer questionType = mistakeAudioMapper.getQuestionType(cpsrcdId);
+            if (Objects.isNull(questionType) || questionType < 0) {
+                //没有查询到它的题目类型，则默认为0语音评测
+                questionType = 0;
+            }
             MistakeAudioDO record = new MistakeAudioDO();
             record.setCreateTime(new Date()).setCpsrcdId(cpsrcdId).setErrorSum(1)
                     .setUserId(userId).setUpdateTime(new Date()).setMistakeType(questionType)

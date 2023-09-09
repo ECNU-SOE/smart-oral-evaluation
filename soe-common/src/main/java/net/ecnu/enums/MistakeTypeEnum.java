@@ -7,7 +7,11 @@ package net.ecnu.enums;
  */
 public enum MistakeTypeEnum {
 
-    DEFAULT(0,"语音评测")
+    DEFAULT(0,"语音评测"),
+    CHARACTER(1,"字"),
+    WORDS(2,"词"),
+    SENTENCE(3,"句"),
+    CHAPTER(4,"章")
     ;
 
     private Integer code;

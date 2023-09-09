@@ -36,6 +36,11 @@ public class MistakesVO implements Serializable {
     private String topicId;
 
     /**
+     * 题目名称
+     * **/
+    private String description;
+
+    /**
      * cpsrcd次序
      */
     @JsonProperty("cNum")
