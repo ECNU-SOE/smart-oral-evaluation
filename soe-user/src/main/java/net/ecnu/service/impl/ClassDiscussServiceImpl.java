@@ -289,6 +289,7 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
 
     @Override
     public Page<ReplyInfoVo> getReplyInfo(String discussId, Integer pageNum, Integer pageSize) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
         //获取以discussId为父节点的讨论记录
         LambdaQueryWrapper<ClassDiscussDo> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ClassDiscussDo::getParentId, discussId).eq(ClassDiscussDo::getDelFlg, 0)
@@ -306,6 +307,11 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
             List<String> audioUrlList = discussAudioService.selectByDiscussId(record.getDiscussId());
             if (!CollectionUtils.isEmpty(audioUrlList)) {
                 replyInfoVo.setAudioList(audioUrlList);
+            }
+            if (discussLikeMapper.isExistLikesRecord(record.getDiscussId().intValue(), currentAccountNo) > 0) {
+                replyInfoVo.setIsLike(true);
+            } else {
+                replyInfoVo.setIsLike(false);
             }
             replyInfoVoList.add(replyInfoVo);
         }

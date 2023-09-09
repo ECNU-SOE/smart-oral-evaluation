@@ -41,6 +41,11 @@ public class ReplyInfoVo {
     private Integer likeCount;
 
     /**
+     * 该用户是否对该帖点过赞
+     * **/
+    private Boolean isLike;
+
+    /**
      * 1-叶节点，0-非叶节点
      */
     private Boolean isLeaf;
