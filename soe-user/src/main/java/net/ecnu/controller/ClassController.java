@@ -44,8 +44,8 @@ public class ClassController {
     }
 
     @PostMapping("add_user_class")
-    public JsonData add_user_class(@RequestBody @Validated(Create.class) UsrClassAddReq usrClassAddReq) {
-        Object data = classService.addUsrClass(usrClassAddReq);
+    public JsonData add_user_class(@RequestBody @Validated(Create.class) UsrClassReq usrClassReq) {
+        Object data = classService.addUsrClass(usrClassReq);
         return JsonData.buildSuccess(data);
     }
 

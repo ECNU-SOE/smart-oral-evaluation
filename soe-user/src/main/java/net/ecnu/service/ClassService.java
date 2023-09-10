@@ -23,7 +23,7 @@ public interface ClassService extends IService<ClassDO> {
 
     Object pageByFilter(ClassFilterReq classFilter, PageData pageData);
 
-    Object addUsrClass(UsrClassAddReq usrClassAddReq);
+    Object addUsrClass(UsrClassReq usrClassReq);
     Object addUsrClassBatch(UsrClassAddBatchReq usrClassAddBatchReq);
 
     Object delUsrClass(String id);

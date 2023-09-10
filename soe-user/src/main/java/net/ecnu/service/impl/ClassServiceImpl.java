@@ -14,7 +14,6 @@ import net.ecnu.model.common.PageData;
 import net.ecnu.model.vo.ClassVO;
 import net.ecnu.model.vo.ClassVO_LYW;
 import net.ecnu.model.vo.UserClassVO;
-import net.ecnu.model.vo.UserVO;
 import net.ecnu.service.ClassService;
 import net.ecnu.service.UserService;
 import net.ecnu.util.IDUtil;
@@ -24,7 +23,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -170,44 +168,45 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     }
 
     @Override
-    public Object addUsrClass(UsrClassAddReq usrClassAddReq) {
+    public Object addUsrClass(UsrClassReq usrClassReq) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         if (StringUtils.isBlank(currentAccountNo)) {
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
         }
         //判断是否重复选课
-        UserClassDO userClassDO = userClassManager.getByAccountNoAndClassId(usrClassAddReq.getAccountNo(),
-                usrClassAddReq.getClassId());
+        UserClassDO userClassDO = userClassManager.getByAccountNoAndClassId(usrClassReq.getAccountNo(),
+                usrClassReq.getClassId());
         if (userClassDO != null)
             throw new BizException(BizCodeEnum.REPEAT_CHOOSE);
         //权限判断
-        if (usrClassAddReq.getAccountNo() == null) {
+        if (usrClassReq.getAccountNo() == null||StringUtils.isBlank(usrClassReq.getAccountNo())) {
             //请求体accountNo为空，用户选择自己的课程（根据token）
             UserClassDO userClassDO1 = new UserClassDO();
-            BeanUtils.copyProperties(usrClassAddReq, userClassDO1);
-            userClassDO1.setRType(usrClassAddReq.getRType());//bug,需要手动设定rtype
+            BeanUtils.copyProperties(usrClassReq, userClassDO1);
+            userClassDO1.setAccountNo(currentAccountNo);
+            userClassDO1.setRType(usrClassReq.getRType());//bug,需要手动设定rtype
             return userClassMapper.insert(userClassDO1);
         } else {
             //请求体accountNo不为空
-            if (Objects.equals(currentAccountNo, usrClassAddReq.getAccountNo())) {
+            if (Objects.equals(currentAccountNo, usrClassReq.getAccountNo())) {
                 //token的accountNo与请求体的accountNo相同，给自己选课
                 UserClassDO userClassDO1 = new UserClassDO();
-                BeanUtils.copyProperties(usrClassAddReq, userClassDO1);
-                userClassDO1.setRType(usrClassAddReq.getRType());//bug,需要手动设定rtype
+                BeanUtils.copyProperties(usrClassReq, userClassDO1);
+                userClassDO1.setRType(usrClassReq.getRType());//bug,需要手动设定rtype
                 return userClassMapper.insert(userClassDO1);
             } else {
                 //token的accountNo与请求体的accountNo不同，给别人选课
                 Integer role = userService.getTopRole(currentAccountNo);
                 if (role<RolesConst.ROLE_ADMIN){//系统管理员及以上直接选课
                     UserClassDO userClassDO1 = new UserClassDO();
-                    BeanUtils.copyProperties(usrClassAddReq, userClassDO1);
+                    BeanUtils.copyProperties(usrClassReq, userClassDO1);
                     return userClassMapper.insert(userClassDO1);
                 }else {//老师给自己所在班级选课
-                    UserClassDO userClassDo = userClassManager.getByAccountNoAndClassId(currentAccountNo, usrClassAddReq.getClassId());
+                    UserClassDO userClassDo = userClassManager.getByAccountNoAndClassId(currentAccountNo, usrClassReq.getClassId());
                     if (userClassDo==null||userClassDo.getRType()==1||userClassDo.getRType()==2)//1：学生，2：助教
                         throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
                     UserClassDO userClassDO1 = new UserClassDO();
-                    BeanUtils.copyProperties(usrClassAddReq, userClassDO1);
+                    BeanUtils.copyProperties(usrClassReq, userClassDO1);
                     return userClassMapper.insert(userClassDO1);
                 }
             }
