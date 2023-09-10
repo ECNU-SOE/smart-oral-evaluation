@@ -27,4 +27,14 @@
         id, course_id, name, description, creator, start_time, end_time, level, picture, notice, stu_limit, join_status, drop_status, del, gmt_create, gmt_modified
     </sql>
 
+    <select id="getOptionsInfo" resultType="net.ecnu.model.vo.dto.ClassOptions">
+      select
+        id AS classId,
+        name AS className
+      from
+        class
+      where
+        course_id = #{courseId,jdbcType=VARCHAR} and del = 0
+    </select>
+
 </mapper>

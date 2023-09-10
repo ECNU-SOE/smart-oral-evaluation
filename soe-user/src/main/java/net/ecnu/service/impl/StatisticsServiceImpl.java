@@ -6,11 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.mapper.ClassCpsgrpMapper;
-import net.ecnu.model.dto.ClassScoreInfoDto;
-import net.ecnu.model.dto.CourseClassCpsgrpInfoDto;
-import net.ecnu.model.dto.StatisticsDto;
+import net.ecnu.mapper.ClassMapper;
+import net.ecnu.model.dto.*;
 import net.ecnu.model.vo.ClassCpsgrpInfoVo;
+import net.ecnu.model.vo.ScoreStatisticsVo;
 import net.ecnu.model.vo.StatisticsVo;
+import net.ecnu.model.vo.dto.ClassOptions;
+import net.ecnu.model.vo.dto.ClassScoreAnalysis;
+import net.ecnu.model.vo.dto.CpsgrpOptions;
 import net.ecnu.service.StatisticsService;
 import net.ecnu.util.ExcelUtil;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -18,17 +21,17 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -42,6 +45,9 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Resource
     private ClassCpsgrpMapper classCpsgrpMapper;
+
+    @Resource
+    private ClassMapper classMapper;
 
     @Value("${class.score.info.template}")
     private String classScoreInfoTemplate;
@@ -77,9 +83,9 @@ public class StatisticsServiceImpl implements StatisticsService {
         //综合总分排序
         if (Objects.nonNull(statisticsDto.getSuggestedScoreKey())) {
             if (statisticsDto.getSuggestedScoreKey() == 0) {
-                statisticsVos = statisticsVos.stream().sorted((o1,o2) -> (int) (o1.getSuggestedScoreAverage() - o2.getSuggestedScoreAverage())).collect(Collectors.toList());
+                statisticsVos = statisticsVos.stream().sorted((o1, o2) -> (int) (o1.getSuggestedScoreAverage() - o2.getSuggestedScoreAverage())).collect(Collectors.toList());
             } else if (statisticsDto.getSuggestedScoreKey() == 1) {
-                statisticsVos = statisticsVos.stream().sorted((o1,o2) -> (int) (o2.getSuggestedScoreAverage() - o1.getSuggestedScoreAverage())).collect(Collectors.toList());
+                statisticsVos = statisticsVos.stream().sorted((o1, o2) -> (int) (o2.getSuggestedScoreAverage() - o1.getSuggestedScoreAverage())).collect(Collectors.toList());
             }
         }
         int total = statisticsVos.size();
@@ -100,6 +106,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     /**
      * 获取指定课程下的试题集数据
+     *
      * @param courseId      课程id
      * @param currentTypeId 测验/考试flag
      **/
@@ -110,7 +117,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public void exportExcel(String classId,String cpsgrpId, HttpServletResponse response) {
+    public void exportExcel(String classId, String cpsgrpId, HttpServletResponse response) {
         log.info("开始导出班级成绩Excel，入参classId:{}", JSON.toJSON(classId));
         File file = new File(classScoreInfoTemplate);
         if (!file.isFile()) {
@@ -118,8 +125,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         }
         try {
             //获取班级下学生指定作业的成绩
-            CourseClassCpsgrpInfoDto courseClassCpsgrpInfoDto = classCpsgrpMapper.getClassCpsgrpInfo(classId,cpsgrpId);
-            List<ClassScoreInfoDto> classScoreInfoDtos = classCpsgrpMapper.getClassScoreInfo(classId,cpsgrpId);
+            CourseClassCpsgrpInfoDto courseClassCpsgrpInfoDto = classCpsgrpMapper.getClassCpsgrpInfo(classId, cpsgrpId);
+            List<ClassScoreInfoDto> classScoreInfoDtos = classCpsgrpMapper.getClassScoreInfo(classId, cpsgrpId);
             Workbook workbook = ExcelUtil.getWorkbook(classScoreInfoTemplate);
             /*CellStyle promptStyle = workbook.createCellStyle();
             //设置字体
@@ -148,7 +155,7 @@ public class StatisticsServiceImpl implements StatisticsService {
             //作业名称
             sheet.getRow(5).getCell(2).setCellValue(courseClassCpsgrpInfoDto.getCpsgrpName());
             //填充表格字段
-            fillStudentScoreInfo(7,sheet,classScoreInfoDtos);
+            fillStudentScoreInfo(7, sheet, classScoreInfoDtos);
             String fileName = courseClassCpsgrpInfoDto.getClassName() + "-" + courseClassCpsgrpInfoDto.getCpsgrpName() + ".xlsx";
             String gFileName = URLEncoder.encode(fileName, "UTF-8");
             // 定义输出类型
@@ -161,18 +168,87 @@ public class StatisticsServiceImpl implements StatisticsService {
             workbook.write(out);
             out.close();
         } catch (Exception e) {
-            log.info("导出Excel失败，异常信息：{}",JSON.toJSON(e.getMessage()));
-            throw new BizException(BizCodeEnum.EXCEL_ERROR.getCode(),"导出Excel失败,请联系管理员");
+            log.info("导出Excel失败，异常信息：{}", JSON.toJSON(e.getMessage()));
+            throw new BizException(BizCodeEnum.EXCEL_ERROR.getCode(), "导出Excel失败,请联系管理员");
         }
+    }
+
+    @Override
+    public Map<String, Object> getOptionsInfo(String courseId) {
+        Map<String, Object> resultMap = new HashMap<>();
+        //查询课程下的有效班级
+        List<ClassOptions> classOptions = classMapper.getOptionsInfo(courseId);
+        //查询课程下老师发布的所有语料组
+        List<String> classIdList = classOptions.stream().map(ClassOptions::getClassId).collect(Collectors.toList());
+        List<CpsgrpOptions> cpsgrpOptionsList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(classIdList)) {
+            cpsgrpOptionsList = classCpsgrpMapper.getCpsgrpInfo(classIdList);
+        }
+        resultMap.put("cpsgrpList", cpsgrpOptionsList);
+        resultMap.put("classList", classOptions);
+        return resultMap;
+    }
+
+    @Override
+    public ScoreStatisticsVo scoreStatistics(ScoreStatisticsReq scoreStatisticsReq) {
+        ScoreStatisticsVo scoreStatisticsVo = new ScoreStatisticsVo();
+        //查询指定课程下，发布该语料组的班级
+        List<ClassScoreAnalysis> classScoreAnalyses = classCpsgrpMapper.getClassIds(scoreStatisticsReq);
+        for (ClassScoreAnalysis classScoreAnalysis : classScoreAnalyses) {
+            //根据班级id获取学生id
+            List<String> studentIdList = classCpsgrpMapper.getStudentIdByClassId(classScoreAnalysis.getClassId());
+            //获取此次测评/考试，该班级下的学生答题情况
+            List<StudentTranscriptDto> studentTranscriptDtoList = classCpsgrpMapper.getTranscriptInfo(studentIdList);
+            classScoreAnalysis.setClassSize(studentIdList.size());
+            if (CollectionUtils.isEmpty(studentTranscriptDtoList)) {
+                classScoreAnalysis.setHighestScore(0.0);
+                classScoreAnalysis.setLowestScore(0.0);
+                classScoreAnalysis.setAverageScore(0.0);
+                classScoreAnalysis.setFailNums(0);
+                classScoreAnalysis.setPassNums(0);
+                classScoreAnalysis.setCurrentRespondentNums(0);
+            } else {
+                classScoreAnalysis.setCurrentRespondentNums(studentTranscriptDtoList.size());
+                BigDecimal averageDeci = new BigDecimal(0);
+                BigDecimal minDeci = new BigDecimal(999L);
+                BigDecimal maxDeci = new BigDecimal(0);
+                Integer failNums = 0;
+                Integer passNums = 0;
+                BigDecimal line = new BigDecimal(60);
+                for (StudentTranscriptDto studentTranscriptDto : studentTranscriptDtoList) {
+                    if (studentTranscriptDto.getSuggestedScore().compareTo(maxDeci) > 0) {
+                        maxDeci = studentTranscriptDto.getSuggestedScore();
+                    }
+                    if (minDeci.compareTo(studentTranscriptDto.getSuggestedScore()) > 0) {
+                        minDeci = studentTranscriptDto.getSuggestedScore();
+                    }
+                    averageDeci.add(studentTranscriptDto.getSuggestedScore());
+                    if (studentTranscriptDto.getSuggestedScore().compareTo(line) >= 0) {
+                        passNums++;
+                    } else {
+                        failNums++;
+                    }
+                }
+                averageDeci = averageDeci.divide(new BigDecimal(studentIdList.size()));
+                classScoreAnalysis.setLowestScore(minDeci.doubleValue());
+                classScoreAnalysis.setHighestScore(maxDeci.doubleValue());
+                classScoreAnalysis.setAverageScore(averageDeci.doubleValue());
+                classScoreAnalysis.setPassNums(passNums);
+                classScoreAnalysis.setFailNums(failNums);
+            }
+        }
+        scoreStatisticsVo.setClassScoreAnalysisList(classScoreAnalyses);
+        return scoreStatisticsVo;
     }
 
     /**
      * 填充学生成绩数据
-     * @param rowLine 开始行数
-     * @param sheet sheet页对象
+     *
+     * @param rowLine            开始行数
+     * @param sheet              sheet页对象
      * @param classScoreInfoDtos 需要填充的表格内容
-     * **/
-    public void fillStudentScoreInfo(Integer rowLine,Sheet sheet,List<ClassScoreInfoDto> classScoreInfoDtos){
+     **/
+    public void fillStudentScoreInfo(Integer rowLine, Sheet sheet, List<ClassScoreInfoDto> classScoreInfoDtos) {
         int index = 0;
         for (ClassScoreInfoDto classScoreInfoDto : classScoreInfoDtos) {
             CellRangeAddress studentNameRange = new CellRangeAddress(rowLine + index, rowLine + index, 0, 1);
@@ -190,11 +266,11 @@ public class StatisticsServiceImpl implements StatisticsService {
             sheet.addMergedRegion(pronAccuracyRange);
             sheet.getRow(rowLine + index).createCell(5).setCellValue(classScoreInfoDto.getPronAccuracyScore());
             //流畅度得分
-            CellRangeAddress pronFluencyRange = new CellRangeAddress(rowLine + index,rowLine + index,7,8);
+            CellRangeAddress pronFluencyRange = new CellRangeAddress(rowLine + index, rowLine + index, 7, 8);
             sheet.addMergedRegion(pronFluencyRange);
             sheet.getRow(rowLine + index).createCell(7).setCellValue(classScoreInfoDto.getPronFluencyScore());
             //综合得分
-            CellRangeAddress suggestedScoreRange = new CellRangeAddress(rowLine + index,rowLine + index,9,10);
+            CellRangeAddress suggestedScoreRange = new CellRangeAddress(rowLine + index, rowLine + index, 9, 10);
             sheet.addMergedRegion(suggestedScoreRange);
             sheet.getRow(rowLine + index).createCell(9).setCellValue(classScoreInfoDto.getSuggestedScoreScore());
             //排名

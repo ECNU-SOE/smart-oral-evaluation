@@ -1,12 +1,15 @@
 package net.ecnu.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import net.ecnu.model.dto.ScoreStatisticsReq;
 import net.ecnu.model.dto.StatisticsDto;
 import net.ecnu.model.vo.ClassCpsgrpInfoVo;
+import net.ecnu.model.vo.ScoreStatisticsVo;
 import net.ecnu.model.vo.StatisticsVo;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @description:数据统计接口类
@@ -22,4 +25,8 @@ public interface StatisticsService {
     List<ClassCpsgrpInfoVo> getCpsgrpInfoByCourseId(String courseId,Integer currentTypeId);
 
     void exportExcel(String classId,String cpsgrpId, HttpServletResponse response);
+
+    Map<String, Object> getOptionsInfo(String courseId);
+
+    ScoreStatisticsVo scoreStatistics(ScoreStatisticsReq scoreStatisticsReq);
 }
