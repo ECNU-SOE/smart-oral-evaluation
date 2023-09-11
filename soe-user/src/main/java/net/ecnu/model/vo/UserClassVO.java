@@ -13,6 +13,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class UserClassVO implements Serializable {
 
+    private Long id;
     /**
      * 用户账号id
      */
