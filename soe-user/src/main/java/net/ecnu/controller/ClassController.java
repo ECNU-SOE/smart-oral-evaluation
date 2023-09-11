@@ -49,6 +49,12 @@ public class ClassController {
         return JsonData.buildSuccess(data);
     }
 
+    @PostMapping("update_user_class")
+    public JsonData update_user_class(@RequestBody @Validated(Update.class) UsrClassReq usrClassReq) {
+        Object data = classService.updateUsrClass(usrClassReq);
+        return JsonData.buildSuccess(data);
+    }
+
     @PostMapping("add_user_batch")
     public JsonData add_user_batch(@RequestBody @Validated(Create.class) UsrClassAddBatchReq usrClassAddBatchReq) {
         Object data = classService.addUsrClassBatch(usrClassAddBatchReq);

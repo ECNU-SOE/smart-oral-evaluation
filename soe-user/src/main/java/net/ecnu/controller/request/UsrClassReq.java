@@ -13,7 +13,7 @@ public class UsrClassReq {
 
     private String accountNo;
 
-    @NotBlank(message = "班级号不能为空",groups = {Create.class})
+    @NotBlank(message = "班级号不能为空",groups = {Create.class,Update.class})
     private String classId;
 
     @NotNull(message = "关系类型不能为空",groups = {Update.class})

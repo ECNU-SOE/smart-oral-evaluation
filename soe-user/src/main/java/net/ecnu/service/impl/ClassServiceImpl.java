@@ -214,6 +214,52 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
     }
 
     @Override
+    public Object updateUsrClass(UsrClassReq usrClassReq) {
+        String currentAccountNo = RequestParamUtil.currentAccountNo();
+        if (StringUtils.isBlank(currentAccountNo)) {
+            throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+        }
+        //权限判断
+        if (usrClassReq.getAccountNo() == null||StringUtils.isBlank(usrClassReq.getAccountNo())) {
+            //请求体accountNo为空，用户更新自己的课程关系信息，只更新rType
+            UserClassDO userClassDO = userClassManager.getByAccountNoAndClassId(currentAccountNo, usrClassReq.getClassId());
+            UserClassDO newUserClassDO = new UserClassDO();
+            BeanUtils.copyProperties(userClassDO, newUserClassDO,"r_type");
+            newUserClassDO.setRType(usrClassReq.getRType());
+            return userClassMapper.updateById(newUserClassDO);
+        } else {
+            //请求体accountNo不为空
+            if (Objects.equals(currentAccountNo, usrClassReq.getAccountNo())) {
+                //token的accountNo与请求体的accountNo相同，用户更新自己的课程关系信息
+                UserClassDO userClassDO = userClassManager.getByAccountNoAndClassId(currentAccountNo, usrClassReq.getClassId());
+                UserClassDO newUserClassDO = new UserClassDO();
+                BeanUtils.copyProperties(userClassDO, newUserClassDO,"r_type");
+                newUserClassDO.setRType(usrClassReq.getRType());
+                return userClassMapper.updateById(newUserClassDO);
+            } else {
+                //token的accountNo与请求体的accountNo不同，给别人更新课程关系信息
+                Integer role = userService.getTopRole(currentAccountNo);
+                if (role<RolesConst.ROLE_ADMIN){//系统管理员及以上直接更新
+                    UserClassDO userClassDO = userClassManager.getByAccountNoAndClassId(usrClassReq.getAccountNo(), usrClassReq.getClassId());
+                    UserClassDO newUserClassDO = new UserClassDO();
+                    BeanUtils.copyProperties(userClassDO, newUserClassDO,"r_type");
+                    newUserClassDO.setRType(usrClassReq.getRType());
+                    return userClassMapper.updateById(newUserClassDO);
+                }else {//老师给自己所在班级更新
+                    UserClassDO userClassDo = userClassManager.getByAccountNoAndClassId(currentAccountNo, usrClassReq.getClassId());
+                    if (userClassDo==null||userClassDo.getRType()==1||userClassDo.getRType()==2)//1：学生，2：助教
+                        throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+                    UserClassDO userClassDO = userClassManager.getByAccountNoAndClassId(usrClassReq.getAccountNo(), usrClassReq.getClassId());
+                    UserClassDO newUserClassDO = new UserClassDO();
+                    BeanUtils.copyProperties(userClassDO, newUserClassDO,"r_type");
+                    newUserClassDO.setRType(usrClassReq.getRType());
+                    return userClassMapper.updateById(newUserClassDO);
+                }
+            }
+        }
+    }
+
+    @Override
     public Object addUsrClassBatch(UsrClassAddBatchReq usrClassAddBatchReq) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         if (StringUtils.isBlank(currentAccountNo)) {
