@@ -77,15 +77,15 @@ public class CorpusServiceImpl extends ServiceImpl<CorpusMapper, CorpusDO> imple
     @Override
     public Object random(Integer entityType) {
         if (entityType==null||entityType==1){
-            CorpusDO randomCorpus = corpusMapper.getRandomCorpus();
-            if (randomCorpus==null)
-                return "暂无语料";
-            return randomCorpus;
-        }else {
             CpsrcdDO randomCpsrcd = cpsrcdMapper.getRandomCpsrcd();
             if (randomCpsrcd == null)
                 return "暂无语料";
             return randomCpsrcd;
+        }else {
+            CorpusDO randomCorpus = corpusMapper.getRandomCorpus();
+            if (randomCorpus==null)
+                return "暂无语料";
+            return randomCorpus;
         }
     }
 }

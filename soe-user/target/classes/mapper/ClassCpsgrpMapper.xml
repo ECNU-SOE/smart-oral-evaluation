@@ -51,7 +51,7 @@
         LEFT JOIN
             transcript t ON t.respondent = uc.account_no
         WHERE
-            c.course_id = #{statisticsDto.courseId,jdbcType=VARCHAR} and c.del = 0 and t.account_no IS NOT NULL
+            c.course_id = #{statisticsDto.courseId,jdbcType=VARCHAR} and c.del = 0 and t.respondent IS NOT NULL
         ORDER BY suggestedScoreAverage DESC
         GROUP BY c.id
     </select>
@@ -92,6 +92,63 @@
           cpsgrp cps ON cps.id = #{cpsgrpId,jdbcType=VARCHAR} and cps.class_id = #{classId,jdbcType=VARCHAR} and cps.del = 0
         WHERE
           c.id = #{classId,jdbcType=VARCHAR} and c.del = 0
+    </select>
+
+    <select id="getCpsgrpInfo" resultType="net.ecnu.model.vo.dto.CpsgrpOptions">
+      SELECT
+        cc.cpsgrp_id AS cpsgrpId,
+        grp.description AS cpsgrpName
+      FROM
+        class_cpsgrp cc
+      LEFT JOIN
+        cpsgrp grp ON grp.id = cc.cpsgrp_id AND grp.del = 0
+      WHERE
+        cc.cpsgrp_id IN
+      <foreach collection="classIdList" item="item" open="(" close=")" separator=",">
+        title
+      </foreach>
+    </select>
+
+    <select id="getClassIds" resultType="net.ecnu.model.vo.dto.ClassScoreAnalysis">
+      SELECT
+        c.id AS classId,
+        c.name AS className
+      FROM
+        class c
+      LEFT JOIN
+        class_cpsgrp cc ON c.id = cc.class_id
+      WHERE
+        c.course_id = #{scoreStatisticsReq.courseId,jdbcType=VARCHAR}
+      AND
+        c.del = 0
+      AND
+        cc.cpsgrp_id = #{scoreStatisticsReq.cpsgrpId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getStudentIdByClassId" resultType="java.lang.String">
+      select
+        account_no
+      from
+        user_class
+      where
+        class_id = #{classId,jdbcType=VARCHAR} and r_type = 1
+    </select>
+
+    <select id="getTranscriptInfo" resultType="net.ecnu.model.dto.StudentTranscriptDto">
+      select
+        temp.cpsgrp_id AS cpsgrpId,
+        temp.respondent AS respondent,
+        temp.suggested_score AS suggestedScore,
+        temp.gmt_create AS gmtCreate
+      FROM
+        (SELECT * FROM transcript ORDER BY gmt_create DESC LIMIT 9999999999) temp
+      WHERE
+        temp.respondent IN
+      <foreach collection="studentList" item="item" open="(" close=")" separator=",">
+        item
+      </foreach>
+      GROUP BY
+        temp.cpsgrp_id,temp.respondent
     </select>
 
 </mapper>
