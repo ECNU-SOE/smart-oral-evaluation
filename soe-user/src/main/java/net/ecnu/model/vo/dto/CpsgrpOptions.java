@@ -16,6 +16,11 @@ public class CpsgrpOptions {
     private String cpsgrpId;
 
     /**
+     * 1：测评，2：考试
+     * **/
+    private Integer cpsgrpType;
+
+    /**
      * 语料组名称
      * **/
     private String cpsgrpName;

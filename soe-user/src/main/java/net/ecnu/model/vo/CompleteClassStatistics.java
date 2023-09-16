@@ -11,18 +11,22 @@ import lombok.Data;
 public class CompleteClassStatistics {
 
     /**
-     *
+     * 语料组id
+     * **/
+    private String cpsgrpId;
+
+    /**
+     * 语料组名称
+     * **/
+    private String cpsgrpName;
+
+    /**
+     * 1：测评，2：考试
+     * **/
+    private Integer cpsgrpType;
+
+    /**
+     * 班级测评/考试完成度
      */
-    private String classId;
-
-    /**
-     *
-     * **/
-    //private Integer ;
-
-    /**
-     *
-     * **/
-
-
+    private String completeRate;
 }

@@ -27,7 +27,7 @@ public enum BizCodeEnum {
     COURSE_REPEAT(250011, "课程重复"),
     COURSE_USING(250012, "该课程被班级关联"),
     USER_SIGNED(250013,"用户已签到"),
-
+    STUDENT_IS_ZERO(250014,"班级内学生数量为0"),
     /**
      * 语料组相关
      */

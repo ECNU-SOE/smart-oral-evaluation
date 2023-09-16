@@ -12,7 +12,15 @@ import java.util.List;
 @Data
 public class CompletionStatisticsVo {
 
+    /**
+     * 班级ID
+     * **/
     private String classId;
+
+    /**
+     * 班级名称
+     * **/
+    private String className;
 
     /**
      * 已布置测评数
@@ -25,7 +33,18 @@ public class CompletionStatisticsVo {
     private Integer examNums;
 
     /**
-     * 测评、考试完成度
+     * 班级人数
      * **/
-    List<CompleteClassStatistics> completeClassStatistics;
+    private Integer studentNums;
+
+    /**
+     * 测评完成度
+     * **/
+    List<CompleteClassStatistics> evaCompletionStatistics;
+
+    /**
+     * 考试完成度
+     * **/
+    List<CompleteClassStatistics> examCompletionStatistics;
+
 }

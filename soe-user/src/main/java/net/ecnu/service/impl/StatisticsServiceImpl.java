@@ -1,17 +1,20 @@
 package net.ecnu.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.enums.BizCodeEnum;
+import net.ecnu.enums.CpsgrpTypeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.mapper.ClassCpsgrpMapper;
 import net.ecnu.mapper.ClassMapper;
+import net.ecnu.mapper.StatisticsMapper;
+import net.ecnu.mapper.UserClassMapper;
+import net.ecnu.model.ClassDO;
+import net.ecnu.model.UserClassDO;
 import net.ecnu.model.dto.*;
-import net.ecnu.model.vo.ClassCpsgrpInfoVo;
-import net.ecnu.model.vo.CompletionStatisticsVo;
-import net.ecnu.model.vo.ScoreStatisticsVo;
-import net.ecnu.model.vo.StatisticsVo;
+import net.ecnu.model.vo.*;
 import net.ecnu.model.vo.dto.ClassOptions;
 import net.ecnu.model.vo.dto.ClassScoreAnalysis;
 import net.ecnu.model.vo.dto.CpsgrpOptions;
@@ -23,6 +26,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +34,7 @@ import java.io.File;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.text.NumberFormat;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -49,6 +54,12 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Resource
     private ClassMapper classMapper;
+
+    @Resource
+    private UserClassMapper userClassMapper;
+
+    @Resource
+    private StatisticsMapper statisticsMapper;
 
     @Value("${class.score.info.template}")
     private String classScoreInfoTemplate;
@@ -245,8 +256,59 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public CompletionStatisticsVo completionStatistics(CompletionStatisticsReq completionStatisticsReq) {
         CompletionStatisticsVo completionStatisticsVo = new CompletionStatisticsVo();
-
-        return null;
+        //1、查询班级的信息
+        QueryWrapper<ClassDO> classDOQueryWrapper = new QueryWrapper<>();
+        classDOQueryWrapper.eq("id",completionStatisticsReq.getClassId()).eq("course_id",completionStatisticsReq.getCourseId())
+                .eq("del",0);
+        ClassDO classDO = classMapper.selectOne(classDOQueryWrapper);
+        completionStatisticsVo.setClassId(classDO.getId());
+        //班级名称
+        completionStatisticsVo.setClassName(classDO.getName());
+        //2、获取班级内的学生人数
+        QueryWrapper<UserClassDO> userClassDOQueryWrapper = new QueryWrapper<>();
+        userClassDOQueryWrapper.eq("class_id",classDO.getId()).eq("r_type",1);
+        List<UserClassDO> userClassDOList = userClassMapper.selectList(userClassDOQueryWrapper);
+        if (!CollectionUtils.isEmpty(userClassDOList)) {
+            completionStatisticsVo.setStudentNums(userClassDOList.size());
+        } else {
+            throw new BizException(BizCodeEnum.STUDENT_IS_ZERO);
+        }
+        //3、获取班级下布置的作业
+        List<CpsgrpOptions> cpsgrpInfo = classCpsgrpMapper.getCpsgrpInfo(Arrays.asList(completionStatisticsReq.getClassId()));
+        //4、获取班级内所有测评、考试的完成情况
+        List<String> studentList = userClassDOList.stream().map(UserClassDO::getAccountNo).collect(Collectors.toList());
+        int evaluationNums = 0;
+        int examNums = 0;
+        //获取格式化对象
+        NumberFormat nt = NumberFormat.getPercentInstance();
+        //设置百分数精确度2即保留两位小数
+        nt.setMinimumFractionDigits(2);
+        //测评完成度
+        List<CompleteClassStatistics> evaCompletionStatistics = new ArrayList<>();
+        //考试完成度
+        List<CompleteClassStatistics> examCompletionStatistics = new ArrayList<>();
+        for (CpsgrpOptions cpsgrpOptions : cpsgrpInfo) {
+            Integer counts = statisticsMapper.getCountByStuIdsAndCpsgrpId(studentList, cpsgrpOptions.getCpsgrpId());
+            //计算测评、考试的完成率
+            double completeRate = (double)counts/completionStatisticsVo.getStudentNums();
+            CompleteClassStatistics completeClassStatistics = new CompleteClassStatistics();
+            completeClassStatistics.setCpsgrpId(cpsgrpOptions.getCpsgrpId());
+            completeClassStatistics.setCpsgrpName(cpsgrpOptions.getCpsgrpName());
+            completeClassStatistics.setCpsgrpType(cpsgrpOptions.getCpsgrpType());
+            completeClassStatistics.setCompleteRate(nt.format(completeRate));
+            if (cpsgrpOptions.getCpsgrpType().intValue() == CpsgrpTypeEnum.TEXT.getCode().intValue()) {
+                evaluationNums++;
+                evaCompletionStatistics.add(completeClassStatistics);
+            } else if (cpsgrpOptions.getCpsgrpType().intValue() == CpsgrpTypeEnum.EXAM.getCode().intValue()) {
+                examNums++;
+                examCompletionStatistics.add(completeClassStatistics);
+            }
+        }
+        completionStatisticsVo.setEvaluationNums(evaluationNums);
+        completionStatisticsVo.setExamNums(examNums);
+        completionStatisticsVo.setEvaCompletionStatistics(evaCompletionStatistics);
+        completionStatisticsVo.setExamCompletionStatistics(examCompletionStatistics);
+        return completionStatisticsVo;
     }
 
     /**
