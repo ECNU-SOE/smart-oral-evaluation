@@ -104,9 +104,9 @@
       LEFT JOIN
         cpsgrp grp ON grp.id = cc.cpsgrp_id AND grp.del = 0
       WHERE
-        cc.cpsgrp_id IN
+        cc.class_id IN
       <foreach collection="classIdList" item="item" open="(" close=")" separator=",">
-        title
+        #{item,jdbcType=VARCHAR}
       </foreach>
     </select>
 
