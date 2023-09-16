@@ -97,6 +97,7 @@
     <select id="getCpsgrpInfo" resultType="net.ecnu.model.vo.dto.CpsgrpOptions">
       SELECT
         cc.cpsgrp_id AS cpsgrpId,
+        grp.type AS cpsgrpType,
         grp.description AS cpsgrpName
       FROM
         class_cpsgrp cc
