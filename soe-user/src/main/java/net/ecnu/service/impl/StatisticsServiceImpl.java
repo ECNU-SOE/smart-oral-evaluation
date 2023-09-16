@@ -9,6 +9,7 @@ import net.ecnu.mapper.ClassCpsgrpMapper;
 import net.ecnu.mapper.ClassMapper;
 import net.ecnu.model.dto.*;
 import net.ecnu.model.vo.ClassCpsgrpInfoVo;
+import net.ecnu.model.vo.CompletionStatisticsVo;
 import net.ecnu.model.vo.ScoreStatisticsVo;
 import net.ecnu.model.vo.StatisticsVo;
 import net.ecnu.model.vo.dto.ClassOptions;
@@ -239,6 +240,13 @@ public class StatisticsServiceImpl implements StatisticsService {
         }
         scoreStatisticsVo.setClassScoreAnalysisList(classScoreAnalyses);
         return scoreStatisticsVo;
+    }
+
+    @Override
+    public CompletionStatisticsVo completionStatistics(CompletionStatisticsReq completionStatisticsReq) {
+        CompletionStatisticsVo completionStatisticsVo = new CompletionStatisticsVo();
+
+        return null;
     }
 
     /**

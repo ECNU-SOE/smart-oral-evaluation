@@ -5,9 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.enums.CpsgrpTypeEnum;
 import net.ecnu.exception.BizException;
+import net.ecnu.model.dto.CompletionStatisticsReq;
 import net.ecnu.model.dto.ScoreStatisticsReq;
 import net.ecnu.model.dto.StatisticsDto;
 import net.ecnu.model.vo.ClassCpsgrpInfoVo;
+import net.ecnu.model.vo.CompletionStatisticsVo;
 import net.ecnu.model.vo.ScoreStatisticsVo;
 import net.ecnu.model.vo.StatisticsVo;
 import net.ecnu.service.StatisticsService;
@@ -56,9 +58,28 @@ public class StatisticsController {
         if (StringUtils.isEmpty(scoreStatisticsReq.getCourseId())) {
             return JsonData.buildError("课程id不能为空");
         }
+        if(StringUtils.isEmpty(scoreStatisticsReq.getCpsgrpId())){
+            return JsonData.buildError("语料组id不能为空");
+        }
         ScoreStatisticsVo scoreStatisticsVo = statisticsService.scoreStatistics(scoreStatisticsReq);
         return JsonData.buildSuccess(scoreStatisticsVo);
     }
+
+    /**
+     * 班级测评/考试的完成率统计
+     * **/
+    @PostMapping("/completionStatistics")
+    public JsonData completionStatistics(@RequestBody CompletionStatisticsReq completionStatisticsReq) {
+        if (StringUtils.isEmpty(completionStatisticsReq.getCourseId())) {
+            return JsonData.buildError("课程id不能为空");
+        }
+        if (StringUtils.isEmpty(completionStatisticsReq.getClassId())) {
+            return JsonData.buildError("班级id不能为空");
+        }
+        CompletionStatisticsVo completionStatisticsVo = statisticsService.completionStatistics(completionStatisticsReq);
+        return JsonData.buildSuccess(completionStatisticsVo);
+    }
+
 
     /**
      * 课程测验、考试数据统计

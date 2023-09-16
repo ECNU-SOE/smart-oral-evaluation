@@ -1,9 +1,11 @@
 package net.ecnu.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import net.ecnu.model.dto.CompletionStatisticsReq;
 import net.ecnu.model.dto.ScoreStatisticsReq;
 import net.ecnu.model.dto.StatisticsDto;
 import net.ecnu.model.vo.ClassCpsgrpInfoVo;
+import net.ecnu.model.vo.CompletionStatisticsVo;
 import net.ecnu.model.vo.ScoreStatisticsVo;
 import net.ecnu.model.vo.StatisticsVo;
 
@@ -29,4 +31,6 @@ public interface StatisticsService {
     Map<String, Object> getOptionsInfo(String courseId);
 
     ScoreStatisticsVo scoreStatistics(ScoreStatisticsReq scoreStatisticsReq);
+
+    CompletionStatisticsVo completionStatistics(CompletionStatisticsReq completionStatisticsReq);
 }
