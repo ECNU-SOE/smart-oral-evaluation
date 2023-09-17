@@ -235,7 +235,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                     if (minDeci.compareTo(studentTranscriptDto.getSuggestedScore()) > 0) {
                         minDeci = studentTranscriptDto.getSuggestedScore();
                     }
-                    averageDeci.add(studentTranscriptDto.getSuggestedScore());
+                    averageDeci = averageDeci.add(studentTranscriptDto.getSuggestedScore());
                     if (studentTranscriptDto.getSuggestedScore().compareTo(line) >= 0) {
                         passNums++;
                     } else {
