@@ -204,6 +204,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public ScoreStatisticsVo scoreStatistics(ScoreStatisticsReq scoreStatisticsReq) {
         ScoreStatisticsVo scoreStatisticsVo = new ScoreStatisticsVo();
+        scoreStatisticsVo.setCpsgrpId(scoreStatisticsReq.getCpsgrpId());
         //查询指定课程下，发布该语料组的班级
         List<ClassScoreAnalysis> classScoreAnalyses = classCpsgrpMapper.getClassIds(scoreStatisticsReq);
         for (ClassScoreAnalysis classScoreAnalysis : classScoreAnalyses) {
