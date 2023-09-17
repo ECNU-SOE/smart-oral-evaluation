@@ -12,7 +12,7 @@
         and
           respondent IN
         <foreach collection="studentList" item="item" open="(" close=")" separator=",">
-          item
+          #{item,jdbcType=VARCHAR}
         </foreach>
         group by cpsgrp_id,respondent
     </select>
