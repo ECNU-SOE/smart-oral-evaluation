@@ -2,6 +2,7 @@ package net.ecnu.controller;
 
 
 import net.ecnu.controller.group.Create;
+import net.ecnu.controller.group.Delete;
 import net.ecnu.controller.group.Update;
 import net.ecnu.controller.request.TagFilterReq;
 import net.ecnu.controller.request.TaggingReq;
@@ -61,6 +62,12 @@ public class TagController {
     @PostMapping("list_ent_tags")
     public JsonData listEntityTags(@RequestParam String entityId) {
         Object data = tagService.listEntityTags(entityId);
+        return JsonData.buildSuccess(data);
+    }
+
+    @PostMapping("del_tagging")
+    public JsonData delTagging(@RequestBody @Validated(Delete.class) TaggingReq taggingReq) {
+        Object data = tagService.delTagging(taggingReq);
         return JsonData.buildSuccess(data);
     }
 }

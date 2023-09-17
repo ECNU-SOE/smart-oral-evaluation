@@ -116,5 +116,20 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
         return tagDOS;
     }
 
+    @Override
+    public Object delTagging(TaggingReq taggingReq) {
+        TagDO tagDO = tagMapper.selectOne(new QueryWrapper<TagDO>()
+                .eq("name", taggingReq.getTagName())
+        );
+        TaggingDO taggingDO = taggingMapper.selectOne(new QueryWrapper<TaggingDO>()
+                .eq("tag_id", tagDO.getId())
+                .eq("entity_id", taggingReq.getEntityId())
+        );
+        if (taggingDO==null)
+            return "该实体所对应的标签不存在";
+        int i = taggingMapper.deleteById(taggingDO.getId());
+        return "删除成功，共影响了"+i+"行";
+    }
+
 
 }
