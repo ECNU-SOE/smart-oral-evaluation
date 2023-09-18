@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.yaml.snakeyaml.util.ArrayUtils;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -78,6 +79,35 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
         //全量更新 但不会更新null值
         BeanUtils.copyProperties(cpsrcdReq, cpsrcdDO, "cpsgrpId");
         cpsrcdDO.setTags(JSONUtil.toJsonStr(cpsrcdReq.getTags()));
+        //同时更新标签映射关系，全量更新，以前的全删，新来的全加
+        int deletedNum = taggingMapper.delete(new QueryWrapper<TaggingDO>()
+                .eq("entity_id", cpsrcdReq.getId())
+        );
+        int tagNum = cpsrcdReq.getTags().size();
+        for (int i = 0;i<tagNum;i++){
+            TagDO tagDO = tagMapper.selectOne(new QueryWrapper<TagDO>()
+                    .eq("name", cpsrcdReq.getTags().get(i))
+            );
+            TaggingDO taggingDO = new TaggingDO();
+            taggingDO.setTagId(tagDO.getId());
+            taggingDO.setEntityId(cpsrcdReq.getId());
+            taggingDO.setEntityType(1);
+            taggingMapper.insert(taggingDO);
+            //映射关系改变后，需修改标签权重
+            Integer total = taggingMapper.selectCount(null);
+            Integer count = taggingMapper.selectCount(new QueryWrapper<TaggingDO>()
+                    .eq("tag_id", tagDO.getId())
+            );
+            TagDO newTagDO = new TagDO();
+            BeanUtils.copyProperties(tagDO,newTagDO,"weight");
+            double w = count / (total*1.00);
+            DecimalFormat format = new DecimalFormat("#.00");
+            String str = format.format(w);
+            double weight = Double.parseDouble(str);
+            newTagDO.setWeight(weight);
+            int updatenum = tagMapper.updateById(newTagDO);
+        }
+
         cpsrcdDO.setGmtModified(null);//Mysql会自动更新时间
         int i = cpsrcdMapper.updateById(cpsrcdDO);
         cpsrcdDO = cpsrcdMapper.selectById(cpsrcdReq.getId());
