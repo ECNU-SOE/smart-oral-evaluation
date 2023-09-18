@@ -2,6 +2,7 @@ package net.ecnu.biz;
 
 
 import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import cn.hutool.json.XML;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
@@ -10,9 +11,14 @@ import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitReque
 import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitResponse;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.CorpusApplication;
+import net.ecnu.enums.BizCodeEnum;
+import net.ecnu.exception.BizException;
+import net.ecnu.mapper.CpsrcdMapper;
+import net.ecnu.model.CpsrcdDO;
 import net.ecnu.service.EvaluateService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,6 +36,9 @@ public class SOETest {
 
     @Autowired
     private EvaluateService evaluateService;
+
+    @Autowired
+    private CpsrcdMapper cpsrcdMapper;
 
     @Value(value = "${aliyun.oss.endpoint}")
     private String ossEndpoint;
@@ -166,14 +175,9 @@ public class SOETest {
 
 
     @Test
-    public void xmlToJson() {
-//        JSONObject xmlJSONObj = XML.toJSONObject(sb.replace("<xml>", "").replace("</xml>", ""));
-        JSONObject xmlJSONObj = XML.toJSONObject(sb);
-        System.out.println(xmlJSONObj.toString());
-//        Map<String, Object> stringObjectMap = XmlUtil.xmlToMap(sb.toString());
-//        String json = JSONObject.toJSONString(stringObjectMap);
-//        System.out.println(json);
-//        JSONObject jsonObject = JSONObject.parseObject(json, JSONObject.class);
-//        System.out.println(jsonObject.toJSONString());
+    public void StringTojson() {
+        String s = "[  \"apple\",  \"banana\",  \"orange\"]";
+
+        return cpsrcdDO;
     }
 }

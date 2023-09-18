@@ -18,6 +18,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,7 +51,8 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
         if (tagDO1 != null)
             return "重复添加";
         TagDO tagDO = new TagDO();
-        BeanUtils.copyProperties(tagReq, tagDO, "id");
+        BeanUtils.copyProperties(tagReq, tagDO, "id","weight");
+        tagDO.setWeight(0.00);
         return tagMapper.insert(tagDO);
     }
 
@@ -65,7 +67,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
     @Override
     public Object update(TagReq tagReq) {
         TagDO tagDO = new TagDO();
-        BeanUtils.copyProperties(tagReq, tagDO);
+        BeanUtils.copyProperties(tagReq, tagDO,"weight");
         return tagMapper.updateById(tagDO);
     }
 
@@ -100,7 +102,22 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
             return "关联标签已存在";
         TaggingDO taggingDO = new TaggingDO();
         BeanUtils.copyProperties(taggingReq, taggingDO);
-        return taggingMapper.insert(taggingDO);
+        int i = taggingMapper.insert(taggingDO);
+        //修改权重
+        Integer total = taggingMapper.selectCount(null);
+        Integer count = taggingMapper.selectCount(new QueryWrapper<TaggingDO>()
+                .eq("tag_id", taggingReq.getTagId())
+        );
+        TagDO tagDO = tagMapper.selectById(taggingReq.getTagId());
+        TagDO newTagDO = new TagDO();
+        BeanUtils.copyProperties(tagDO,newTagDO,"weight");
+        double w = count / (total*1.00);
+        DecimalFormat format = new DecimalFormat("#.00");
+        String str = format.format(w);
+        double weight = Double.parseDouble(str);
+        newTagDO.setWeight(weight);
+        int updateid = tagMapper.updateById(newTagDO);
+        return i;
 
     }
 
@@ -128,6 +145,19 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
         if (taggingDO==null)
             return "该实体所对应的标签不存在";
         int i = taggingMapper.deleteById(taggingDO.getId());
+        //修改权重
+        Integer total = taggingMapper.selectCount(null);
+        Integer count = taggingMapper.selectCount(new QueryWrapper<TaggingDO>()
+                .eq("tag_id", tagDO.getId())
+        );
+        TagDO newTagDO = new TagDO();
+        BeanUtils.copyProperties(tagDO,newTagDO,"weight");
+        double w = count / (total*1.00);
+        DecimalFormat format = new DecimalFormat("#.00");
+        String str = format.format(w);
+        double weight = Double.parseDouble(str);
+        newTagDO.setWeight(weight);
+        int updateid = tagMapper.updateById(newTagDO);
         return "删除成功，共影响了"+i+"行";
     }
 

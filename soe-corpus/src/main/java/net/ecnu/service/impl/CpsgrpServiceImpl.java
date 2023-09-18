@@ -60,6 +60,10 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
 
     @Autowired
     private CpsgrpMapper cpsgrpMapper;
+    @Autowired
+    private TaggingMapper taggingMapper;
+    @Autowired
+    private TagMapper tagMapper;
 
     @Autowired
     private CorpusMapper corpusMapper;
@@ -290,8 +294,17 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         CpsrcdVO cpsrcdVO = new CpsrcdVO();
         BeanUtils.copyProperties(cpsrcdDO, cpsrcdVO);
         //tags单独处理String->List<String>
-        List<String> tags = JSONUtil.parseArray(cpsrcdDO.getTags()).toList(String.class);
-        cpsrcdVO.setTags(tags);
+        List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>()
+                .eq("entity_id", cpsrcdDO.getId())
+        );
+        if (taggingDOS.size()!=0){
+            List<Integer> tagIds = taggingDOS.stream().map(TaggingDO::getTagId).collect(Collectors.toList());
+            List<TagDO> tagDOS = tagMapper.selectBatchIds(tagIds);
+            List<String> tagNames = tagDOS.stream().map(TagDO::getName).collect(Collectors.toList());
+            cpsrcdVO.setTags(tagNames);
+        }
+//        List<String> tags = JSONUtil.parseArray(cpsrcdDO.getTags()).toList(String.class);
+//        cpsrcdVO.setTags(tags);
         return cpsrcdVO;
     }
 
