@@ -211,7 +211,7 @@ public class StatisticsServiceImpl implements StatisticsService {
             //根据班级id获取学生id
             List<String> studentIdList = classCpsgrpMapper.getStudentIdByClassId(classScoreAnalysis.getClassId());
             //获取此次测评/考试，该班级下的学生答题情况
-            List<StudentTranscriptDto> studentTranscriptDtoList = classCpsgrpMapper.getTranscriptInfo(studentIdList);
+            List<StudentTranscriptDto> studentTranscriptDtoList = classCpsgrpMapper.getTranscriptInfo(studentIdList,scoreStatisticsReq.getCpsgrpId());
             classScoreAnalysis.setClassSize(studentIdList.size());
             if (CollectionUtils.isEmpty(studentTranscriptDtoList)) {
                 classScoreAnalysis.setHighestScore(0.0);

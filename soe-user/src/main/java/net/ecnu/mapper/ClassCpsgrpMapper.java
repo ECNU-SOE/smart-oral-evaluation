@@ -38,5 +38,5 @@ public interface ClassCpsgrpMapper extends BaseMapper<ClassCpsgrpDO> {
 
     List<String> getStudentIdByClassId(@Param("classId") String classId);
 
-    List<StudentTranscriptDto> getTranscriptInfo(@Param("studentList") List<String> studentIdList);
+    List<StudentTranscriptDto> getTranscriptInfo(@Param("studentList") List<String> studentIdList,@Param("cpsgrpId") String CpsgrpId);
 }
