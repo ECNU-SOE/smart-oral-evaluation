@@ -2,16 +2,13 @@ package net.ecnu.service.impl;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import net.ecnu.controller.request.CpsrcdReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.manager.CpsrcdManager;
-import net.ecnu.mapper.CpsgrpMapper;
-import net.ecnu.mapper.TopicMapper;
-import net.ecnu.model.CpsgrpDO;
-import net.ecnu.model.CpsrcdDO;
-import net.ecnu.mapper.CpsrcdMapper;
-import net.ecnu.model.TopicDO;
+import net.ecnu.mapper.*;
+import net.ecnu.model.*;
 import net.ecnu.model.vo.CpsrcdVO;
 import net.ecnu.service.CpsrcdService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -24,8 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.yaml.snakeyaml.util.ArrayUtils;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -49,6 +48,10 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
 
     @Autowired
     private TopicMapper topicMapper;
+    @Autowired
+    private TagMapper tagMapper;
+    @Autowired
+    private TaggingMapper taggingMapper;
 
     @Autowired
     private OssService ossService;
@@ -76,6 +79,35 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
         //全量更新 但不会更新null值
         BeanUtils.copyProperties(cpsrcdReq, cpsrcdDO, "cpsgrpId");
         cpsrcdDO.setTags(JSONUtil.toJsonStr(cpsrcdReq.getTags()));
+        //同时更新标签映射关系，全量更新，以前的全删，新来的全加
+        int deletedNum = taggingMapper.delete(new QueryWrapper<TaggingDO>()
+                .eq("entity_id", cpsrcdReq.getId())
+        );
+        int tagNum = cpsrcdReq.getTags().size();
+        for (int i = 0;i<tagNum;i++){
+            TagDO tagDO = tagMapper.selectOne(new QueryWrapper<TagDO>()
+                    .eq("name", cpsrcdReq.getTags().get(i))
+            );
+            TaggingDO taggingDO = new TaggingDO();
+            taggingDO.setTagId(tagDO.getId());
+            taggingDO.setEntityId(cpsrcdReq.getId());
+            taggingDO.setEntityType(1);
+            taggingMapper.insert(taggingDO);
+            //映射关系改变后，需修改标签权重
+            Integer total = taggingMapper.selectCount(null);
+            Integer count = taggingMapper.selectCount(new QueryWrapper<TaggingDO>()
+                    .eq("tag_id", tagDO.getId())
+            );
+            TagDO newTagDO = new TagDO();
+            BeanUtils.copyProperties(tagDO,newTagDO,"weight");
+            double w = count / (total*1.00);
+            DecimalFormat format = new DecimalFormat("#.00");
+            String str = format.format(w);
+            double weight = Double.parseDouble(str);
+            newTagDO.setWeight(weight);
+            int updatenum = tagMapper.updateById(newTagDO);
+        }
+
         cpsrcdDO.setGmtModified(null);//Mysql会自动更新时间
         int i = cpsrcdMapper.updateById(cpsrcdDO);
         cpsrcdDO = cpsrcdMapper.selectById(cpsrcdReq.getId());
@@ -100,6 +132,16 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
             throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
         }
         BeanUtils.copyProperties(cpsrcdDO,cpsrcdVO);
+        List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>()
+                .eq("entity_id", cpsrcdId)
+        );
+        if (taggingDOS.size()!=0){
+            List<Integer> tagIds = taggingDOS.stream().map(TaggingDO::getTagId).collect(Collectors.toList());
+            List<TagDO> tagDOS = tagMapper.selectBatchIds(tagIds);
+            List<String> tagNames = tagDOS.stream().map(TagDO::getName).collect(Collectors.toList());
+            cpsrcdVO.setTags(tagNames);
+        }
+
         return cpsrcdVO;
     }
 

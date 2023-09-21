@@ -1,5 +1,6 @@
 package net.ecnu.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -10,9 +11,11 @@ import net.ecnu.exception.BizException;
 import net.ecnu.manager.CorpusManager;
 import net.ecnu.mapper.CorpusMapper;
 import net.ecnu.mapper.CpsrcdMapper;
-import net.ecnu.model.CorpusDO;
-import net.ecnu.model.CpsrcdDO;
+import net.ecnu.mapper.TagMapper;
+import net.ecnu.mapper.TaggingMapper;
+import net.ecnu.model.*;
 import net.ecnu.model.common.PageData;
+import net.ecnu.model.vo.CpsrcdVO;
 import net.ecnu.service.CorpusService;
 import net.ecnu.util.IDUtil;
 import net.ecnu.util.RequestParamUtil;
@@ -20,6 +23,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 //import net.ecnu.interceptor.LoginInterceptor;
 
@@ -36,6 +42,10 @@ public class CorpusServiceImpl extends ServiceImpl<CorpusMapper, CorpusDO> imple
 
     @Autowired
     private CorpusManager corpusManager;
+    @Autowired
+    private TagMapper tagMapper;
+    @Autowired
+    private TaggingMapper taggingMapper;
     @Autowired
     private CorpusMapper corpusMapper;
     @Autowired
@@ -80,7 +90,18 @@ public class CorpusServiceImpl extends ServiceImpl<CorpusMapper, CorpusDO> imple
             CpsrcdDO randomCpsrcd = cpsrcdMapper.getRandomCpsrcd();
             if (randomCpsrcd == null)
                 return "暂无语料";
-            return randomCpsrcd;
+            CpsrcdVO cpsrcdVO = new CpsrcdVO();
+            BeanUtils.copyProperties(randomCpsrcd,cpsrcdVO);
+            List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>()
+                    .eq("entity_id", randomCpsrcd.getId())
+            );
+            if (taggingDOS.size()!=0){
+                List<Integer> tagIds = taggingDOS.stream().map(TaggingDO::getTagId).collect(Collectors.toList());
+                List<TagDO> tagDOS = tagMapper.selectBatchIds(tagIds);
+                List<String> tagNames = tagDOS.stream().map(TagDO::getName).collect(Collectors.toList());
+                cpsrcdVO.setTags(tagNames);
+            }
+            return cpsrcdVO;
         }else {
             CorpusDO randomCorpus = corpusMapper.getRandomCorpus();
             if (randomCorpus==null)
