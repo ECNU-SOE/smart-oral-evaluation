@@ -16,11 +16,6 @@ public class StatisticsDto {
     private String courseId;
 
     /**
-     * 类型：测验1，考试2，不传默认为测验
-     * **/
-    private Integer type;
-
-    /**
      * 作业、测评、考试id，不传则默认为该课程下第一场作业/测评/考试
      * **/
     private String cpsgrpId;

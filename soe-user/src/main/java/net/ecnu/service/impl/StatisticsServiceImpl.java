@@ -198,6 +198,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         }
         resultMap.put("cpsgrpList", cpsgrpOptionsList);
         resultMap.put("classList", classOptions);
+        //获取语料组类型枚举数据
+        resultMap.put("cpsgrpType",CpsgrpTypeEnum.getAllTypeInfo());
         return resultMap;
     }
 

@@ -1,7 +1,6 @@
 package net.ecnu.enums;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * @description:
@@ -38,7 +37,14 @@ public enum CpsgrpTypeEnum {
         this.msg = msg;
     }
 
-    public static List<CpsgrpTypeEnum> getAllTypeInfo(){
-        return Arrays.asList(CpsgrpTypeEnum.values());
+    public static List<Map<String,String>> getAllTypeInfo(){
+        List<Map<String,String>> resultList = new ArrayList<>();
+        for (CpsgrpTypeEnum value : CpsgrpTypeEnum.values()) {
+            Map<String,String> map = new HashMap<>();
+            map.put("code",String.valueOf(value.getCode()));
+            map.put("msg",value.getMsg());
+            resultList.add(map);
+        }
+        return resultList;
     }
 }
