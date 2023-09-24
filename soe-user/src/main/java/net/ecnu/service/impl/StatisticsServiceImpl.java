@@ -144,8 +144,8 @@ public class StatisticsServiceImpl implements StatisticsService {
             //获取班级下学生指定作业的成绩
             CourseClassCpsgrpInfoDto courseClassCpsgrpInfoDto = classCpsgrpMapper.getClassCpsgrpInfo(classId, cpsgrpId);
             List<ClassScoreInfoDto> classScoreInfoDtos = classCpsgrpMapper.getClassScoreInfo(classId, cpsgrpId);
-            //Workbook workbook = ExcelUtil.getWorkbook(classScoreInfoTemplate);
-            Workbook workbook = ExcelUtil.getWorkbook("E:\\汉语正音平台\\class_score_info_template.xlsx");
+            Workbook workbook = ExcelUtil.getWorkbook(classScoreInfoTemplate);
+            //Workbook workbook = ExcelUtil.getWorkbook("E:\\汉语正音平台\\class_score_info_template.xlsx");
             CellStyle promptStyle = workbook.createCellStyle();
             //设置字体
             Font promptFont = workbook.createFont();
