@@ -20,6 +20,9 @@ import net.ecnu.model.vo.dto.ClassScoreAnalysis;
 import net.ecnu.model.vo.dto.CpsgrpOptions;
 import net.ecnu.service.StatisticsService;
 import net.ecnu.util.ExcelUtil;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -132,6 +135,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     public void exportExcel(String classId, String cpsgrpId, HttpServletResponse response) {
         log.info("开始导出班级成绩Excel，入参classId:{}", JSON.toJSON(classId));
         File file = new File(classScoreInfoTemplate);
+        //File file = new File("E:\\汉语正音平台\\class_score_info_template.xlsx");
         if (!file.isFile()) {
             throw new BizException(BizCodeEnum.EXCEL_TEMPLATE_IS_NOT_EXIST);
         }
@@ -139,16 +143,33 @@ public class StatisticsServiceImpl implements StatisticsService {
             //获取班级下学生指定作业的成绩
             CourseClassCpsgrpInfoDto courseClassCpsgrpInfoDto = classCpsgrpMapper.getClassCpsgrpInfo(classId, cpsgrpId);
             List<ClassScoreInfoDto> classScoreInfoDtos = classCpsgrpMapper.getClassScoreInfo(classId, cpsgrpId);
-            Workbook workbook = ExcelUtil.getWorkbook(classScoreInfoTemplate);
-            /*CellStyle promptStyle = workbook.createCellStyle();
+            //Workbook workbook = ExcelUtil.getWorkbook(classScoreInfoTemplate);
+            Workbook workbook = ExcelUtil.getWorkbook("E:\\汉语正音平台\\class_score_info_template.xlsx");
+            CellStyle promptStyle = workbook.createCellStyle();
             //设置字体
             Font promptFont = workbook.createFont();
             promptFont.setFontName("微软雅黑");
-            promptStyle.setFont(promptFont);*/
+            promptStyle.setFont(promptFont);
+            promptStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN); //下边框
+            promptStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);//左边框
+            promptStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);//上边框
+            promptStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);//右边框
+            promptStyle.setWrapText(true);//自动换行
+            promptStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);//水平居中
+            promptStyle.setVerticalAlignment((short) 1);//垂直居中
             Sheet sheet = workbook.getSheetAt(0);
             sheet.autoSizeColumn(1);
             sheet.autoSizeColumn(1, true);
             //课程名称
+            sheet.createRow(3);
+            sheet.getRow(3).createCell(0).setCellStyle(promptStyle);
+            sheet.getRow(3).createCell(1).setCellStyle(promptStyle);
+            sheet.getRow(3).getCell(0).setCellValue("课程名称");
+            CellRangeAddress courseName = new CellRangeAddress(3, 3, 2, 4);
+            sheet.addMergedRegion(courseName);
+            sheet.getRow(3).createCell(2).setCellStyle(promptStyle);
+            sheet.getRow(3).createCell(3).setCellStyle(promptStyle);
+            sheet.getRow(3).createCell(4).setCellStyle(promptStyle);
             sheet.getRow(3).getCell(2).setCellValue(courseClassCpsgrpInfoDto.getCourseName());
             //课程开始、结束时间
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -156,18 +177,69 @@ public class StatisticsServiceImpl implements StatisticsService {
                     .atZone(ZoneId.systemDefault()).toLocalDateTime().format(formatter);
             String endTime = courseClassCpsgrpInfoDto.getCourseEndTime().toInstant()
                     .atZone(ZoneId.systemDefault()).toLocalDateTime().format(formatter);
+            //CellRangeAddress startTimeRange = new CellRangeAddress(3, 3, 5, 6);
+            //sheet.addMergedRegion(startTimeRange);
+            sheet.getRow(3).createCell(5).setCellStyle(promptStyle);
+            sheet.getRow(3).createCell(6).setCellStyle(promptStyle);
+            sheet.getRow(3).getCell(5).setCellValue("课程开始时间");
+            sheet.getRow(3).createCell(7).setCellStyle(promptStyle);
             sheet.getRow(3).getCell(7).setCellValue(startTime);
+
+            //CellRangeAddress endTimeRange = new CellRangeAddress(3, 3, 8, 9);
+            //sheet.addMergedRegion(endTimeRange);
+            sheet.getRow(3).createCell(8).setCellStyle(promptStyle);
+            sheet.getRow(3).createCell(9).setCellStyle(promptStyle);
+            sheet.getRow(3).getCell(8).setCellValue("课程结束时间");
+            sheet.getRow(3).createCell(10).setCellStyle(promptStyle);
             sheet.getRow(3).getCell(10).setCellValue(endTime);
             //班级名称
+            sheet.createRow(4);
+            //CellRangeAddress classNameStrRange = new CellRangeAddress(4, 4, 0, 1);
+            //sheet.addMergedRegion(classNameStrRange);
+            sheet.getRow(4).createCell(0).setCellStyle(promptStyle);
+            sheet.getRow(4).createCell(1).setCellStyle(promptStyle);
+            sheet.getRow(4).getCell(0).setCellValue("班级名称");
+            CellRangeAddress classNameCellRange = new CellRangeAddress(4, 4, 2, 4);
+            sheet.addMergedRegion(classNameCellRange);
+            sheet.getRow(4).createCell(2).setCellStyle(promptStyle);
+            sheet.getRow(4).createCell(3).setCellStyle(promptStyle);
+            sheet.getRow(4).createCell(4).setCellStyle(promptStyle);
             sheet.getRow(4).getCell(2).setCellValue(courseClassCpsgrpInfoDto.getClassName());
             //授课老师,未找到对应字段，暂时为空
+            //CellRangeAddress teacherStrRange = new CellRangeAddress(4, 4, 5, 6);
+            //sheet.addMergedRegion(teacherStrRange);
+            sheet.getRow(4).createCell(5).setCellStyle(promptStyle);
+            sheet.getRow(4).createCell(6).setCellStyle(promptStyle);
+            sheet.getRow(4).getCell(5).setCellValue("授课老师");
+
+            sheet.getRow(4).createCell(7).setCellStyle(promptStyle);
             sheet.getRow(4).getCell(7).setCellValue("");
+
             //学生人数
+            //CellRangeAddress studentNumStrRange = new CellRangeAddress(4, 4, 8, 9);
+            //sheet.addMergedRegion(studentNumStrRange);
+            sheet.getRow(4).createCell(8).setCellStyle(promptStyle);
+            sheet.getRow(4).createCell(9).setCellStyle(promptStyle);
+            sheet.getRow(4).getCell(8).setCellValue("学生人数");
+
+            sheet.getRow(4).createCell(10).setCellStyle(promptStyle);
             sheet.getRow(4).getCell(10).setCellValue(String.valueOf(courseClassCpsgrpInfoDto.getStudentNums()));
             //作业名称
+            sheet.createRow(5);
+            //CellRangeAddress homeworkStrRange = new CellRangeAddress(5, 5, 0, 1);
+            //sheet.addMergedRegion(homeworkStrRange);
+            sheet.getRow(5).createCell(0).setCellStyle(promptStyle);
+            sheet.getRow(5).createCell(1).setCellStyle(promptStyle);
+            sheet.getRow(5).getCell(0).setCellValue("作业名称");
+
+            CellRangeAddress homeworkCellRange = new CellRangeAddress(5, 5, 2, 11);
+            sheet.addMergedRegion(homeworkCellRange);
+            for (int index = 2 ; index <= 11 ; index++){
+                sheet.getRow(5).createCell(index).setCellStyle(promptStyle);
+            }
             sheet.getRow(5).getCell(2).setCellValue(courseClassCpsgrpInfoDto.getCpsgrpName());
             //填充表格字段
-            fillStudentScoreInfo(7, sheet, classScoreInfoDtos);
+            fillStudentScoreInfo(7, sheet, classScoreInfoDtos,promptStyle);
             String fileName = courseClassCpsgrpInfoDto.getClassName() + "-" + courseClassCpsgrpInfoDto.getCpsgrpName() + ".xlsx";
             String gFileName = URLEncoder.encode(fileName, "UTF-8");
             // 定义输出类型
@@ -321,33 +393,46 @@ public class StatisticsServiceImpl implements StatisticsService {
      * @param sheet              sheet页对象
      * @param classScoreInfoDtos 需要填充的表格内容
      **/
-    public void fillStudentScoreInfo(Integer rowLine, Sheet sheet, List<ClassScoreInfoDto> classScoreInfoDtos) {
+    public void fillStudentScoreInfo(Integer rowLine, Sheet sheet, List<ClassScoreInfoDto> classScoreInfoDtos,CellStyle promptStyle) {
         int index = 0;
         for (ClassScoreInfoDto classScoreInfoDto : classScoreInfoDtos) {
             CellRangeAddress studentNameRange = new CellRangeAddress(rowLine + index, rowLine + index, 0, 1);
             sheet.addMergedRegion(studentNameRange);
             //学生姓名
-            sheet.getRow(rowLine + index).createCell(0).setCellValue(classScoreInfoDto.getStudentName());
+            sheet.createRow(rowLine + index);
+            sheet.getRow(rowLine + index).createCell(0).setCellStyle(promptStyle);
+            sheet.getRow(rowLine + index).createCell(1).setCellStyle(promptStyle);
+            sheet.getRow(rowLine + index).getCell(0).setCellValue(classScoreInfoDto.getStudentName());
             //性别
-            sheet.getRow(rowLine + index).createCell(2).setCellValue(classScoreInfoDto.getSex());
+            sheet.getRow(rowLine + index).createCell(2).setCellStyle(promptStyle);
+            sheet.getRow(rowLine + index).getCell(2).setCellValue(classScoreInfoDto.getSex());
             //完整度得分
             CellRangeAddress completeRange = new CellRangeAddress(rowLine + index, rowLine + index, 3, 4);
             sheet.addMergedRegion(completeRange);
-            sheet.getRow(rowLine + index).createCell(3).setCellValue(classScoreInfoDto.getPronCompletionScore());
+            sheet.getRow(rowLine + index).createCell(3).setCellStyle(promptStyle);
+            sheet.getRow(rowLine + index).createCell(4).setCellStyle(promptStyle);
+            sheet.getRow(rowLine + index).getCell(3).setCellValue(Objects.isNull(classScoreInfoDto.getPronCompletionScore()) ? "" : String.valueOf(classScoreInfoDto.getPronCompletionScore()));
             //准确度得分
             CellRangeAddress pronAccuracyRange = new CellRangeAddress(rowLine + index, rowLine + index, 5, 6);
             sheet.addMergedRegion(pronAccuracyRange);
-            sheet.getRow(rowLine + index).createCell(5).setCellValue(classScoreInfoDto.getPronAccuracyScore());
+            sheet.getRow(rowLine + index).createCell(5).setCellStyle(promptStyle);
+            sheet.getRow(rowLine + index).createCell(6).setCellStyle(promptStyle);
+            sheet.getRow(rowLine + index).getCell(5).setCellValue(Objects.isNull(classScoreInfoDto.getPronAccuracyScore()) ? "" : String.valueOf(classScoreInfoDto.getPronAccuracyScore()));
             //流畅度得分
             CellRangeAddress pronFluencyRange = new CellRangeAddress(rowLine + index, rowLine + index, 7, 8);
             sheet.addMergedRegion(pronFluencyRange);
-            sheet.getRow(rowLine + index).createCell(7).setCellValue(classScoreInfoDto.getPronFluencyScore());
+            sheet.getRow(rowLine + index).createCell(7).setCellStyle(promptStyle);
+            sheet.getRow(rowLine + index).createCell(8).setCellStyle(promptStyle);
+            sheet.getRow(rowLine + index).getCell(7).setCellValue(Objects.isNull(classScoreInfoDto.getPronFluencyScore()) ? "" : String.valueOf(classScoreInfoDto.getPronFluencyScore()));
             //综合得分
             CellRangeAddress suggestedScoreRange = new CellRangeAddress(rowLine + index, rowLine + index, 9, 10);
             sheet.addMergedRegion(suggestedScoreRange);
-            sheet.getRow(rowLine + index).createCell(9).setCellValue(classScoreInfoDto.getSuggestedScoreScore());
+            sheet.getRow(rowLine + index).createCell(9).setCellStyle(promptStyle);
+            sheet.getRow(rowLine + index).createCell(10).setCellStyle(promptStyle);
+            sheet.getRow(rowLine + index).getCell(9).setCellValue(Objects.isNull(classScoreInfoDto.getSuggestedScoreScore()) ? "" : String.valueOf(classScoreInfoDto.getSuggestedScoreScore()));
             //排名
-            sheet.getRow(rowLine + index).createCell(11).setCellValue(index + 1);
+            sheet.getRow(rowLine + index).createCell(11).setCellStyle(promptStyle);
+            sheet.getRow(rowLine + index).getCell(11).setCellValue(index + 1);
             index++;
         }
     }

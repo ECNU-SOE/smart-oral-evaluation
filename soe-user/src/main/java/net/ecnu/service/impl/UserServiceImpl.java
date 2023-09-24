@@ -10,6 +10,7 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.microsoft.schemas.office.visio.x2012.main.CellType;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.constant.RolesConst;
 import net.ecnu.controller.request.UserFilterReq;
@@ -453,7 +454,7 @@ public class UserServiceImpl implements UserService {
             UserDO userDO = new UserDO();
             for (int index = 0; index < row.getPhysicalNumberOfCells(); index++) {
                 Cell cell = row.getCell(index);
-                cell.setCellType(CellType.STRING);
+                cell.setCellType(Cell.CELL_TYPE_STRING);
                 switch (index) {
                     case 0:
                         if (!StringUtils.isBlank(cell.getStringCellValue())) {

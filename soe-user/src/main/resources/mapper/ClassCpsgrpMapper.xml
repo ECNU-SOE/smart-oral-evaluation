@@ -78,17 +78,30 @@
     <select id="getClassScoreInfo" resultType="net.ecnu.model.dto.ClassScoreInfoDto">
         SELECT
             u.real_name AS studentName,
-            if(u.sex > 0, '男','女') AS sex,
-            t.pron_completion AS pronCompletionScore,
-            t.pron_accuracy AS pronAccuracyScore,
-            t.pron_fluency AS pronFluencyScore,
-            t.suggested_score AS suggestedScoreScore
+            IF( u.sex > 0, '男', '女' ) AS sex,
+            temp.pron_completion AS pronCompletionScore,
+            temp.pron_accuracy AS pronAccuracyScore,
+            temp.pron_fluency AS pronFluencyScore,
+            temp.suggested_score AS suggestedScoreScore
         FROM
             user_class uc
-        LEFT JOIN
-            user u ON uc.account_no = u.account_no
-        LEFT JOIN
-            transcript t ON t.respondent = u.account_no and t.cpsgrp_id = #{cpsgrpId,jdbcType=VARCHAR}
+            LEFT JOIN user u ON uc.account_no = u.account_no
+            LEFT JOIN (SELECT
+                        t.respondent,
+                        t.cpsgrp_id,
+                        t.pron_completion,
+                        t.pron_accuracy,
+                        t.pron_fluency,
+                        t.suggested_score
+                    FROM
+                        (SELECT
+                            respondent,cpsgrp_id,pron_completion,pron_accuracy,pron_fluency,suggested_score
+                        FROM transcript
+                        ORDER BY gmt_create DESC
+                        LIMIT 99999999999
+                        ) t
+                    GROUP BY t.respondent,t.cpsgrp_id) temp ON temp.respondent = u.account_no
+            AND temp.cpsgrp_id = #{cpsgrpId,jdbcType=VARCHAR}
         WHERE
             uc.class_id = #{classId,jdbcType=VARCHAR}
     </select>
@@ -108,7 +121,7 @@
         LEFT JOIN
           user_class uc ON uc.class_id = #{classId,jdbcType=VARCHAR}
         LEFT JOIN
-          cpsgrp cps ON cps.id = #{cpsgrpId,jdbcType=VARCHAR} and cps.class_id = #{classId,jdbcType=VARCHAR} and cps.del = 0
+          cpsgrp cps ON cps.id = #{cpsgrpId,jdbcType=VARCHAR} and cps.del = 0
         WHERE
           c.id = #{classId,jdbcType=VARCHAR} and c.del = 0
     </select>
