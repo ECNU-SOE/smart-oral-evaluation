@@ -137,6 +137,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         File file = new File(classScoreInfoTemplate);
         //File file = new File("E:\\汉语正音平台\\class_score_info_template.xlsx");
         if (!file.isFile()) {
+            log.error("班级测验/成绩模板路径:{}",JSON.toJSON(classScoreInfoTemplate));
             throw new BizException(BizCodeEnum.EXCEL_TEMPLATE_IS_NOT_EXIST);
         }
         try {
