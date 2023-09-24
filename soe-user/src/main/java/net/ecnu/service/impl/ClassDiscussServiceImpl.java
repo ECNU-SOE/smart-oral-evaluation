@@ -162,7 +162,7 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
         return false;
     }
 
-    @Override
+    /*@Override
     public Page<DiscussVo> getDiscussInfo(String classId, Integer pageNum, Integer pageSize) {
         //获取该班级下的所有话题（不包含回复）
         LambdaQueryWrapper<ClassDiscussDo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -205,7 +205,7 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
         }
         resultPage.setRecords(discussVoList);
         return resultPage;
-    }
+    }*/
 
     @Override
     public Page<DiscussVo> getDiscussInfo(ReplyInfoReq replyInfoReq) {
@@ -241,12 +241,12 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
                 DiscussVo forwardVo = new DiscussVo();
                 BeanUtils.copyProperties(classDiscussDo, forwardVo);
                 //获取转发贴的发布人姓名以及班级身份
-                String publisherName = getPublisherInfo(forwardVo.getPublisher());
+                String publisherName = getPublisherInfo(forwardVo.getPublisher(),replyInfoReq.getClassId());
                 forwardVo.setPublisherName(publisherName);
                 discussVo.setForwardDiscuss(forwardVo);
             }
             //获取话题的发布人姓名以及班级身份
-            String publisherName = getPublisherInfo(record.getPublisher());
+            String publisherName = getPublisherInfo(record.getPublisher(),replyInfoReq.getClassId());
             //转发班级次数
             Integer publishClassesNum = classDiscussMapper.selectPublishClassesNum(record.getDiscussId());
             discussVo.setPublisherName(publisherName);
@@ -275,12 +275,13 @@ public class ClassDiscussServiceImpl implements ClassDiscussService {
      *
      * @param publisher 发布人id（user.account_no）
      **/
-    public String getPublisherInfo(String publisher) {
-        Map<String, Object> publisherInfoMap = classDiscussMapper.getPublisherInfo(publisher);
+    public String getPublisherInfo(String publisher,String classId) {
+        List<Map<String, Object>> publisherInfoMap = classDiscussMapper.getPublisherInfo(publisher,classId);
         String publisherName;
         if (!CollectionUtils.isEmpty(publisherInfoMap) && publisherInfoMap.size() > 0) {
-            Object roleType = publisherInfoMap.get("roleType");
-            publisherName = publisherInfoMap.get("userName") + "(" + ClassRoleTypeEnum.getMsgByCode(Integer.valueOf(roleType.toString())) + ")";
+            Map<String, Object> map = publisherInfoMap.get(0);
+            Object roleType = map.get("roleType");
+            publisherName = map.get("userName") + "(" + ClassRoleTypeEnum.getMsgByCode(Integer.valueOf(roleType.toString())) + ")";
         } else {
             publisherName = "用户" + publisher;
         }

@@ -38,7 +38,7 @@ public interface ClassDiscussService {
 
     Boolean addDiscuss(DiscussDto discussDto);
 
-    Page<DiscussVo> getDiscussInfo(String classId, Integer pageNum, Integer pageSize);
+    //Page<DiscussVo> getDiscussInfo(String classId, Integer pageNum, Integer pageSize);
 
     Page<DiscussVo> getDiscussInfo(ReplyInfoReq replyInfoReq);
 

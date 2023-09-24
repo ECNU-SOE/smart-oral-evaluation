@@ -71,7 +71,7 @@ public interface ClassDiscussMapper extends BaseMapper<ClassDiscussDo> {
 
     int addLikes(String discussId);
 
-    Map<String, Object> getPublisherInfo(@Param("publisher") String publisher);
+    List<Map<String, Object>> getPublisherInfo(@Param("publisher") String publisher,@Param("classId") String clsssId);
 
     Integer selectPublishClassesNum(@Param("forwardId") Long forwardId);
 

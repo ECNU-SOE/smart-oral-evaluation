@@ -59,7 +59,7 @@ public class DiscussController {
     /**
      * 查询班级下的讨论内容，不包含回复
      * */
-    @GetMapping("/getDiscussInfo")
+    /*@GetMapping("/getDiscussInfo")
     public JsonData getReplyInfo(@RequestParam("classId") String classId, @RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize) {
         if (StringUtils.isEmpty(classId)) {
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY);
@@ -68,7 +68,7 @@ public class DiscussController {
         pageSize = Objects.isNull(pageSize) ? 10 : pageSize;
         Page<DiscussVo> pageList = classDiscussService.getDiscussInfo(classId, pageNum, pageSize);
         return JsonData.buildSuccess(pageList);
-    }
+    }*/
 
     /**
      * 查询班级下讨论的内容，不包含回复，支持排序
