@@ -32,10 +32,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.OptionalDouble;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -144,10 +144,24 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     @Override
     public Object pageByFilter(CpsgrpFilterReq cpsgrpFilter, PageData pageData) {
         if (!ObjectUtils.isEmpty(cpsgrpFilter.getClassId())) {
+//            Date date = new Date();
+//            SimpleDateFormat now = new SimpleDateFormat("YYYY-mm-dd HH:mm:ss");
+            LocalDateTime now = LocalDateTime.now();
             //查询班级下的语料组 仅classId字段有效 返回所有isPrivate=0的记录（无分页）
             //TODO 考虑gmtCreate与gmtModified以那个为准
             List<ClassCpsgrpDO> classCpsgrpDOS = classCpsgrpMapper.selectList(new QueryWrapper<ClassCpsgrpDO>()
-                    .eq("class_id", cpsgrpFilter.getClassId()));
+                    .eq("class_id", cpsgrpFilter.getClassId())
+                    .gt(cpsgrpFilter.getStatus() != null && cpsgrpFilter.getStatus() == 1, "start_time",now)
+                    .lt(cpsgrpFilter.getStatus() != null && cpsgrpFilter.getStatus() == 3, "end_time",now)
+                    .lt(cpsgrpFilter.getStatus() != null && cpsgrpFilter.getStatus() == 2, "start_time",now)
+                    .gt(cpsgrpFilter.getStatus() != null && cpsgrpFilter.getStatus() == 2, "end_time", now)
+            );
+            if (classCpsgrpDOS.size()==0){
+                pageData.setSize(0);
+                List<CpsgrpVO> cpsgrpVOS = new ArrayList<>();
+                pageData.setRecords(cpsgrpVOS);
+                return pageData;
+            }
             Map<String, ClassCpsgrpDO> cpsgrpIdMap = classCpsgrpDOS.stream().collect(
                     Collectors.toMap(ClassCpsgrpDO::getCpsgrpId, item -> item));
             //查询cpsgrpDO列表 TODO 过滤出isPrivate=0的cpsgrpDO
@@ -161,6 +175,8 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
                     cpsgrpIdMap.get(cpsgrpVO.getId()), cpsgrpVO, "gmtCreate", "gmtModified")
             );
             pageData.setRecords(cpsgrpVOS);
+
+
         } else {
             //查询所有语料组
             List<CpsgrpDO> cpsgrpDOS = cpsgrpManager.listByFilter(cpsgrpFilter, pageData);
@@ -292,7 +308,7 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>()
                 .eq("entity_id", cpsrcdDO.getId())
         );
-        if (taggingDOS.size()!=0){
+        if (taggingDOS.size() != 0) {
             List<Integer> tagIds = taggingDOS.stream().map(TaggingDO::getTagId).collect(Collectors.toList());
             List<TagDO> tagDOS = tagMapper.selectBatchIds(tagIds);
             List<String> tagNames = tagDOS.stream().map(TagDO::getName).collect(Collectors.toList());
