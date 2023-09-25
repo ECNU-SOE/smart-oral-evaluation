@@ -1,6 +1,9 @@
 package net.ecnu.manager;
 
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import net.ecnu.controller.request.CpsrcdFilterReq;
 import net.ecnu.model.CpsgrpDO;
 import net.ecnu.model.CpsrcdDO;
 
@@ -11,4 +14,7 @@ public interface CpsrcdManager {
     List<CpsrcdDO> listByCpsgrpId(String cpsgrpId);
 
     int countByCpsgrpId(String cpsgrpId);
+
+    IPage<CpsrcdDO> pageByFilter(CpsrcdFilterReq cpsrcdFilter, Page<CpsrcdDO> cpsrcdDOPage);
+
 }

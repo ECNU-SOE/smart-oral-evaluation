@@ -29,10 +29,6 @@ public class CpsgrpDO implements Serializable {
     @TableId(value = "id", type = IdType.NONE)
     private String id;
 
-    /**
-     * 所属课程id(弃用)
-     */
-    private String classId;
 
     /**
      * 语料组名称
@@ -43,11 +39,6 @@ public class CpsgrpDO implements Serializable {
      * 语料组描述
      */
     private String description;
-
-    /**
-     * 语料组类型：1测验、2试卷、3作业(弃用)
-     */
-    private Integer type;
 
     /**
      * 难易程度：[A~J][0~9]
@@ -64,15 +55,7 @@ public class CpsgrpDO implements Serializable {
      */
     private Integer modStatus;
 
-    /**
-     * 起始时间(弃用)
-     */
-    private Date startTime;
-
-    /**
-     * 截止时间(弃用)
-     */
-    private Date endTime;
+    private String tags;
 
     /**
      * 创建者账号id

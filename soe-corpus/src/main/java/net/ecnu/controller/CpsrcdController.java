@@ -1,8 +1,11 @@
 package net.ecnu.controller;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.group.Update;
+import net.ecnu.controller.request.CorpusFilterReq;
+import net.ecnu.controller.request.CpsrcdFilterReq;
 import net.ecnu.controller.request.CpsrcdReq;
 import net.ecnu.controller.request.TopicReq;
 import net.ecnu.model.vo.CpsrcdVO;
@@ -28,6 +31,14 @@ public class CpsrcdController {
     @PostMapping("add")
     public JsonData add(@RequestBody @Validated(Create.class) CpsrcdReq cpsrcdReq) {
         Object data = cpsrcdService.add(cpsrcdReq);
+        return JsonData.buildSuccess(data);
+    }
+
+    @PostMapping("list")
+    public JsonData list(@RequestParam(value = "cur", defaultValue = "1") int cur,
+                         @RequestParam(value = "size", defaultValue = "50") int size,
+                         @RequestBody CpsrcdFilterReq cpsrcdFilter) {
+        Object data = cpsrcdService.pageByFilter(cpsrcdFilter, new Page<>(cur, size));
         return JsonData.buildSuccess(data);
     }
 

@@ -90,11 +90,6 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         //获取当前用户信息
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         if (currentAccountNo == null) throw new BizException(BizCodeEnum.ACCOUNT_UNLOGIN);
-        //校验参数合法性,判断班级是存在
-        if (!ObjectUtils.isEmpty(cpsgrpReq.getClassId())) {
-            ClassDO classDO = classMapper.selectById(cpsgrpReq.getClassId());
-            if (classDO == null) throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
-        }
         //处理生成 cpsgrpDO 对象，并插入数据库
         CpsgrpDO cpsgrpDO = new CpsgrpDO();
         BeanUtils.copyProperties(cpsgrpReq, cpsgrpDO, "id");

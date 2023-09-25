@@ -365,7 +365,7 @@
     INNER JOIN
         user u ON u.account_no = uc.account_no and u.del = 0
     WHERE
-        uc.account_no = #{publisher,jdbcType=VARCHAR}
+        uc.account_no = #{publisher,jdbcType=VARCHAR} and uc.class_id = #{classId,jdbcType=VARCHAR}
   </select>
 
   <select id="selectPublishClassesNum" resultType="java.lang.Integer">

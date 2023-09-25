@@ -1,5 +1,7 @@
 package net.ecnu.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import net.ecnu.controller.request.CpsrcdFilterReq;
 import net.ecnu.controller.request.CpsrcdReq;
 import net.ecnu.model.CpsrcdDO;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -26,4 +28,5 @@ public interface CpsrcdService extends IService<CpsrcdDO> {
     Object del(String cpsrcdId);
 
     CpsrcdVO getCpsrcdDetail(String cpsrcdId);
+    Object pageByFilter(CpsrcdFilterReq cpsrcdFilter, Page<CpsrcdDO> cpsrcdDOPage);
 }

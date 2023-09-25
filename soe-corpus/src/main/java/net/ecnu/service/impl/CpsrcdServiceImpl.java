@@ -3,12 +3,17 @@ package net.ecnu.service.impl;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import net.ecnu.controller.request.CorpusFilterReq;
+import net.ecnu.controller.request.CpsrcdFilterReq;
 import net.ecnu.controller.request.CpsrcdReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.mapper.*;
 import net.ecnu.model.*;
+import net.ecnu.model.common.PageData;
 import net.ecnu.model.vo.CpsrcdVO;
 import net.ecnu.service.CpsrcdService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -70,6 +75,14 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
         int insert = cpsrcdMapper.insert(cpsrcdDO);
         cpsrcdDO = cpsrcdMapper.selectById(cpsrcdDO.getId());
         return cpsrcdDO;
+    }
+
+    @Override
+    public Object pageByFilter(CpsrcdFilterReq cpsrcdFilter, Page<CpsrcdDO> cpsrcdDOPage) {
+        IPage<CpsrcdDO> cpsrcdDOIPage = cpsrcdManager.pageByFilter(cpsrcdFilter, cpsrcdDOPage);
+        PageData pageData = new PageData();
+        BeanUtils.copyProperties(cpsrcdDOIPage, pageData);
+        return pageData;
     }
 
     @Override

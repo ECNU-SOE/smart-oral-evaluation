@@ -6,15 +6,22 @@
         select
           count(1)
         from
-          transcript t
-        where
-          cpsgrp_id = #{cpsgrpId,jdbcType=VARCHAR}
-        and
-          respondent IN
-        <foreach collection="studentList" item="item" open="(" close=")" separator=",">
-          item
-        </foreach>
-        group by cpsgrp_id,respondent
+        (
+            select
+              t.respondent,
+              t.cpsgrp_id,
+              t.suggested_score
+            from
+              transcript t
+            where
+              cpsgrp_id = #{cpsgrpId,jdbcType=VARCHAR}
+            and
+              respondent IN
+            <foreach collection="studentList" item="item" open="(" close=")" separator=",">
+              #{item,jdbcType=VARCHAR}
+            </foreach>
+            group by cpsgrp_id,respondent
+        ) temp
     </select>
 
 </mapper>

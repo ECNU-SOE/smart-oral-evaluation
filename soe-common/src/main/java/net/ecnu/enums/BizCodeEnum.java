@@ -45,6 +45,7 @@ public enum BizCodeEnum {
     CORPUS_DEL_ERROR(270001, "删除语料异常"),
     CORPUS_UPDATE_ERROR(270002, "更新语料异常"),
     CORPUS_ADD_ERROR(270003, "添加语料异常"),
+    CORPUS_ADD_REPREAT(270004, "添加语料重复"),
 
     /**
      * 话题相关

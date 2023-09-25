@@ -18,11 +18,6 @@ public class CpsgrpReq {
     private String id;
 
     /**
-     * 所属班级id（弃用）
-     */
-    private String classId;
-
-    /**
      * 语料组名称
      */
     @NotEmpty(message = "title can't be empty in create", groups = {Create.class})
@@ -33,11 +28,6 @@ public class CpsgrpReq {
      */
     private String description;
 
-//    /**
-//     * 语料组类型（弃用）
-//     */
-//    @NotNull(message = "type can't be null in create", groups = {Create.class})
-//    private Integer type;
 
     /**
      * 难易程度
@@ -49,16 +39,9 @@ public class CpsgrpReq {
      */
     private Integer isPrivate;
 
-    /**
-     * 起始时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date startTime;
+    private Integer modStatus;
 
-    /**
-     * 截止时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date endTime;
+    private String tags;
+
 
 }

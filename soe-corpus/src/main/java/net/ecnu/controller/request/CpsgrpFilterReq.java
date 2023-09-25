@@ -22,12 +22,6 @@ public class CpsgrpFilterReq {
      * 语料组描述
      */
     private String description;
-
-    /**
-     * 语料组类型
-     */
-    private Integer type;
-
     /**
      * 难易程度：[A～J][0~9]
      */

@@ -65,6 +65,8 @@ public class CpsgrpVO implements Serializable {
      */
     private Integer modStatus;
 
+    private String tags;
+
     /**
      * 起始时间
      */

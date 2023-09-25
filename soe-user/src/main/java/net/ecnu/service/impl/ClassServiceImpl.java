@@ -377,7 +377,7 @@ public class ClassServiceImpl extends ServiceImpl<ClassMapper, ClassDO> implemen
                 .eq("cpsgrp_id", classCpsgrpReq.getCpsgrpId())
         );
         if (classCpsgrpDO!=null)
-            throw new BizException(BizCodeEnum.CORPUS_ADD_ERROR);
+            throw new BizException(BizCodeEnum.CORPUS_ADD_REPREAT);
         ClassCpsgrpDO classCpsgrpDO1 = new ClassCpsgrpDO();
         BeanUtils.copyProperties(classCpsgrpReq,classCpsgrpDO1);
         int total = classCpsgrpMapper.insert(classCpsgrpDO1);

@@ -8,11 +8,10 @@
         <result column="class_id" property="classId" />
         <result column="title" property="title" />
         <result column="description" property="description" />
-        <result column="type" property="type" />
         <result column="difficulty" property="difficulty" />
-        <result column="is_public" property="isPublic" />
-        <result column="start_time" property="startTime" />
-        <result column="end_time" property="endTime" />
+        <result column="is_private" property="isPrivate" />
+        <result column="mod_status" property="modStatus" />
+        <result column="tags" property="tags" />
         <result column="creator" property="creator" />
         <result column="del" property="del" />
         <result column="gmt_create" property="gmtCreate" />
@@ -21,7 +20,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, class_id, title, description, `type`, difficulty, is_public, start_time, end_time, creator, del, gmt_create, gmt_modified
+        id, class_id, title, description, difficulty, is_private,mod_status,tags, creator, del, gmt_create, gmt_modified
     </sql>
 
 </mapper>
