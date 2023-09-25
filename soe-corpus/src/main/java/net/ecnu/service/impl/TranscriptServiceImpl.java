@@ -75,6 +75,12 @@ public class TranscriptServiceImpl extends ServiceImpl<TranscriptMapper, Transcr
                 .eq("respondent", currentAccountNo));
         //转换成VO对象返回
         List<TranscriptVO> transcriptVOS = transcriptDOS.stream().map(this::beanProcess).collect(Collectors.toList());
+        transcriptVOS.forEach(transcriptVO -> {
+            CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(transcriptVO.getCpsgrpId());
+            if (cpsgrpDO != null && cpsgrpDO.getTitle() != null){ //对应的语料组存在 && 名称不为null
+                transcriptVO.setCpsgrpName(cpsgrpDO.getTitle());
+            }
+        });
         return transcriptVOS;
     }
 

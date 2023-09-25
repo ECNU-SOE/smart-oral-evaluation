@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="net.ecnu.mapper.StatisticsMapper">
+
+    <select id="getCountByStuIdsAndCpsgrpId" resultType="java.lang.Integer">
+        select
+          count(1)
+        from
+          transcript t
+        where
+          cpsgrp_id = #{cpsgrpId,jdbcType=VARCHAR}
+        and
+          respondent IN
+        <foreach collection="studentList" item="item" open="(" close=")" separator=",">
+          item
+        </foreach>
+        group by cpsgrp_id,respondent
+    </select>
+
+</mapper>

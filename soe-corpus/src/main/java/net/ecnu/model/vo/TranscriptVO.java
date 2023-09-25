@@ -34,6 +34,11 @@ public class TranscriptVO implements Serializable {
     private String cpsgrpId;
 
     /**
+     * 关联语料组名称
+     */
+    private String cpsgrpName;
+
+    /**
      * 答题人id
      */
     private String respondent;
