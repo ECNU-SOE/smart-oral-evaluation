@@ -28,12 +28,7 @@ public interface ClassService extends IService<ClassDO> {
     Object addUsrClassBatch(UsrClassAddBatchReq usrClassAddBatchReq);
 
     Object delUsrClass(String id);
-    Object addTest(TestAddReq testAddReq);
     Object addCpsgrp(ClassCpsgrpReq classCpsgrpReq);
-
-    Object delTest(String id);
-
-    Object updateTest(TestUpdateReq testUpdateReq);
 
     Object detail(String classId);
 

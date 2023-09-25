@@ -98,24 +98,6 @@ public class ClassController {
         return JsonData.buildSuccess(data);
     }
 
-    //发布考试/作业
-    @PostMapping("add_test")
-    public JsonData add_test(@RequestBody @Validated(Create.class) TestAddReq testAddReq) {
-        Object data = classService.addTest(testAddReq);
-        return JsonData.buildSuccess(data);
-    }
-
-    @PostMapping("update_test")
-    public JsonData update_test(@RequestBody @Validated(Update.class) TestUpdateReq testUpdateReq) {
-        Object data = classService.updateTest(testUpdateReq);
-        return JsonData.buildSuccess(data);
-    }
-
-    @GetMapping("/del_test")
-    public JsonData del_test(@RequestParam String id) {
-        Object data = classService.delTest(id);
-        return JsonData.buildSuccess(data);
-    }
     //发布语料组到班级
     @PostMapping("add_cpsgrp")
     public JsonData add_cpsgrp(@RequestBody @Validated(Create.class) ClassCpsgrpReq classCpsgrpReq) {
