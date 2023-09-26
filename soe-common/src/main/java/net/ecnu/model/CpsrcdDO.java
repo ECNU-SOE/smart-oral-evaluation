@@ -1,23 +1,13 @@
 package net.ecnu.model;
 
 import java.math.BigDecimal;
-
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-
 import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableId;
-
 import java.io.Serializable;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.ecnu.aop.ListTypeHandler;
-import org.apache.ibatis.type.LongTypeHandler;
 
 /**
  * <p>
@@ -25,7 +15,7 @@ import org.apache.ibatis.type.LongTypeHandler;
  * </p>
  *
  * @author LYW
- * @since 2023-04-10
+ * @since 2023-09-26
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -37,7 +27,7 @@ public class CpsrcdDO implements Serializable {
     /**
      * 主键id
      */
-    @TableId(value = "id", type = IdType.NONE)
+      @TableId(value = "id", type = IdType.AUTO)
     private String id;
 
     /**
@@ -66,14 +56,29 @@ public class CpsrcdDO implements Serializable {
     private Integer evalMode;
 
     /**
+     * 题目类型
+     */
+    private String type;
+
+    /**
      * 语料难度
      */
     private Integer difficulty;
 
     /**
-     * 每字分值
+     * 每字分值❌
      */
     private BigDecimal wordWeight;
+
+    /**
+     * 本题分值
+     */
+    private BigDecimal score;
+
+    /**
+     * 是否启用拼音
+     */
+    private Boolean enablePinyin;
 
     /**
      * 语料内容拼音
@@ -93,19 +98,16 @@ public class CpsrcdDO implements Serializable {
     /**
      * 题目标签
      */
-//    @TableField(typeHandler = ListTypeHandler.class)
     private String tags;
 
     /**
-     * 创建时间
+     * 创建时间❌
      */
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     private Date gmtCreate;
 
     /**
-     * 更新时间
+     * 更新时间❌
      */
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     private Date gmtModified;
 
 
