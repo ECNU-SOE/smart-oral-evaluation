@@ -66,6 +66,9 @@ public class CpsrcdVO implements Serializable {
      */
     private BigDecimal wordWeight;
 
+
+    private Boolean enablePinyin;
+
     /**
      * 语料内容拼音
      */
