@@ -5,7 +5,6 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="net.ecnu.model.CpsrcdDO">
         <id column="id" property="id" />
-        <result column="corpus_id" property="corpusId" />
         <result column="cpsgrp_id" property="cpsgrpId" />
         <result column="topic_id" property="topicId" />
         <result column="c_num" property="cNum" />
@@ -25,7 +24,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, corpus_id, cpsgrp_id, topic_id, c_num, eval_mode, type, difficulty, word_weight, score, enable_pinyin, pinyin, ref_text, audio_url, tags, gmt_create, gmt_modified
+        id, cpsgrp_id, topic_id, c_num, eval_mode, type, difficulty, word_weight, score, enable_pinyin, pinyin, ref_text, audio_url, tags, gmt_create, gmt_modified
     </sql>
 
 </mapper>

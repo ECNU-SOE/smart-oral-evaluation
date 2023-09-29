@@ -1,8 +1,5 @@
 package net.ecnu.service.impl;
 
-import cn.hutool.json.JSON;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import net.ecnu.controller.request.CpsgrpReq;
 import net.ecnu.controller.request.CpsgrpFilterReq;
@@ -32,8 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -53,6 +48,9 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     private CpsrcdManager cpsrcdManager;
 
     @Autowired
+    private CpsrcdMapper cpsrcdMapper;
+
+    @Autowired
     private CpsgrpManager cpsgrpManager;
 
     @Autowired
@@ -60,28 +58,18 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
 
     @Autowired
     private CpsgrpMapper cpsgrpMapper;
+
     @Autowired
     private TaggingMapper taggingMapper;
+
     @Autowired
     private TagMapper tagMapper;
 
     @Autowired
-    private CorpusMapper corpusMapper;
-
-    @Autowired
-    private CpsrcdMapper cpsrcdMapper;
-
-    @Autowired
-    private TranscriptMapper transcriptMapper;
-
-    @Autowired
-    private TopicMapper topicMapper;
-
-    @Autowired
-    private ClassMapper classMapper;
-
-    @Autowired
     private ClassCpsgrpMapper classCpsgrpMapper;
+
+    @Autowired
+    private TopicCpsMapper topicCpsMapper;
 
 
     @Override
@@ -128,9 +116,10 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         List<TopicVO> topicVOS = topicDOS.stream().map(this::beanProcess).collect(Collectors.toList());
         cpsgrpVO.setTopics(topicVOS);
         //获取cpsrcd子题列表
-        List<CpsrcdDO> cpsrcdDOS = cpsrcdManager.listByCpsgrpId(cpsgrpId);
-        if (CollectionUtils.isEmpty(cpsrcdDOS)) return cpsgrpVO;    //没有子题，返回cpsgrp
-        List<CpsrcdVO> cpsrcdVOS = cpsrcdDOS.stream().map(this::beanProcess).collect(Collectors.toList());
+        List<TopicCpsDO> topicCpsDOS = topicCpsMapper.selectList(new QueryWrapper<TopicCpsDO>()
+                .in("topic_id", topicDOS.parallelStream().map(TopicDO::getId).collect(Collectors.toList())));
+        if (CollectionUtils.isEmpty(topicCpsDOS)) return cpsgrpVO;    //没有子题，返回cpsgrp
+        List<CpsrcdVO> cpsrcdVOS = topicCpsDOS.parallelStream().map(this::beanProcess).collect(Collectors.toList());
         //聚合cpsrcd子题到topic大题中
         topicVOS.forEach(topicVO -> {
             List<CpsrcdVO> subCpsrcdVOs = cpsrcdVOS.stream().filter(
@@ -151,12 +140,12 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
             //TODO 考虑gmtCreate与gmtModified以那个为准
             List<ClassCpsgrpDO> classCpsgrpDOS = classCpsgrpMapper.selectList(new QueryWrapper<ClassCpsgrpDO>()
                     .eq("class_id", cpsgrpFilter.getClassId())
-                    .gt(cpsgrpFilter.getStatus() != null && cpsgrpFilter.getStatus() == 1, "start_time",now)
-                    .lt(cpsgrpFilter.getStatus() != null && cpsgrpFilter.getStatus() == 3, "end_time",now)
-                    .lt(cpsgrpFilter.getStatus() != null && cpsgrpFilter.getStatus() == 2, "start_time",now)
+                    .gt(cpsgrpFilter.getStatus() != null && cpsgrpFilter.getStatus() == 1, "start_time", now)
+                    .lt(cpsgrpFilter.getStatus() != null && cpsgrpFilter.getStatus() == 3, "end_time", now)
+                    .lt(cpsgrpFilter.getStatus() != null && cpsgrpFilter.getStatus() == 2, "start_time", now)
                     .gt(cpsgrpFilter.getStatus() != null && cpsgrpFilter.getStatus() == 2, "end_time", now)
             );
-            if (classCpsgrpDOS.size()==0){
+            if (classCpsgrpDOS.size() == 0) {
                 pageData.setSize(0);
                 List<CpsgrpVO> cpsgrpVOS = new ArrayList<>();
                 pageData.setRecords(cpsgrpVOS);
@@ -301,9 +290,18 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     /**
      * CpsrcdDO->CpsrcdVO
      */
-    private CpsrcdVO beanProcess(CpsrcdDO cpsrcdDO) {
+    public CpsrcdVO beanProcess(TopicCpsDO topicCpsDO) {
         CpsrcdVO cpsrcdVO = new CpsrcdVO();
+        CpsrcdDO cpsrcdDO = cpsrcdMapper.selectById(topicCpsDO.getCpsrcdId());
         BeanUtils.copyProperties(cpsrcdDO, cpsrcdVO);
+
+        //聚合topicCpsDO类
+        cpsrcdVO.setTopicId(topicCpsDO.getTopicId());
+        cpsrcdVO.setCNum(topicCpsDO.getCNum());
+        cpsrcdVO.setScore(topicCpsDO.getScore());
+        cpsrcdVO.setEnablePinyin(topicCpsDO.getEnablePinyin());
+        cpsrcdVO.setDesc(topicCpsDO.getDescription());
+
         //tags单独处理String->List<String>
         List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>()
                 .eq("entity_id", cpsrcdDO.getId())

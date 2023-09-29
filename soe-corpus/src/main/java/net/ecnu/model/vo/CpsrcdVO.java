@@ -31,17 +31,12 @@ public class CpsrcdVO implements Serializable {
     private String id;
 
     /**
-     * 语料原型id
-     */
-    private String corpusId;
-
-    /**
      * 所属语料组id
      */
     private String cpsgrpId;
 
     /**
-     * 所属大题id
+     * 所属题型id
      */
     private String topicId;
 
@@ -64,9 +59,11 @@ public class CpsrcdVO implements Serializable {
     /**
      * 每字分值
      */
-    private BigDecimal wordWeight;
+    private Double score;
 
-
+    /**
+     * 是否启用拼音
+     */
     private Boolean enablePinyin;
 
     /**
@@ -85,6 +82,11 @@ public class CpsrcdVO implements Serializable {
     private String audioUrl;
 
     /**
+     * 题目备注
+     */
+    private String desc;
+
+    /**
      * 题目标签
      */
     private List<String> tags;
@@ -92,13 +94,13 @@ public class CpsrcdVO implements Serializable {
     /**
      * 创建时间
      */
-    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date gmtCreate;
 
     /**
      * 更新时间
      */
-    @JsonFormat(pattern = "YYYY-MM-DD hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date gmtModified;
 
 

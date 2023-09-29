@@ -2,67 +2,66 @@ package net.ecnu.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
+
 import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * corpus快照
+ *
  * </p>
  *
  * @author LYW
- * @since 2023-09-29
+ * @since 2023-09-28
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("cpsrcd")
-public class CpsrcdDO implements Serializable {
+@TableName("topic_cps")
+public class TopicCpsDO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主键id
+     * 自增id
      */
-      @TableId(value = "id", type = IdType.AUTO)
-    private String id;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
 
     /**
-     * 题目类型
+     * 题型id
      */
-    private String type;
+    private String topicId;
 
     /**
-     * 评测模式
+     * 子题id
      */
-    private Integer evalMode;
+    private String cpsrcdId;
 
     /**
-     * 语料难度
+     * 子题序号
      */
-    private Integer difficulty;
+    private Integer cNum;
 
     /**
-     * 语料内容拼音
+     * 是否启用拼音
      */
-    private String pinyin;
+    private Boolean enablePinyin;
 
     /**
-     * 语料文本内容
+     * 本题分值
      */
-    private String refText;
+    private Double score;
 
     /**
-     * 示范音频播放url
+     * 题目备注
      */
-    private String audioUrl;
-
-    /**
-     * 逻辑删除标识位
-     */
-    private Boolean del;
+    private String description;
 
     /**
      * 创建时间

@@ -7,10 +7,7 @@ import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.manager.TopicManager;
 import net.ecnu.mapper.*;
-import net.ecnu.model.CpsrcdDO;
-import net.ecnu.model.TagDO;
-import net.ecnu.model.TaggingDO;
-import net.ecnu.model.TopicDO;
+import net.ecnu.model.*;
 import net.ecnu.model.vo.CpsrcdVO;
 import net.ecnu.model.vo.TopicVO;
 import net.ecnu.service.TopicService;
@@ -42,10 +39,18 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, TopicDO> implemen
 
     @Autowired
     private TagMapper tagMapper;
+
     @Autowired
     private TaggingMapper taggingMapper;
+
     @Autowired
     private CpsrcdMapper cpsrcdMapper;
+
+    @Autowired
+    private TopicCpsMapper topicCpsMapper;
+
+    @Autowired
+    private CpsgrpServiceImpl cpsgrpService;
 
     @Override
     public Object add(TopicReq topicReq) {
@@ -77,9 +82,12 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, TopicDO> implemen
         //检查topicId是否存在
         TopicDO topicDO = topicMapper.selectById(topicId);
         if (topicDO == null) throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
-        //查询子题
-        List<CpsrcdDO> cpsrcdDOS = cpsrcdMapper.selectList(new QueryWrapper<CpsrcdDO>().eq("topic_id", topicId));
-        List<CpsrcdVO> cpsrcdVOS = cpsrcdDOS.stream().map(this::beanProcess).collect(Collectors.toList());
+
+        //查询该题型的子题列表
+        List<TopicCpsDO> topicCpsDOS = topicCpsMapper.selectList(new QueryWrapper<TopicCpsDO>().eq("topic_id", topicId));
+        List<CpsrcdVO> cpsrcdVOS = topicCpsDOS.parallelStream()
+                .map(topicCpsDO -> cpsgrpService.beanProcess(topicCpsDO)).collect(Collectors.toList());
+
         //聚合生成topicVO对象
         TopicVO topicVO = new TopicVO();
         BeanUtils.copyProperties(topicDO, topicVO);
@@ -98,7 +106,7 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, TopicDO> implemen
         List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>()
                 .eq("entity_id", cpsrcdDO.getId())
         );
-        if (taggingDOS.size()!=0){
+        if (taggingDOS.size() != 0) {
             List<Integer> tagIds = taggingDOS.stream().map(TaggingDO::getTagId).collect(Collectors.toList());
             List<TagDO> tagDOS = tagMapper.selectBatchIds(tagIds);
             List<String> tagNames = tagDOS.stream().map(TagDO::getName).collect(Collectors.toList());
