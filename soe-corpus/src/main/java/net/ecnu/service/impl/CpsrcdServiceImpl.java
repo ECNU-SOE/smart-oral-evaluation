@@ -53,6 +53,8 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
 
     @Autowired
     private TopicMapper topicMapper;
+    @Autowired
+    private TopicCpsMapper topicCpsMapper;
 
     @Autowired
     private TagMapper tagMapper;
@@ -68,15 +70,12 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
 
     @Override
     public Object add(CpsrcdReq cpsrcdReq) {
-        //数据合法性校验
-        CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(cpsrcdReq.getCpsgrpId());
-        TopicDO topicDO = topicMapper.selectById(cpsrcdReq.getTopicId());
-        if (cpsgrpDO == null || topicDO == null) throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         //向cpsrcd表中插入新记录
         CpsrcdDO cpsrcdDO = new CpsrcdDO();
         BeanUtils.copyProperties(cpsrcdReq, cpsrcdDO);
 //        cpsrcdDO.setTags(JSONUtil.toJsonStr(cpsrcdReq.getTags()));
         cpsrcdDO.setId(IDUtil.nextCpsrcdId());
+        cpsrcdDO.setDel(false);
         int insert = cpsrcdMapper.insert(cpsrcdDO);
         cpsrcdDO = cpsrcdMapper.selectById(cpsrcdDO.getId());
         return cpsrcdDO;
@@ -101,31 +100,6 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
         int deletedNum = taggingMapper.delete(new QueryWrapper<TaggingDO>()
                 .eq("entity_id", cpsrcdReq.getId())
         );
-        int tagNum = cpsrcdReq.getTags().size();
-        for (int i = 0; i < tagNum; i++) {
-            TagDO tagDO = tagMapper.selectOne(new QueryWrapper<TagDO>()
-                    .eq("name", cpsrcdReq.getTags().get(i))
-            );
-            TaggingDO taggingDO = new TaggingDO();
-            taggingDO.setTagId(tagDO.getId());
-            taggingDO.setEntityId(cpsrcdReq.getId());
-            taggingDO.setEntityType(1);
-            taggingMapper.insert(taggingDO);
-            //映射关系改变后，需修改标签权重
-            Integer total = taggingMapper.selectCount(null);
-            Integer count = taggingMapper.selectCount(new QueryWrapper<TaggingDO>()
-                    .eq("tag_id", tagDO.getId())
-            );
-            TagDO newTagDO = new TagDO();
-            BeanUtils.copyProperties(tagDO, newTagDO, "weight");
-            double w = count / (total * 1.00);
-            DecimalFormat format = new DecimalFormat("#.00");
-            String str = format.format(w);
-            double weight = Double.parseDouble(str);
-            newTagDO.setWeight(weight);
-            int updatenum = tagMapper.updateById(newTagDO);
-        }
-
         cpsrcdDO.setGmtModified(null);//Mysql会自动更新时间
         int i = cpsrcdMapper.updateById(cpsrcdDO);
         cpsrcdDO = cpsrcdMapper.selectById(cpsrcdReq.getId());
@@ -147,6 +121,16 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
         CpsrcdVO cpsrcdVO = new CpsrcdVO();
         CpsrcdDO cpsrcdDO = cpsrcdMapper.selectById(cpsrcdId);
         if (Objects.isNull(cpsrcdDO)) throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
+        BeanUtils.copyProperties(cpsrcdDO,cpsrcdVO);
+        //聚合TopicId、CpsgrpId
+        TopicCpsDO topicCpsDO = topicCpsMapper.selectOne(new QueryWrapper<TopicCpsDO>()
+                .eq("cpsrcd_id", cpsrcdId)
+        );
+        cpsrcdVO.setTopicId(topicCpsDO.getTopicId());
+        TopicDO topicDO = topicMapper.selectById(topicCpsDO.getTopicId());
+        if (topicDO==null)
+            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
+        cpsrcdVO.setCpsgrpId(topicDO.getCpsgrpId());
         //查询题目标签
         List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>()
                 .eq("entity_id", cpsrcdId));

@@ -92,15 +92,6 @@ public class CorpusServiceImpl extends ServiceImpl<CorpusMapper, CorpusDO> imple
                 return "暂无语料";
             CpsrcdVO cpsrcdVO = new CpsrcdVO();
             BeanUtils.copyProperties(randomCpsrcd,cpsrcdVO);
-            List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>()
-                    .eq("entity_id", randomCpsrcd.getId())
-            );
-            if (taggingDOS.size()!=0){
-                List<Integer> tagIds = taggingDOS.stream().map(TaggingDO::getTagId).collect(Collectors.toList());
-                List<TagDO> tagDOS = tagMapper.selectBatchIds(tagIds);
-                List<String> tagNames = tagDOS.stream().map(TagDO::getName).collect(Collectors.toList());
-                cpsrcdVO.setTags(tagNames);
-            }
             return cpsrcdVO;
         }else {
             CorpusDO randomCorpus = corpusMapper.getRandomCorpus();
