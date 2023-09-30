@@ -130,7 +130,7 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
         TopicDO topicDO = topicMapper.selectById(topicCpsDO.getTopicId());
         if (topicDO==null)
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
-        cpsrcdVO.setCpsgrpId(topicDO.getCpsgrpId());
+//        cpsrcdVO.setCpsgrpId(topicDO.getCpsgrpId());
         //查询题目标签
         List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>()
                 .eq("entity_id", cpsrcdId));

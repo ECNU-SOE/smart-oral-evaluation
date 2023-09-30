@@ -26,8 +26,9 @@ public enum BizCodeEnum {
     COURSE_UNEXISTS(250010, "课程不存在"),
     COURSE_REPEAT(250011, "课程重复"),
     COURSE_USING(250012, "该课程被班级关联"),
-    USER_SIGNED(250013,"用户已签到"),
-    STUDENT_IS_ZERO(250014,"班级内学生数量为0"),
+    USER_SIGNED(250013, "用户已签到"),
+    STUDENT_IS_ZERO(250014, "班级内学生数量为0"),
+
     /**
      * 语料组相关
      */
@@ -35,12 +36,19 @@ public enum BizCodeEnum {
     CPSGRP_NOT_EXIST(260002, "语料组不存在"),
 
     /**
-     * corpus快照相关
-     * **/
-    CPSRCD_NOT_EXIST(265001,"题目不存在"),
+     * topic_cps题型语料关系 相关
+     */
+    TOPIC_CPS_EXIST(26003, "<题型-子题>关系 已存在"),
+    TOPIC_CPS_UNEXIST(26004, "<题型-子题>关系 不存在"),
+
 
     /**
-     * 语料相关
+     * cpsrcd语料相关
+     **/
+    CPSRCD_NOT_EXIST(265001, "题目不存在"),
+
+    /**
+     * 语料相关(弃用)
      */
     CORPUS_DEL_ERROR(270001, "删除语料异常"),
     CORPUS_UPDATE_ERROR(270002, "更新语料异常"),
@@ -49,10 +57,10 @@ public enum BizCodeEnum {
 
     /**
      * 话题相关
-     * */
-    DISCUSS_AUDIO_ADD_ERROR(280001,"添加话题异常"),
-    DISCUSS_REPLY_ADD_ERROR(280002,"回复异常"),
-    DISCUSS_LIKES_ERROR(280003,"点赞异常"),
+     */
+    DISCUSS_AUDIO_ADD_ERROR(280001, "添加话题异常"),
+    DISCUSS_REPLY_ADD_ERROR(280002, "回复异常"),
+    DISCUSS_LIKES_ERROR(280003, "点赞异常"),
 
     /**
      * 参数异常
@@ -61,17 +69,16 @@ public enum BizCodeEnum {
 
     /**
      * 错题异常
-     * **/
-    MISTAKE_CLEAN_ERROR(400000,"清除错题异常"),
-    MISTAKE_ADD_WRONG_NUM_ERROR(400001,"增加错误次数异常"),
-    MISTAKE_ADD_ERROR(400002,"错题添加异常"),
+     **/
+    MISTAKE_CLEAN_ERROR(400000, "清除错题异常"),
+    MISTAKE_ADD_WRONG_NUM_ERROR(400001, "增加错误次数异常"),
+    MISTAKE_ADD_ERROR(400002, "错题添加异常"),
 
     /**
      * Excel模板异常
-     * **/
-    EXCEL_ERROR(500000,"Excel异常报错"),
-    EXCEL_TEMPLATE_IS_NOT_EXIST(500001,"Excel模板不存在")
-    ;
+     **/
+    EXCEL_ERROR(500000, "Excel异常报错"),
+    EXCEL_TEMPLATE_IS_NOT_EXIST(500001, "Excel模板不存在");
     @Getter
     private final int code;
 

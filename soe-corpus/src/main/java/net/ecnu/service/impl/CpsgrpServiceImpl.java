@@ -300,7 +300,7 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         cpsrcdVO.setCNum(topicCpsDO.getCNum());
         cpsrcdVO.setScore(topicCpsDO.getScore());
         cpsrcdVO.setEnablePinyin(topicCpsDO.getEnablePinyin());
-        cpsrcdVO.setDesc(topicCpsDO.getDescription());
+        cpsrcdVO.setDescription(topicCpsDO.getDescription());
 
         //tags单独处理String->List<String>
         List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>()

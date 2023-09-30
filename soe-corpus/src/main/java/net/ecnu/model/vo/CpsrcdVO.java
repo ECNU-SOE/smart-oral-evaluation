@@ -1,15 +1,11 @@
 package net.ecnu.model.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -30,10 +26,10 @@ public class CpsrcdVO implements Serializable {
      */
     private String id;
 
-    /**
-     * 所属语料组id
-     */
-    private String cpsgrpId;
+//    /**
+//     * 所属语料组id
+//     */
+//    private String cpsgrpId;
 
     /**
      * 所属题型id
@@ -47,6 +43,11 @@ public class CpsrcdVO implements Serializable {
     private Integer cNum;
 
     /**
+     * 题目类型
+     */
+    private String type;
+
+    /**
      * 评测模式
      */
     private Integer evalMode;
@@ -57,7 +58,7 @@ public class CpsrcdVO implements Serializable {
     private Integer difficulty;
 
     /**
-     * 每字分值
+     * 子题分值
      */
     private Double score;
 
@@ -84,7 +85,7 @@ public class CpsrcdVO implements Serializable {
     /**
      * 题目备注
      */
-    private String desc;
+    private String description;
 
     /**
      * 题目标签
