@@ -10,6 +10,8 @@ import net.ecnu.model.vo.ScoreStatisticsVo;
 import net.ecnu.model.vo.StatisticsVo;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +28,7 @@ public interface StatisticsService {
 
     List<ClassCpsgrpInfoVo> getCpsgrpInfoByCourseId(String courseId,Integer currentTypeId);
 
-    void exportExcel(String classId,String cpsgrpId, HttpServletResponse response);
+    void exportExcel(String classId,String cpsgrpId, HttpServletResponse response) throws IOException;
 
     Map<String, Object> getOptionsInfo(String courseId);
 

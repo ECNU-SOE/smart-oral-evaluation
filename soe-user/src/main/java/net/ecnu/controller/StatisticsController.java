@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -108,6 +110,12 @@ public class StatisticsController {
         if (StringUtils.isEmpty(classId)) {
             throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY);
         }
-        statisticsService.exportExcel(classId, cpsgrpId, response);
+        try {
+            statisticsService.exportExcel(classId, cpsgrpId, response);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

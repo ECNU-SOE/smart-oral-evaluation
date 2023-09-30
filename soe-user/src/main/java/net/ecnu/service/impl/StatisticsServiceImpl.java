@@ -26,15 +26,19 @@ import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.OutputStream;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.text.NumberFormat;
@@ -132,19 +136,18 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public void exportExcel(String classId, String cpsgrpId, HttpServletResponse response) {
+    public void exportExcel(String classId, String cpsgrpId, HttpServletResponse response) throws IOException {
         log.info("开始导出班级成绩Excel，入参classId:{}", JSON.toJSON(classId));
-        File file = new File(classScoreInfoTemplate);
-        //File file = new File("E:\\汉语正音平台\\class_score_info_template.xlsx");
-        if (!file.isFile()) {
-            log.error("班级测验/成绩模板路径:{}",JSON.toJSON(classScoreInfoTemplate));
-            throw new BizException(BizCodeEnum.EXCEL_TEMPLATE_IS_NOT_EXIST);
-        }
+        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        org.springframework.core.io.Resource[] resources = resolver.getResources("/template/class_score_info_template.xlsx");
+        org.springframework.core.io.Resource resource = resources[0];
+        InputStream inputStream = resource.getInputStream();
         try {
             //获取班级下学生指定作业的成绩
             CourseClassCpsgrpInfoDto courseClassCpsgrpInfoDto = classCpsgrpMapper.getClassCpsgrpInfo(classId, cpsgrpId);
             List<ClassScoreInfoDto> classScoreInfoDtos = classCpsgrpMapper.getClassScoreInfo(classId, cpsgrpId);
-            Workbook workbook = ExcelUtil.getWorkbook(classScoreInfoTemplate);
+            //Workbook workbook = ExcelUtil.getWorkbook(classScoreInfoTemplate);
+            Workbook workbook = new XSSFWorkbook(inputStream);
             //Workbook workbook = ExcelUtil.getWorkbook("E:\\汉语正音平台\\class_score_info_template.xlsx");
             CellStyle promptStyle = workbook.createCellStyle();
             //设置字体
