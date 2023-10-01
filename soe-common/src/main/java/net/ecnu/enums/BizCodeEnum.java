@@ -45,7 +45,7 @@ public enum BizCodeEnum {
     /**
      * cpsrcd语料相关
      **/
-    CPSRCD_NOT_EXIST(265001, "题目不存在"),
+    CPSRCD_NOT_EXIST(265001, "语料 不存在"),
 
     /**
      * 语料相关(弃用)

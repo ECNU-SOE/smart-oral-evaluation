@@ -1,37 +1,33 @@
-package net.ecnu.model;
+package net.ecnu.model.dto;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableId;
-
-import java.io.Serializable;
-
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import net.ecnu.model.TagDO;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
- * corpus快照
+ * 语料VO类
  * </p>
  *
  * @author LYW
  * @since 2023-09-29
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
-@TableName("cpsrcd")
-public class CpsrcdDO implements Serializable {
+public class CpsrcdDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
      * 主键id
      */
-    @TableId(value = "id", type = IdType.NONE)
     private String id;
 
     /**
@@ -65,20 +61,20 @@ public class CpsrcdDO implements Serializable {
     private String audioUrl;
 
     /**
-     * 逻辑删除标识位
+     * tags
      */
-    private Boolean del;
+    private List<TagDO> tags;
 
     /**
      * 创建时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     private Date gmtCreate;
 
     /**
      * 更新时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     private Date gmtModified;
 
 

@@ -40,7 +40,7 @@ public class TopicCpsController {
     /**
      * 更新子题
      */
-    @PostMapping("update")
+    @PostMapping("mod")
     public JsonData update(@RequestBody @Validated(Update.class) TopicCpsReq topicCpsReq) {
         CpsrcdVO cpsrcdVO = topicCpsService.updateOne(topicCpsReq);
         return JsonData.buildSuccess(cpsrcdVO);

@@ -46,7 +46,7 @@ public class CpsrcdController {
     }
 
     /**
-     * 更新子题cpsrcd
+     * 更新语料原型cpsrcd
      */
     @PostMapping("mod")
     public JsonData mod(@RequestBody @Validated(Update.class) CpsrcdReq cpsrcdReq) {
@@ -55,7 +55,7 @@ public class CpsrcdController {
     }
 
     /**
-     * 删除子题cpsrcd
+     * 删除语料原型cpsrcd
      */
     @GetMapping("del")
     public JsonData del(@RequestParam(value = "cpsrcdId", required = true) String cpsrcdId) {
@@ -64,12 +64,12 @@ public class CpsrcdController {
     }
 
     /**
-     * 查询子题
+     * 查询语料详情
      * **/
     @GetMapping("/getCpsrcdDetail")
     public JsonData getCpsrcdDetail(@RequestParam("cpsrcdId") String cpsrcdId) {
         if (StringUtils.isEmpty(cpsrcdId)) {
-            return JsonData.buildError("子题id不能为空");
+            return JsonData.buildError("语料id不能为空");
         }
         CpsrcdVO cpsrcdVO = cpsrcdService.getCpsrcdDetail(cpsrcdId);
         return JsonData.buildSuccess(cpsrcdVO);

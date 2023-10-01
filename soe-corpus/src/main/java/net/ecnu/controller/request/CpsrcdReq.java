@@ -20,7 +20,10 @@ public class CpsrcdReq {
     @NotEmpty(message = "id can't be empty in update", groups = {Update.class})
     private String id;
 
-    @NotEmpty(message = "语料类型不能为空",groups = {Create.class})
+    /**
+     * 语料类型
+     */
+    @NotEmpty(message = "语料类型不能为空", groups = {Create.class})
     private String type;
 
     /**
@@ -47,5 +50,10 @@ public class CpsrcdReq {
      * 示范音频播放url
      */
     private String audioUrl;
+
+    /**
+     * 标签列表
+     */
+    private List<Integer> tagIds;
 
 }

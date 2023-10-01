@@ -26,11 +26,6 @@ public class CpsrcdVO implements Serializable {
      */
     private String id;
 
-//    /**
-//     * 所属语料组id
-//     */
-//    private String cpsgrpId;
-
     /**
      * 所属题型id
      */

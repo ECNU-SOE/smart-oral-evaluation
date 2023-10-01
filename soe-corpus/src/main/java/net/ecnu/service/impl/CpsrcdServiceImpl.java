@@ -1,11 +1,8 @@
 package net.ecnu.service.impl;
 
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import net.ecnu.controller.request.CorpusFilterReq;
 import net.ecnu.controller.request.CpsrcdFilterReq;
 import net.ecnu.controller.request.CpsrcdReq;
 import net.ecnu.enums.BizCodeEnum;
@@ -14,19 +11,16 @@ import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.mapper.*;
 import net.ecnu.model.*;
 import net.ecnu.model.common.PageData;
+import net.ecnu.model.dto.CpsrcdDTO;
 import net.ecnu.model.vo.CpsrcdVO;
 import net.ecnu.service.CpsrcdService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import net.ecnu.service.OssService;
 import net.ecnu.util.IDUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.commons.util.IdUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.yaml.snakeyaml.util.ArrayUtils;
+import org.springframework.util.CollectionUtils;
 
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -49,10 +43,8 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     private CpsrcdMapper cpsrcdMapper;
 
     @Autowired
-    private CpsgrpMapper cpsgrpMapper;
-
-    @Autowired
     private TopicMapper topicMapper;
+
     @Autowired
     private TopicCpsMapper topicCpsMapper;
 
@@ -62,58 +54,88 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     @Autowired
     private TaggingMapper taggingMapper;
 
-    @Autowired
-    private OssService ossService;
-
-    @Autowired
-    private CpsgrpServiceImpl cpsgrpService;
 
     @Override
     public Object add(CpsrcdReq cpsrcdReq) {
         //向cpsrcd表中插入新记录
         CpsrcdDO cpsrcdDO = new CpsrcdDO();
         BeanUtils.copyProperties(cpsrcdReq, cpsrcdDO);
-//        cpsrcdDO.setTags(JSONUtil.toJsonStr(cpsrcdReq.getTags()));
         cpsrcdDO.setId(IDUtil.nextCpsrcdId());
         cpsrcdDO.setDel(false);
         int insert = cpsrcdMapper.insert(cpsrcdDO);
         cpsrcdDO = cpsrcdMapper.selectById(cpsrcdDO.getId());
-        return cpsrcdDO;
+        //tagIds不为空 -> 添加标签
+        if (!CollectionUtils.isEmpty(cpsrcdReq.getTagIds())) {
+            CpsrcdDO finalCpsrcdDO = cpsrcdDO;
+            cpsrcdReq.getTagIds().parallelStream().forEach(tagId -> {
+                int taggingRows = taggingMapper.insert(buildTaggingDO(tagId, finalCpsrcdDO.getId()));
+            });
+        }
+        //查询添加结果 返回数据
+        CpsrcdDTO cpsrcdDTO = buildCpsrcdDTOByCpsrcdDO(cpsrcdDO);
+        return cpsrcdDTO;
+    }
+
+    private TaggingDO buildTaggingDO(Integer tagId, String entityId) {
+        TaggingDO taggingDO = new TaggingDO();
+        taggingDO.setTagId(tagId);
+        taggingDO.setEntityId(entityId);
+        taggingDO.setEntityType(1);
+        return taggingDO;
     }
 
     @Override
     public Object pageByFilter(CpsrcdFilterReq cpsrcdFilter, Page<CpsrcdDO> cpsrcdDOPage) {
-        IPage<CpsrcdDO> cpsrcdDOIPage = cpsrcdManager.pageByFilter(cpsrcdFilter, cpsrcdDOPage);
+        IPage<CpsrcdDO> cpsrcdDOIPage = cpsrcdManager.pageByFilter(cpsrcdFilter, cpsrcdDOPage);//TODO 支持条件过滤
+        List<CpsrcdDO> cpsrcdDOS = cpsrcdDOIPage.getRecords();
+        List<CpsrcdDTO> cpsrcdDTOS = cpsrcdDOS.stream().map(this::buildCpsrcdDTOByCpsrcdDO).collect(Collectors.toList());
         PageData pageData = new PageData();
         BeanUtils.copyProperties(cpsrcdDOIPage, pageData);
+        pageData.setRecords(cpsrcdDTOS);
         return pageData;
     }
 
     @Override
     public Object mod(CpsrcdReq cpsrcdReq) {
         CpsrcdDO cpsrcdDO = cpsrcdMapper.selectById(cpsrcdReq.getId());
-        if (cpsrcdDO == null) throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
-        //全量更新 但不会更新null值
-        BeanUtils.copyProperties(cpsrcdReq, cpsrcdDO, "cpsgrpId");
-//        cpsrcdDO.setTags(JSONUtil.toJsonStr(cpsrcdReq.getTags()));
-        //同时更新标签映射关系，全量更新，以前的全删，新来的全加
-        int deletedNum = taggingMapper.delete(new QueryWrapper<TaggingDO>()
-                .eq("entity_id", cpsrcdReq.getId())
-        );
+        if (cpsrcdDO == null) throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
+        //更新cpsrcdDO 全量更新 但不会更新null值
+        BeanUtils.copyProperties(cpsrcdReq, cpsrcdDO);
         cpsrcdDO.setGmtModified(null);//Mysql会自动更新时间
         int i = cpsrcdMapper.updateById(cpsrcdDO);
-        cpsrcdDO = cpsrcdMapper.selectById(cpsrcdReq.getId());
-//        List<String> list = JSONUtil.toList(cpsrcdDO.getTags(), String.class);
 
-        return cpsrcdDO;
+        //同时更新标签映射关系，全量更新，以前的全删，新来的全加
+        int deletedNum = taggingMapper.delete(new QueryWrapper<TaggingDO>().eq("entity_id", cpsrcdReq.getId()));
+        if (!CollectionUtils.isEmpty(cpsrcdReq.getTagIds())) {
+            cpsrcdReq.getTagIds().forEach(tagId -> taggingMapper.insert(buildTaggingDO(tagId, cpsrcdReq.getId())));
+        }
+
+        //查询更新结果聚合cpsrcdDTO返回
+        cpsrcdDO = cpsrcdMapper.selectById(cpsrcdDO.getId());
+        CpsrcdDTO cpsrcdDTO = buildCpsrcdDTOByCpsrcdDO(cpsrcdDO);
+        return cpsrcdDTO;
+    }
+
+    private CpsrcdDTO buildCpsrcdDTOByCpsrcdDO(CpsrcdDO cpsrcdDO) {
+        CpsrcdDTO cpsrcdDTO = new CpsrcdDTO();
+        BeanUtils.copyProperties(cpsrcdDO, cpsrcdDTO);
+        List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>().eq("entity_id", cpsrcdDO.getId()));
+        if (!CollectionUtils.isEmpty(taggingDOS)) {
+            List<TagDO> tagDOs = tagMapper.selectList(new QueryWrapper<TagDO>()
+                    .in("id", taggingDOS.stream().map(TaggingDO::getTagId).collect(Collectors.toList())));
+            cpsrcdDTO.setTags(tagDOs);
+        }
+        return cpsrcdDTO;
     }
 
     @Override
     public Object del(String cpsrcdId) {
         CpsrcdDO cpsrcdDO = cpsrcdMapper.selectById(cpsrcdId);
-        if (cpsrcdDO == null) throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
-        int i = cpsrcdMapper.deleteById(cpsrcdId);
-        return i;
+        if (cpsrcdDO == null) throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
+        //删除cpsrcdDO 与对应的 taggingDO 记录
+        int delCpsrcds = cpsrcdMapper.deleteById(cpsrcdId);
+        int delTaggings = taggingMapper.delete(new QueryWrapper<TaggingDO>().eq("entity_id", cpsrcdId));
+        return delCpsrcds + delTaggings;
     }
 
     @Override
@@ -121,14 +143,14 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
         CpsrcdVO cpsrcdVO = new CpsrcdVO();
         CpsrcdDO cpsrcdDO = cpsrcdMapper.selectById(cpsrcdId);
         if (Objects.isNull(cpsrcdDO)) throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
-        BeanUtils.copyProperties(cpsrcdDO,cpsrcdVO);
+        BeanUtils.copyProperties(cpsrcdDO, cpsrcdVO);
         //聚合TopicId、CpsgrpId
         TopicCpsDO topicCpsDO = topicCpsMapper.selectOne(new QueryWrapper<TopicCpsDO>()
                 .eq("cpsrcd_id", cpsrcdId)
         );
         cpsrcdVO.setTopicId(topicCpsDO.getTopicId());
         TopicDO topicDO = topicMapper.selectById(topicCpsDO.getTopicId());
-        if (topicDO==null)
+        if (topicDO == null)
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
 //        cpsrcdVO.setCpsgrpId(topicDO.getCpsgrpId());
         //查询题目标签
