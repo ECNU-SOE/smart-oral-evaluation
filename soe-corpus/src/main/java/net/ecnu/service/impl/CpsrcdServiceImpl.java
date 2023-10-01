@@ -144,16 +144,16 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
         CpsrcdDO cpsrcdDO = cpsrcdMapper.selectById(cpsrcdId);
         if (Objects.isNull(cpsrcdDO)) throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
         BeanUtils.copyProperties(cpsrcdDO, cpsrcdVO);
-        //聚合TopicId、CpsgrpId
+        //聚合TopicCpsDO和CpsgrpId到CpsrcdVO
         TopicCpsDO topicCpsDO = topicCpsMapper.selectOne(new QueryWrapper<TopicCpsDO>()
                 .eq("cpsrcd_id", cpsrcdId)
         );
-        cpsrcdVO.setTopicId(topicCpsDO.getTopicId());
+        BeanUtils.copyProperties(topicCpsDO,cpsrcdVO);
         TopicDO topicDO = topicMapper.selectById(topicCpsDO.getTopicId());
         if (topicDO == null)
             throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
-//        cpsrcdVO.setCpsgrpId(topicDO.getCpsgrpId());
-        //查询题目标签
+        cpsrcdVO.setCpsgrpId(topicDO.getCpsgrpId());
+        //聚合Tags
         List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>()
                 .eq("entity_id", cpsrcdId));
         if (taggingDOS.size() != 0) {

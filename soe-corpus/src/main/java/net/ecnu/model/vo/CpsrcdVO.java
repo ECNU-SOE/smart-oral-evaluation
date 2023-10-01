@@ -30,6 +30,7 @@ public class CpsrcdVO implements Serializable {
      * 所属题型id
      */
     private String topicId;
+    private String cpsgrpId;
 
     /**
      * cpsrcd次序
