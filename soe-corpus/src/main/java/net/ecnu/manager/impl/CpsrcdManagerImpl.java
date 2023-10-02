@@ -3,6 +3,7 @@ package net.ecnu.manager.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.controller.request.CpsrcdFilterReq;
 import net.ecnu.manager.CpsgrpManager;
@@ -16,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,24 +44,26 @@ public class CpsrcdManagerImpl implements CpsrcdManager {
     @Override
     public IPage<CpsrcdDO> pageByFilter(CpsrcdFilterReq cpsrcdFilter, Page<CpsrcdDO> cpsrcdDOPage) {
         QueryWrapper<CpsrcdDO> cpsrcdDOQueryWrapper = new QueryWrapper<>();
-        //语料id
-        if (!StringUtils.isEmpty(cpsrcdFilter.getCpsrcdId())) {
-            cpsrcdDOQueryWrapper.eq("id",cpsrcdFilter.getCpsrcdId());
-        }
-        //测评模式
-        if(!Objects.isNull(cpsrcdFilter.getEvalMode())){
-            cpsrcdDOQueryWrapper.eq("eval_mode",cpsrcdFilter.getEvalMode());
-        }
+
         if (!StringUtils.isEmpty(cpsrcdFilter.getType())) {
             cpsrcdDOQueryWrapper.eq("type",cpsrcdFilter.getType());
         }
         //难易程度
-        if(!Objects.isNull(cpsrcdFilter.getDifficulty())){
-            cpsrcdDOQueryWrapper.eq("difficulty",cpsrcdFilter.getDifficulty());
+        if(!Objects.isNull(cpsrcdFilter.getDifficultyBegin())){
+            cpsrcdDOQueryWrapper.ge("difficulty",cpsrcdFilter.getDifficultyBegin());
         }
+        if(!Objects.isNull(cpsrcdFilter.getDifficultyEnd())){
+            cpsrcdDOQueryWrapper.le("difficulty",cpsrcdFilter.getDifficultyEnd());
+        }
+
         //文本内容
         if(!StringUtils.isEmpty(cpsrcdFilter.getTextValue())){
             cpsrcdDOQueryWrapper.like("ref_text",cpsrcdFilter.getTextValue());
+        }
+        if (cpsrcdFilter.getTagIds().size()!=0){
+            for(Integer tagId : cpsrcdFilter.getTagIds()){
+
+            }
         }
         return cpsrcdMapper.selectPage(cpsrcdDOPage, cpsrcdDOQueryWrapper);
     }

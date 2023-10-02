@@ -7,25 +7,12 @@ import java.util.List;
 @Data
 public class CpsrcdFilterReq {
 
-    /**
-     * 语料id
-     */
-    private String cpsrcdId;
-
-    /**
-     * 评测模式
-     */
-    private Integer evalMode;
 
     /**
      * 语料类型
      */
     private String type;
 
-    /**
-     * 难易程度
-     */
-    private Integer difficulty;
 
     /**
      * 起始难度

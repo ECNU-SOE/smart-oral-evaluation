@@ -86,7 +86,7 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
 
     @Override
     public Object pageByFilter(CpsrcdFilterReq cpsrcdFilter, Page<CpsrcdDO> cpsrcdDOPage) {
-        IPage<CpsrcdDO> cpsrcdDOIPage = cpsrcdManager.pageByFilter(cpsrcdFilter, cpsrcdDOPage);//TODO 支持条件过滤
+        IPage<CpsrcdDO> cpsrcdDOIPage = cpsrcdManager.pageByFilter(cpsrcdFilter, cpsrcdDOPage);
         List<CpsrcdDO> cpsrcdDOS = cpsrcdDOIPage.getRecords();
         List<CpsrcdDTO> cpsrcdDTOS = cpsrcdDOS.stream().map(this::buildCpsrcdDTOByCpsrcdDO).collect(Collectors.toList());
         PageData pageData = new PageData();
