@@ -82,7 +82,7 @@
             temp.pron_completion AS pronCompletionScore,
             temp.pron_accuracy AS pronAccuracyScore,
             temp.pron_fluency AS pronFluencyScore,
-            temp.suggested_score AS suggestedScoreScore
+            IFNULL(temp.suggested_score,0.0) AS suggestedScoreScore
         FROM
             user_class uc
             LEFT JOIN user u ON uc.account_no = u.account_no
@@ -104,6 +104,7 @@
             AND temp.cpsgrp_id = #{cpsgrpId,jdbcType=VARCHAR}
         WHERE
             uc.class_id = #{classId,jdbcType=VARCHAR}
+        ORDER BY suggestedScoreScore DESC
     </select>
 
     <select id="getClassCpsgrpInfo" resultType="net.ecnu.model.dto.CourseClassCpsgrpInfoDto">

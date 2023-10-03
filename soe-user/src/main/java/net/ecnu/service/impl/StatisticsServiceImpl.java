@@ -181,16 +181,12 @@ public class StatisticsServiceImpl implements StatisticsService {
                     .atZone(ZoneId.systemDefault()).toLocalDateTime().format(formatter);
             String endTime = courseClassCpsgrpInfoDto.getCourseEndTime().toInstant()
                     .atZone(ZoneId.systemDefault()).toLocalDateTime().format(formatter);
-            //CellRangeAddress startTimeRange = new CellRangeAddress(3, 3, 5, 6);
-            //sheet.addMergedRegion(startTimeRange);
             sheet.getRow(3).createCell(5).setCellStyle(promptStyle);
             sheet.getRow(3).createCell(6).setCellStyle(promptStyle);
             sheet.getRow(3).getCell(5).setCellValue("课程开始时间");
             sheet.getRow(3).createCell(7).setCellStyle(promptStyle);
             sheet.getRow(3).getCell(7).setCellValue(startTime);
 
-            //CellRangeAddress endTimeRange = new CellRangeAddress(3, 3, 8, 9);
-            //sheet.addMergedRegion(endTimeRange);
             sheet.getRow(3).createCell(8).setCellStyle(promptStyle);
             sheet.getRow(3).createCell(9).setCellStyle(promptStyle);
             sheet.getRow(3).getCell(8).setCellValue("课程结束时间");
@@ -198,8 +194,6 @@ public class StatisticsServiceImpl implements StatisticsService {
             sheet.getRow(3).getCell(10).setCellValue(endTime);
             //班级名称
             sheet.createRow(4);
-            //CellRangeAddress classNameStrRange = new CellRangeAddress(4, 4, 0, 1);
-            //sheet.addMergedRegion(classNameStrRange);
             sheet.getRow(4).createCell(0).setCellStyle(promptStyle);
             sheet.getRow(4).createCell(1).setCellStyle(promptStyle);
             sheet.getRow(4).getCell(0).setCellValue("班级名称");
@@ -210,8 +204,6 @@ public class StatisticsServiceImpl implements StatisticsService {
             sheet.getRow(4).createCell(4).setCellStyle(promptStyle);
             sheet.getRow(4).getCell(2).setCellValue(courseClassCpsgrpInfoDto.getClassName());
             //授课老师,未找到对应字段，暂时为空
-            //CellRangeAddress teacherStrRange = new CellRangeAddress(4, 4, 5, 6);
-            //sheet.addMergedRegion(teacherStrRange);
             sheet.getRow(4).createCell(5).setCellStyle(promptStyle);
             sheet.getRow(4).createCell(6).setCellStyle(promptStyle);
             sheet.getRow(4).getCell(5).setCellValue("授课老师");
@@ -220,8 +212,6 @@ public class StatisticsServiceImpl implements StatisticsService {
             sheet.getRow(4).getCell(7).setCellValue("");
 
             //学生人数
-            //CellRangeAddress studentNumStrRange = new CellRangeAddress(4, 4, 8, 9);
-            //sheet.addMergedRegion(studentNumStrRange);
             sheet.getRow(4).createCell(8).setCellStyle(promptStyle);
             sheet.getRow(4).createCell(9).setCellStyle(promptStyle);
             sheet.getRow(4).getCell(8).setCellValue("学生人数");
@@ -230,8 +220,6 @@ public class StatisticsServiceImpl implements StatisticsService {
             sheet.getRow(4).getCell(10).setCellValue(String.valueOf(courseClassCpsgrpInfoDto.getStudentNums()));
             //作业名称
             sheet.createRow(5);
-            //CellRangeAddress homeworkStrRange = new CellRangeAddress(5, 5, 0, 1);
-            //sheet.addMergedRegion(homeworkStrRange);
             sheet.getRow(5).createCell(0).setCellStyle(promptStyle);
             sheet.getRow(5).createCell(1).setCellStyle(promptStyle);
             sheet.getRow(5).getCell(0).setCellValue("作业名称");
