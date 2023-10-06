@@ -74,5 +74,11 @@ public class CpsrcdController {
         CpsrcdVO cpsrcdVO = cpsrcdService.getCpsrcdDetail(cpsrcdId);
         return JsonData.buildSuccess(cpsrcdVO);
     }
+
+    @PostMapping("rand")
+    public JsonData rand(@RequestBody CpsrcdFilterReq cpsrcdFilter) {
+        Object data = cpsrcdService.random(cpsrcdFilter);
+        return JsonData.buildSuccess(data);
+    }
 }
 

@@ -30,4 +30,5 @@ public interface CpsrcdService extends IService<CpsrcdDO> {
     CpsrcdVO getCpsrcdDetail(String cpsrcdId);
 
     Object pageByFilter(CpsrcdFilterReq cpsrcdFilter, Page<CpsrcdDO> cpsrcdDOPage);
+    Object random(CpsrcdFilterReq cpsrcdFilter);
 }

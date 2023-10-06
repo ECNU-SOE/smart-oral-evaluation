@@ -174,5 +174,22 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
         return cpsrcdVO;
     }
 
+    @Override
+    public Object random(CpsrcdFilterReq cpsrcdFilterReq) {
+        QueryWrapper<CpsrcdDO> qw = new QueryWrapper<>();
+        if (!CollectionUtils.isEmpty(cpsrcdFilterReq.getTagIds())){
+            List<String> cpsrcdIds = cpsrcdManager.getCpsrcdIdsByTagIds(cpsrcdFilterReq.getTagIds());
+            if (CollectionUtils.isEmpty(cpsrcdIds))
+                throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
+            qw.in("id",cpsrcdIds);
+        }
+        List<CpsrcdDO> cpsrcdDOS = cpsrcdMapper.selectList(qw);
+        if (CollectionUtils.isEmpty(cpsrcdDOS))
+            throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
+        int index = (int) (Math.random()* cpsrcdDOS.size());
+        CpsrcdDO cpsrcdDO = cpsrcdDOS.get(index);
+        return buildCpsrcdDTOByCpsrcdDO(cpsrcdDO);
+    }
+
 
 }

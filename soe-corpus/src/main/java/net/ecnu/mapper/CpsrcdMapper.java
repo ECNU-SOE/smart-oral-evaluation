@@ -20,8 +20,4 @@ import java.util.List;
  */
 @Mapper
 public interface CpsrcdMapper extends BaseMapper<CpsrcdDO> {
-    @Select("select * from cpsrcd order by rand() limit 1")
-    CpsrcdDO getRandomCpsrcd();
-
-
 }

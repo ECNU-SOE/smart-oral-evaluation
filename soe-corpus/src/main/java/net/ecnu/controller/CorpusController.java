@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.ecnu.controller.group.Create;
 import net.ecnu.controller.request.CorpusFilterReq;
 import net.ecnu.controller.request.CorpusReq;
+import net.ecnu.controller.request.CpsrcdFilterReq;
+import net.ecnu.model.CpsrcdDO;
 import net.ecnu.service.CorpusService;
 import net.ecnu.util.JsonData;
 import org.apache.commons.lang3.StringUtils;
@@ -70,11 +72,6 @@ public class CorpusController {
         return JsonData.buildSuccess("更新语料成功！");
     }
 
-    @GetMapping("rand")
-    public JsonData rand(@RequestParam(value = "entityType",required = false) Integer entityType) {
-        Object data = corpusService.random(entityType);
-        return JsonData.buildSuccess(data);
-    }
 
 }
 
