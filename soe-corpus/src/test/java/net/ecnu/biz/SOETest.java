@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.ecnu.CorpusApplication;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
+import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.mapper.CpsrcdMapper;
 import net.ecnu.model.CpsrcdDO;
 import net.ecnu.service.EvaluateService;
@@ -39,6 +40,8 @@ public class SOETest {
 
     @Autowired
     private CpsrcdMapper cpsrcdMapper;
+    @Autowired
+    private CpsrcdManager cpsrcdManager;
 
     @Value(value = "${aliyun.oss.endpoint}")
     private String ossEndpoint;
@@ -170,14 +173,11 @@ public class SOETest {
 
     @Test
     public void IDTest() {
-        System.out.println(ossEndpoint);
+        List<Integer> tagIds = new ArrayList<>();
+        tagIds.add(5);
+        tagIds.add(2);
+        List<String> res = cpsrcdManager.getCpsrcdIdsByTagIds(tagIds);
+        System.out.println(res);
     }
 
-
-//    @Test
-//    public void StringTojson() {
-//        String s = "[  \"apple\",  \"banana\",  \"orange\"]";
-//
-//        return cpsrcdDO;
-//    }
 }

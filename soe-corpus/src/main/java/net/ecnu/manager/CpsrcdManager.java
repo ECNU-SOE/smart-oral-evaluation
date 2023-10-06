@@ -15,6 +15,8 @@ public interface CpsrcdManager {
 
     int countByCpsgrpId(String cpsgrpId);
 
-    IPage<CpsrcdDO> pageByFilter(CpsrcdFilterReq cpsrcdFilter, Page<CpsrcdDO> cpsrcdDOPage);
+    IPage<CpsrcdDO> pageByFilter(CpsrcdFilterReq cpsrcdFilter, Page<CpsrcdDO> cpsrcdDOPage,List<String> cpsrcdIds);
+
+    List<String> getCpsrcdIdsByTagIds(List<Integer> tagIds);
 
 }

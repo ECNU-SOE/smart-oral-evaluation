@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -86,10 +87,18 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
 
     @Override
     public Object pageByFilter(CpsrcdFilterReq cpsrcdFilter, Page<CpsrcdDO> cpsrcdDOPage) {
-        IPage<CpsrcdDO> cpsrcdDOIPage = cpsrcdManager.pageByFilter(cpsrcdFilter, cpsrcdDOPage);
+        PageData pageData = new PageData();
+        List<String> cpsrcdIds = cpsrcdManager.getCpsrcdIdsByTagIds(cpsrcdFilter.getTagIds());
+        if (CollectionUtils.isEmpty(cpsrcdIds)){
+            pageData.setSize(10);
+            pageData.setTotal(0);
+            pageData.setRecords(new ArrayList<>());
+            pageData.setCurrent(1);
+            return pageData;
+        }
+        IPage<CpsrcdDO> cpsrcdDOIPage = cpsrcdManager.pageByFilter(cpsrcdFilter, cpsrcdDOPage,cpsrcdIds);
         List<CpsrcdDO> cpsrcdDOS = cpsrcdDOIPage.getRecords();
         List<CpsrcdDTO> cpsrcdDTOS = cpsrcdDOS.stream().map(this::buildCpsrcdDTOByCpsrcdDO).collect(Collectors.toList());
-        PageData pageData = new PageData();
         BeanUtils.copyProperties(cpsrcdDOIPage, pageData);
         pageData.setRecords(cpsrcdDTOS);
         return pageData;

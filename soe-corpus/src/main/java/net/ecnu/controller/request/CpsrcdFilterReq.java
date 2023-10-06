@@ -27,7 +27,7 @@ public class CpsrcdFilterReq {
     /**
      * 文本内容
      */
-    private String textValue;
+    private String refText;
 
     /**
      * 标签列表
