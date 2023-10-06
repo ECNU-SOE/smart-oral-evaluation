@@ -148,30 +148,16 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     }
 
     @Override
-    public CpsrcdVO getCpsrcdDetail(String cpsrcdId) {
-        CpsrcdVO cpsrcdVO = new CpsrcdVO();
+    public Object getCpsrcdDetail(String cpsrcdId) {
         CpsrcdDO cpsrcdDO = cpsrcdMapper.selectById(cpsrcdId);
-        if (Objects.isNull(cpsrcdDO)) throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
-        BeanUtils.copyProperties(cpsrcdDO, cpsrcdVO);
-        //聚合TopicCpsDO和CpsgrpId到CpsrcdVO
-        TopicCpsDO topicCpsDO = topicCpsMapper.selectOne(new QueryWrapper<TopicCpsDO>()
+        if (cpsrcdDO==null)
+            throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
+        CpsrcdDTO cpsrcdDTO = buildCpsrcdDTOByCpsrcdDO(cpsrcdDO);
+        List<TopicCpsDO> count = topicCpsMapper.selectList(new QueryWrapper<TopicCpsDO>()
                 .eq("cpsrcd_id", cpsrcdId)
         );
-        BeanUtils.copyProperties(topicCpsDO,cpsrcdVO);
-        TopicDO topicDO = topicMapper.selectById(topicCpsDO.getTopicId());
-        if (topicDO == null)
-            throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
-        cpsrcdVO.setCpsgrpId(topicDO.getCpsgrpId());
-        //聚合Tags
-        List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>()
-                .eq("entity_id", cpsrcdId));
-        if (taggingDOS.size() != 0) {
-            List<Integer> tagIds = taggingDOS.stream().map(TaggingDO::getTagId).collect(Collectors.toList());
-            List<TagDO> tagDOS = tagMapper.selectBatchIds(tagIds);
-            List<String> tagNames = tagDOS.stream().map(TagDO::getName).collect(Collectors.toList());
-            cpsrcdVO.setTags(tagNames);
-        }
-        return cpsrcdVO;
+        cpsrcdDTO.setUsedBy(count.size());
+        return cpsrcdDTO;
     }
 
     @Override

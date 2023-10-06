@@ -60,6 +60,8 @@ public class CpsrcdDTO implements Serializable {
      */
     private String audioUrl;
 
+    private Integer usedBy;
+
     /**
      * tags
      */

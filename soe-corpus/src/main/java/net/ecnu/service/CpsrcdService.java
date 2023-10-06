@@ -27,7 +27,7 @@ public interface CpsrcdService extends IService<CpsrcdDO> {
 
     Object del(String cpsrcdId);
 
-    CpsrcdVO getCpsrcdDetail(String cpsrcdId);
+    Object getCpsrcdDetail(String cpsrcdId);
 
     Object pageByFilter(CpsrcdFilterReq cpsrcdFilter, Page<CpsrcdDO> cpsrcdDOPage);
     Object random(CpsrcdFilterReq cpsrcdFilter);

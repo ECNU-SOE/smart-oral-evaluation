@@ -71,8 +71,8 @@ public class CpsrcdController {
         if (StringUtils.isEmpty(cpsrcdId)) {
             return JsonData.buildError("语料id不能为空");
         }
-        CpsrcdVO cpsrcdVO = cpsrcdService.getCpsrcdDetail(cpsrcdId);
-        return JsonData.buildSuccess(cpsrcdVO);
+        Object o = cpsrcdService.getCpsrcdDetail(cpsrcdId);
+        return JsonData.buildSuccess(o);
     }
 
     @PostMapping("rand")

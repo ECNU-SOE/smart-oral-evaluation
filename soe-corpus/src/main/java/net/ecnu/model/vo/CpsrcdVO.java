@@ -88,6 +88,8 @@ public class CpsrcdVO implements Serializable {
      */
     private List<String> tags;
 
+    private Integer usedBy;
+
     /**
      * 创建时间
      */
