@@ -8,6 +8,7 @@ import net.ecnu.mapper.MistakeAudioMapper;
 import net.ecnu.model.MistakeAudioDO;
 import net.ecnu.model.MistakeAudioDOExample;
 import net.ecnu.model.dto.MistakeAnswerDto;
+import net.ecnu.model.dto.MistakeInfoDto;
 import net.ecnu.model.dto.MistakesDto;
 import net.ecnu.model.vo.MistakeAnswerVO;
 import net.ecnu.model.vo.MistakeDetailVO;
@@ -129,10 +130,10 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         List<MistakesVO> mistakesVOS = new ArrayList<>();
         //获取cpsrcd快照题目id
-        List<String> cpsrcdIdList = mistakeAudioMapper.getCpsrcdIdByUserIdAndMistakeType(currentAccountNo
+        List<MistakeInfoDto> mistakeInfoList = mistakeAudioMapper.getCpsrcdIdByUserIdAndMistakeType(currentAccountNo
                 ,mistakesDto.getMistakeTypeCode(),mistakesDto.getOneWeekKey());
         //查询对应的题目信息
-        mistakesVOS = mistakeAudioMapper.getMistakesInfo(cpsrcdIdList);
+        mistakesVOS = mistakeAudioMapper.getMistakesInfo(mistakeInfoList);
         return mistakesVOS;
     }
 
@@ -143,14 +144,16 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
         Double resultRate = mistakeAnswer.getSuggestedScore() / mistakeAnswer.getQuestionScore();
         if (resultRate >= PASS_RATE) {
             //错题回答成功，将该错题逻辑删除，当数据量过大时，可手动删除数据库错题表中被逻辑删除数据
-            if (mistakeAudioMapper.cleanMistakeByCpsrcdId(currentAccountNo,mistakeAnswer.getCpsrcdId()) <= 0) {
+            if (mistakeAudioMapper.cleanMistakeByCpsrcdId(currentAccountNo,mistakeAnswer.getCpsrcdId(),
+                    mistakeAnswer.getCpsgrpId()) <= 0) {
                 throw new BizException(BizCodeEnum.MISTAKE_CLEAN_ERROR);
             }
             mistakeAnswerVO.setResultMsg("答对题目将从错题本移除");
             return mistakeAnswerVO;
         } else {
             //错题回答失败，增加该错题错误次数
-            if (mistakeAudioMapper.addWrongNumByCpsrcdId(currentAccountNo, mistakeAnswer.getCpsrcdId()) <= 0) {
+            if (mistakeAudioMapper.addWrongNumByCpsrcdId(currentAccountNo, mistakeAnswer.getCpsrcdId(),
+                    mistakeAnswer.getCpsgrpId()) <= 0) {
                 throw new BizException(BizCodeEnum.MISTAKE_ADD_WRONG_NUM_ERROR);
             }
             mistakeAnswerVO.setResultMsg("回答错误");
@@ -161,25 +164,26 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
     /**
      * 判断语音对错方法
      * @param userId 用户唯一id
-     * @param cpsrcdId 语料快照id
+     * @param mistakeInfoDto 错题信息
      * @param suggestedScore 用户该题得分
      * @param questionScore 该题总分
      * **/
     @Override
-    public Boolean isAddInErrorBook(String userId,String cpsrcdId,Double suggestedScore,Double questionScore){
+    public Boolean isAddInErrorBook(String userId,MistakeInfoDto mistakeInfoDto,Double suggestedScore,Double questionScore){
         Double resultRate = suggestedScore / questionScore;
         if (resultRate >= PASS_RATE) {
             //回答成功
             return true;
         } else {
             //回答失败，将该题加入用户的错题集
-            Integer questionType = mistakeAudioMapper.getQuestionType(cpsrcdId);
+            Integer questionType = mistakeAudioMapper.getQuestionType(mistakeInfoDto.getCpsrcdId());
             if (Objects.isNull(questionType) || questionType < 0) {
                 //没有查询到它的题目类型，则默认为0语音评测
                 questionType = 0;
             }
             MistakeAudioDO record = new MistakeAudioDO();
-            record.setCreateTime(new Date()).setCpsrcdId(cpsrcdId).setErrorSum(1)
+            record.setCreateTime(new Date()).setCpsrcdId(mistakeInfoDto.getCpsrcdId())
+                    .setCpsgrpId(mistakeInfoDto.getCpsgrpId()).setErrorSum(1)
                     .setUserId(userId).setUpdateTime(new Date()).setMistakeType(questionType)
                     .setDelFlg(false);
             if (mistakeAudioMapper.insertSelective(record) <= 0) {

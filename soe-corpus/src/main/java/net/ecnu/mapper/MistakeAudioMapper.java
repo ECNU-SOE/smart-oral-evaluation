@@ -2,6 +2,7 @@ package net.ecnu.mapper;
 
 import net.ecnu.model.MistakeAudioDO;
 import net.ecnu.model.MistakeAudioDOExample;
+import net.ecnu.model.dto.MistakeInfoDto;
 import net.ecnu.model.vo.MistakeTypeVO;
 import net.ecnu.model.vo.MistakesVO;
 import org.apache.ibatis.annotations.Param;
@@ -74,15 +75,15 @@ public interface MistakeAudioMapper {
 
     List<MistakeTypeVO> selectEachMistakeTypeDataNearWeek(@Param("userId") String userId);
 
-    List<String> getCpsrcdIdByUserIdAndMistakeType(@Param("userId") String userId
+    List<MistakeInfoDto> getCpsrcdIdByUserIdAndMistakeType(@Param("userId") String userId
             , @Param("mistakeTypeCode") Integer mistakeTypeCode
             , @Param("oneWeekKey") Integer oneWeekKey);
 
-    List<MistakesVO> getMistakesInfo(@Param("cpsrcdIdList") List<String> cpsrcdIdList);
+    List<MistakesVO> getMistakesInfo(@Param("mistakeInfoList") List<MistakeInfoDto> mistakeInfoList);
 
-    int cleanMistakeByCpsrcdId(@Param("userId") String userId,@Param("cpsrcdId") String cpsrcdId);
+    int cleanMistakeByCpsrcdId(@Param("userId") String userId,@Param("cpsrcdId") String cpsrcdId,@Param("cpsgrpId")String cpsgrpId);
 
-    int addWrongNumByCpsrcdId(@Param("userId") String userId,@Param("cpsrcdId") String cpsrcdId);
+    int addWrongNumByCpsrcdId(@Param("userId") String userId,@Param("cpsrcdId") String cpsrcdId,@Param("cpsgrpId")String cpsgrpId);
 
     Integer getQuestionType(@Param("cpsrcdId") String cpsrcdId);
 }

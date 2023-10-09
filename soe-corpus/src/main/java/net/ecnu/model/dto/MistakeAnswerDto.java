@@ -20,6 +20,11 @@ public class MistakeAnswerDto {
     private String cpsrcdId;
 
     /**
+     * 题目组id
+     * **/
+    private String cpsgrpId;
+
+    /**
      * 得分
      * **/
     @NotNull

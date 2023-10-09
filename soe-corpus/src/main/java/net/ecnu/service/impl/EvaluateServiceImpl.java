@@ -14,6 +14,7 @@ import net.ecnu.mapper.CpsgrpMapper;
 import net.ecnu.mapper.EvalRecordMapper;
 import net.ecnu.model.EvalListener;
 import net.ecnu.model.EvalRecordDO;
+import net.ecnu.model.dto.MistakeInfoDto;
 import net.ecnu.model.vo.EvalResultVO;
 import net.ecnu.service.EvaluateService;
 import net.ecnu.util.CommonUtil;
@@ -259,7 +260,13 @@ public class EvaluateServiceImpl implements EvaluateService {
             if (StringUtils.isBlank(currentAccountNo)) {
                 throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
             }
-            mistakeAudioService.isAddInErrorBook(currentAccountNo, cpsrcdId, totalSocre, 100.00);
+            MistakeInfoDto mistakeInfoDto = new MistakeInfoDto();
+            mistakeInfoDto.setCpsrcdId(cpsrcdId);
+            /**
+             * TODO 语料组id也需要传值
+             * **/
+            mistakeInfoDto.setCpsgrpId("");
+            mistakeAudioService.isAddInErrorBook(currentAccountNo, mistakeInfoDto, totalSocre, 100.00);
         }
 
         EvalRecordDO evalRecordDO = new EvalRecordDO();

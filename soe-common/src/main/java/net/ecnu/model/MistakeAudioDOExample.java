@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @description:
  * @Author lsy
- * @Date 2023/7/15 15:50
+ * @Date 2023/10/10 0:22
  */
 public class MistakeAudioDOExample {
     protected String orderByClause;
@@ -167,6 +167,76 @@ public class MistakeAudioDOExample {
 
         public Criteria andMistakeIdNotBetween(Long value1, Long value2) {
             addCriterion("mistake_id not between", value1, value2, "mistakeId");
+            return (Criteria) this;
+        }
+
+        public Criteria andCpsgrpIdIsNull() {
+            addCriterion("cpsgrp_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCpsgrpIdIsNotNull() {
+            addCriterion("cpsgrp_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCpsgrpIdEqualTo(String value) {
+            addCriterion("cpsgrp_id =", value, "cpsgrpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andCpsgrpIdNotEqualTo(String value) {
+            addCriterion("cpsgrp_id <>", value, "cpsgrpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andCpsgrpIdGreaterThan(String value) {
+            addCriterion("cpsgrp_id >", value, "cpsgrpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andCpsgrpIdGreaterThanOrEqualTo(String value) {
+            addCriterion("cpsgrp_id >=", value, "cpsgrpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andCpsgrpIdLessThan(String value) {
+            addCriterion("cpsgrp_id <", value, "cpsgrpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andCpsgrpIdLessThanOrEqualTo(String value) {
+            addCriterion("cpsgrp_id <=", value, "cpsgrpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andCpsgrpIdLike(String value) {
+            addCriterion("cpsgrp_id like", value, "cpsgrpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andCpsgrpIdNotLike(String value) {
+            addCriterion("cpsgrp_id not like", value, "cpsgrpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andCpsgrpIdIn(List<String> values) {
+            addCriterion("cpsgrp_id in", values, "cpsgrpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andCpsgrpIdNotIn(List<String> values) {
+            addCriterion("cpsgrp_id not in", values, "cpsgrpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andCpsgrpIdBetween(String value1, String value2) {
+            addCriterion("cpsgrp_id between", value1, value2, "cpsgrpId");
+            return (Criteria) this;
+        }
+
+        public Criteria andCpsgrpIdNotBetween(String value1, String value2) {
+            addCriterion("cpsgrp_id not between", value1, value2, "cpsgrpId");
             return (Criteria) this;
         }
 

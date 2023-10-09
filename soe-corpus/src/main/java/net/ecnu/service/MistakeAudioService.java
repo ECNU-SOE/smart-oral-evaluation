@@ -3,6 +3,7 @@ package net.ecnu.service;
 import net.ecnu.model.MistakeAudioDO;
 import net.ecnu.model.MistakeAudioDOExample;
 import net.ecnu.model.dto.MistakeAnswerDto;
+import net.ecnu.model.dto.MistakeInfoDto;
 import net.ecnu.model.dto.MistakesDto;
 import net.ecnu.model.vo.MistakeAnswerVO;
 import net.ecnu.model.vo.MistakeDetailVO;
@@ -48,5 +49,5 @@ public interface MistakeAudioService {
 
     MistakeAnswerVO checkAnswer(MistakeAnswerDto mistakeAnswer);
 
-    Boolean isAddInErrorBook(String userId,String cpsrcdId,Double suggestedScore,Double questionScore);
+    Boolean isAddInErrorBook(String userId, MistakeInfoDto mistakeInfoDto, Double suggestedScore, Double questionScore);
 }
