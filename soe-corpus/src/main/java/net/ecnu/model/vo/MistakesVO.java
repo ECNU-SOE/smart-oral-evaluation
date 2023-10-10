@@ -31,6 +31,11 @@ public class MistakesVO implements Serializable {
     private String topicId;
 
     /**
+     * 所属大题名称
+     * **/
+    private String topicTitle;
+
+    /**
      * 题目名称
      * **/
     private String description;
@@ -52,11 +57,6 @@ public class MistakesVO implements Serializable {
     private Integer difficulty;
 
     /**
-     * 每字分值
-     */
-    private BigDecimal wordWeight;
-
-    /**
      * 语料内容拼音
      */
     private String pinyin;
@@ -71,8 +71,4 @@ public class MistakesVO implements Serializable {
      */
     private String audioUrl;
 
-    /**
-     * 题目标签
-     */
-    private List<String> tags;
 }

@@ -339,32 +339,32 @@
 
   <select id="getMistakesInfo" resultType="net.ecnu.model.vo.MistakesVO">
     select
-        rcd.id AS cpsrcdId,
-        rcd.cpsgrp_id AS cpsgrpId,
-        CONCAT(grp.description,"第",tc.c_num,"题") AS description,
-        rcd.topic_id AS topicId,
-        rcd.c_num AS cNum,
-        rcd.eval_mode AS evalModel,
-        rcd.type AS type,
-        rcd.difficulty AS difficulty,
-        rcd.word_weight AS wordWeight,
-        rcd.score AS score,
-        rcd.pinyin AS pinyin,
-        rcd.ref_text AS refText,
-        rcd.audio_url AS audioUrl,
-        rcd.tags AS tags
+		rcd.id AS cpsrcdId,
+		t.cpsgrp_id AS cpsgrpId,
+		CONCAT(grp.description,t.title,"第",tc.c_num,"题") AS description,
+		tc.topic_id AS topicId,
+		t.title AS topicTitle,
+		tc.c_num AS cNum,
+		rcd.eval_mode AS evalModel,
+		rcd.type AS type,
+		rcd.difficulty AS difficulty,
+		tc.score AS score,
+		rcd.pinyin AS pinyin,
+		rcd.ref_text AS refText,
+		rcd.audio_url AS audioUrl
     from
         cpsrcd rcd
     LEFT JOIN
         topic_cps tc ON rcd.id = tc.cpsrcd_id
     LEFT JOIN
-        topic t ON t.cpsgrp_id =
+        topic t ON t.id = tc.topic_id
     LEFT JOIN
-        cpsgrp grp ON rcd.cpsgrp_id = grp.id AND grp.del = 0
+        cpsgrp grp ON t.cpsgrp_id = grp.id AND grp.del = 0
     where
-      rcd.id in
-    <foreach collection="mistakeInfoList" item="mistakeInfo" open="(" close=")" separator=",">
-      #{mistakeInfo.cpsrcdId,jdbcType=VARCHAR}
+        rcd.del = 0
+    and
+    <foreach collection="mistakeInfoList" item="mistakeInfo" open="(" close=")" separator=" or ">
+        (rcd.id = #{mistakeInfo.cpsrcdId,jdbcType=VARCHAR} and t.cpsgrp_id = #{mistakeInfo.cpsgrpId,jdbcType=VARCHAR})
     </foreach>
   </select>
 
