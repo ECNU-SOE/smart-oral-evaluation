@@ -17,6 +17,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -61,6 +62,11 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
         TagDO tagDO = tagMapper.selectById(id);
         if (tagDO == null)
             return "标签不存在";
+        List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>()
+                .eq("tag_id", id)
+        );
+        if (!CollectionUtils.isEmpty(taggingDOS))
+            return "标签在使用中";
         return tagMapper.deleteById(id);
     }
 
