@@ -1,16 +1,13 @@
-package net.ecnu.model.common.readWordByXF;
+package net.ecnu.model.common;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import net.ecnu.model.common.Word;
+import net.ecnu.model.common.Syll;
 
-/**
- * @description:
- * @Author lsy
- * @Date 2023/10/14 16:16
- */
+import java.util.List;
+
 @Data
-public class Sentence {
+public class Word {
 
     /**
      * 开始位置
@@ -30,11 +27,15 @@ public class Sentence {
     private int endPos;
 
     /**
-     * 时长
-     * 单位：帧，每帧相当于10ms
+     * 拼音: 数字代表声调，5表示轻声
+     * **/
+    private String symbol;
+
+    /**
+     * 时长（单位:帧，每帧相当于10ms）
      * **/
     @JsonProperty("time_len")
     private int timeLen;
 
-    private Word word;
+    private List<Syll> syll;
 }

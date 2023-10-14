@@ -1,4 +1,4 @@
-package net.ecnu.model.common.readWordByXF;
+package net.ecnu.model.common;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
