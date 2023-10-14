@@ -91,6 +91,13 @@ public class SysUserServiceImpl implements SysUserService {
     //用户管理：新增
     @Override
     public void addUser(UserDTO sysuser) {
+        /**
+         * 检查用户是否已存在
+         * **/
+        UserDO checkUserInfo = userMapper.selectOneByPhone(sysuser.getPhone());
+        if (checkUserInfo != null) {
+            throw new BizException(BizCodeEnum.ACCOUNT_REPEAT);
+        }
         sysuser.setPwd(passwordEncoder.encode(
                 SOEConst.USER_INIT_PASSWORD
         ));

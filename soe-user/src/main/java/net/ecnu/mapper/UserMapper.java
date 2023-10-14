@@ -3,6 +3,7 @@ package net.ecnu.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import net.ecnu.model.UserDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -15,4 +16,5 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface UserMapper extends BaseMapper<UserDO> {
 
+    UserDO selectOneByPhone(@Param("phone") String phone);
 }
