@@ -55,6 +55,9 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     @Autowired
     private TaggingMapper taggingMapper;
 
+    @Autowired
+    private CpsgrpMapper cpsgrpMapper;
+
 
     @Override
     public Object add(CpsrcdReq cpsrcdReq) {
@@ -108,6 +111,13 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     public Object mod(CpsrcdReq cpsrcdReq) {
         CpsrcdDO cpsrcdDO = cpsrcdMapper.selectById(cpsrcdReq.getId());
         if (cpsrcdDO == null) throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
+        List<TopicCpsDO> topicCpsDOS = topicCpsMapper.selectList(new QueryWrapper<TopicCpsDO>().eq("cpsrcd_id", cpsrcdReq.getId()));
+        if (!CollectionUtils.isEmpty(topicCpsDOS)){
+            List<String> topicIds = topicCpsDOS.stream().map(TopicCpsDO::getTopicId).collect(Collectors.toList());
+            List<TopicDO> topicDOS = topicMapper.selectBatchIds(topicIds);
+            List<String> cpsgrpIds = topicDOS.stream().map(TopicDO::getCpsgrpId).collect(Collectors.toList());
+            return "修改失败，语料正被:"+cpsgrpIds.stream().distinct().collect(Collectors.toList())+"使用";
+        }
         //更新cpsrcdDO 全量更新 但不会更新null值
         BeanUtils.copyProperties(cpsrcdReq, cpsrcdDO);
         cpsrcdDO.setGmtModified(null);//Mysql会自动更新时间
@@ -141,6 +151,13 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     public Object del(String cpsrcdId) {
         CpsrcdDO cpsrcdDO = cpsrcdMapper.selectById(cpsrcdId);
         if (cpsrcdDO == null) throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
+        List<TopicCpsDO> topicCpsDOS = topicCpsMapper.selectList(new QueryWrapper<TopicCpsDO>().eq("cpsrcd_id", cpsrcdId));
+        if (!CollectionUtils.isEmpty(topicCpsDOS)){
+            List<String> topicIds = topicCpsDOS.stream().map(TopicCpsDO::getTopicId).collect(Collectors.toList());
+            List<TopicDO> topicDOS = topicMapper.selectBatchIds(topicIds);
+            List<String> cpsgrpIds = topicDOS.stream().map(TopicDO::getCpsgrpId).collect(Collectors.toList());
+            return "删除失败，语料正被:"+cpsgrpIds.stream().distinct().collect(Collectors.toList())+"使用";
+        }
         //删除cpsrcdDO 与对应的 taggingDO 记录
         int delCpsrcds = cpsrcdMapper.deleteById(cpsrcdId);
         int delTaggings = taggingMapper.delete(new QueryWrapper<TaggingDO>().eq("entity_id", cpsrcdId));
