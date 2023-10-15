@@ -57,6 +57,11 @@ public class MistakesVO implements Serializable {
     private Integer difficulty;
 
     /**
+     * 是否启用拼音
+     * **/
+    private Integer enablePinYin;
+
+    /**
      * 语料内容拼音
      */
     private String pinyin;
