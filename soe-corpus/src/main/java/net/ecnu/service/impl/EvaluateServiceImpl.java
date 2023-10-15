@@ -1,6 +1,7 @@
 package net.ecnu.service.impl;
 
 import cn.hutool.json.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.soe.v20180724.SoeClient;
 import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitRequest;
@@ -14,6 +15,7 @@ import net.ecnu.mapper.CpsgrpMapper;
 import net.ecnu.mapper.EvalRecordMapper;
 import net.ecnu.model.EvalListener;
 import net.ecnu.model.EvalRecordDO;
+import net.ecnu.model.common.EvaluationXF;
 import net.ecnu.model.dto.MistakeInfoDto;
 import net.ecnu.model.vo.EvalResultVO;
 import net.ecnu.service.EvaluateService;
@@ -249,7 +251,7 @@ public class EvaluateServiceImpl implements EvaluateService {
             }
         }
         //新增评测记录evalRecord
-        Object evalJsonRes = ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
+        EvaluationXF evalJsonRes = JSON.parseObject(JSON.toJSONString(((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category)), EvaluationXF.class);
 
         //若cpsrcdId不为空，则调用错题记录逻辑
         if (cpsrcdId != null) {

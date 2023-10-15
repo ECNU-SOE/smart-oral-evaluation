@@ -2,6 +2,7 @@ package net.ecnu.model.common;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import net.ecnu.model.common.readChapterByXF.ReadChapter;
 import net.ecnu.model.common.readSentenceByXF.ReadSentence;
 import net.ecnu.model.common.readSyllableByXF.ReadSyllable;
 import net.ecnu.model.common.readWordByXF.ReadWord;
@@ -20,4 +21,7 @@ public class RecPaper {
 
     @JsonProperty("read_sentence")
     private ReadSentence readSentence;
+
+    @JsonProperty("read_chapter")
+    private ReadChapter readChapter;
 }

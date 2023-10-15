@@ -2,7 +2,6 @@ package net.ecnu.model.common;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import net.ecnu.model.common.Syll;
 
 import java.util.List;
 
