@@ -251,8 +251,8 @@ public class EvaluateServiceImpl implements EvaluateService {
             }
         }
         //新增评测记录evalRecord
-        EvaluationXF evalJsonRes = JSON.parseObject(JSON.toJSONString(((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category)), EvaluationXF.class);
-
+        //EvaluationXF evalJsonRes = JSON.parseObject(JSON.toJSONString(((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category)), EvaluationXF.class);
+        Object evalJsonRes = ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
         //若cpsrcdId不为空，则调用错题记录逻辑
         if (cpsrcdId != null) {
             JSONObject resJson = (JSONObject) ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
