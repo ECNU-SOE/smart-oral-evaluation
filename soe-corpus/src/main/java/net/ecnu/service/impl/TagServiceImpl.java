@@ -110,19 +110,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
         BeanUtils.copyProperties(taggingReq, taggingDO);
         int i = taggingMapper.insert(taggingDO);
         //修改权重
-        Integer total = taggingMapper.selectCount(null);
-        Integer count = taggingMapper.selectCount(new QueryWrapper<TaggingDO>()
-                .eq("tag_id", taggingReq.getTagId())
-        );
-        TagDO tagDO = tagMapper.selectById(taggingReq.getTagId());
-        TagDO newTagDO = new TagDO();
-        BeanUtils.copyProperties(tagDO,newTagDO,"weight");
-        double w = count / (total*1.00);
-        DecimalFormat format = new DecimalFormat("#.00");
-        String str = format.format(w);
-        double weight = Double.parseDouble(str);
-        newTagDO.setWeight(weight);
-        int updateid = tagMapper.updateById(newTagDO);
+        double weight = updateWeight(taggingReq.getTagId());
         return i;
 
     }
@@ -152,19 +140,26 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
             return "该实体所对应的标签不存在";
         int i = taggingMapper.deleteById(taggingDO.getId());
         //修改权重
+        double weight = updateWeight(tagDO.getId());
+        return "删除成功，共影响了"+i+"行";
+    }
+
+    private double updateWeight(Integer tagId){
         Integer total = taggingMapper.selectCount(null);
+        if (total == 0)
+            return 0 ;
         Integer count = taggingMapper.selectCount(new QueryWrapper<TaggingDO>()
-                .eq("tag_id", tagDO.getId())
+                .eq("tag_id", tagId)
         );
+        TagDO tagDO = tagMapper.selectById(tagId);
         TagDO newTagDO = new TagDO();
         BeanUtils.copyProperties(tagDO,newTagDO,"weight");
-        double w = count / (total*1.00);
-        DecimalFormat format = new DecimalFormat("#.00");
-        String str = format.format(w);
-        double weight = Double.parseDouble(str);
+        double result = count / (double)total;
+        DecimalFormat formatter = new DecimalFormat("#.0000");
+        double weight = Double.parseDouble(formatter.format(result));
         newTagDO.setWeight(weight);
         int updateid = tagMapper.updateById(newTagDO);
-        return "删除成功，共影响了"+i+"行";
+        return weight;
     }
 
 

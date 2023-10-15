@@ -5,6 +5,7 @@
     <!--@mbg.generated-->
     <!--@Table mistake_audio-->
     <id column="mistake_id" jdbcType="BIGINT" property="mistakeId" />
+    <result column="cpsgrp_id" jdbcType="VARCHAR" property="cpsgrpId" />
     <result column="cpsrcd_id" jdbcType="VARCHAR" property="cpsrcdId" />
     <result column="mistake_type" jdbcType="INTEGER" property="mistakeType" />
     <result column="user_id" jdbcType="VARCHAR" property="userId" />
@@ -75,7 +76,8 @@
   </sql>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    mistake_id, cpsrcd_id, mistake_type, user_id, error_sum, del_flg, create_time, update_time
+    mistake_id, cpsgrp_id, cpsrcd_id, mistake_type, user_id, error_sum, del_flg, create_time,
+    update_time
   </sql>
   <select id="selectByExample" parameterType="net.ecnu.model.MistakeAudioDOExample" resultMap="BaseResultMap">
     <!--@mbg.generated-->
@@ -94,7 +96,7 @@
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     <!--@mbg.generated-->
-    select 
+    select
     <include refid="Base_Column_List" />
     from mistake_audio
     where mistake_id = #{mistakeId,jdbcType=BIGINT}
@@ -113,17 +115,20 @@
   </delete>
   <insert id="insert" keyColumn="mistake_id" keyProperty="mistakeId" parameterType="net.ecnu.model.MistakeAudioDO" useGeneratedKeys="true">
     <!--@mbg.generated-->
-    insert into mistake_audio (cpsrcd_id, mistake_type, user_id, 
-      error_sum, del_flg, create_time, 
-      update_time)
-    values (#{cpsrcdId,jdbcType=VARCHAR}, #{mistakeType,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR}, 
-      #{errorSum,jdbcType=INTEGER}, #{delFlg,jdbcType=BOOLEAN}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP})
+    insert into mistake_audio (cpsgrp_id, cpsrcd_id, mistake_type,
+      user_id, error_sum, del_flg,
+      create_time, update_time)
+    values (#{cpsgrpId,jdbcType=VARCHAR}, #{cpsrcdId,jdbcType=VARCHAR}, #{mistakeType,jdbcType=INTEGER},
+      #{userId,jdbcType=VARCHAR}, #{errorSum,jdbcType=INTEGER}, #{delFlg,jdbcType=BOOLEAN},
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" keyColumn="mistake_id" keyProperty="mistakeId" parameterType="net.ecnu.model.MistakeAudioDO" useGeneratedKeys="true">
     <!--@mbg.generated-->
     insert into mistake_audio
     <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="cpsgrpId != null">
+        cpsgrp_id,
+      </if>
       <if test="cpsrcdId != null">
         cpsrcd_id,
       </if>
@@ -147,6 +152,9 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="cpsgrpId != null">
+        #{cpsgrpId,jdbcType=VARCHAR},
+      </if>
       <if test="cpsrcdId != null">
         #{cpsrcdId,jdbcType=VARCHAR},
       </if>
@@ -184,6 +192,9 @@
       <if test="record.mistakeId != null">
         mistake_id = #{record.mistakeId,jdbcType=BIGINT},
       </if>
+      <if test="record.cpsgrpId != null">
+        cpsgrp_id = #{record.cpsgrpId,jdbcType=VARCHAR},
+      </if>
       <if test="record.cpsrcdId != null">
         cpsrcd_id = #{record.cpsrcdId,jdbcType=VARCHAR},
       </if>
@@ -214,6 +225,7 @@
     <!--@mbg.generated-->
     update mistake_audio
     set mistake_id = #{record.mistakeId,jdbcType=BIGINT},
+      cpsgrp_id = #{record.cpsgrpId,jdbcType=VARCHAR},
       cpsrcd_id = #{record.cpsrcdId,jdbcType=VARCHAR},
       mistake_type = #{record.mistakeType,jdbcType=INTEGER},
       user_id = #{record.userId,jdbcType=VARCHAR},
@@ -229,6 +241,9 @@
     <!--@mbg.generated-->
     update mistake_audio
     <set>
+      <if test="cpsgrpId != null">
+        cpsgrp_id = #{cpsgrpId,jdbcType=VARCHAR},
+      </if>
       <if test="cpsrcdId != null">
         cpsrcd_id = #{cpsrcdId,jdbcType=VARCHAR},
       </if>
@@ -256,7 +271,8 @@
   <update id="updateByPrimaryKey" parameterType="net.ecnu.model.MistakeAudioDO">
     <!--@mbg.generated-->
     update mistake_audio
-    set cpsrcd_id = #{cpsrcdId,jdbcType=VARCHAR},
+    set cpsgrp_id = #{cpsgrpId,jdbcType=VARCHAR},
+      cpsrcd_id = #{cpsrcdId,jdbcType=VARCHAR},
       mistake_type = #{mistakeType,jdbcType=INTEGER},
       user_id = #{userId,jdbcType=VARCHAR},
       error_sum = #{errorSum,jdbcType=INTEGER},
@@ -307,8 +323,9 @@
     group by user_id,mistake_type
   </select>
 
-  <select id="getCpsrcdIdByUserIdAndMistakeType" resultType="java.lang.String">
+  <select id="getCpsrcdIdByUserIdAndMistakeType" resultType="net.ecnu.model.dto.MistakeInfoDto">
     select
+      cpsgrp_id,
       cpsrcd_id
     from
       mistake_audio
@@ -322,29 +339,32 @@
 
   <select id="getMistakesInfo" resultType="net.ecnu.model.vo.MistakesVO">
     select
-        rcd.id AS cpsrcdId,
-        rcd.corpus_id AS corpusId,
-        rcd.cpsgrp_id AS cpsgrpId,
-        CONCAT(grp.description,"第",rcd.c_num,"题") AS description,
-        rcd.topic_id AS topicId,
-        rcd.c_num AS cNum,
-        rcd.eval_mode AS evalModel,
-        rcd.type AS type,
-        rcd.difficulty AS difficulty,
-        rcd.word_weight AS wordWeight,
-        rcd.score AS score,
-        rcd.pinyin AS pinyin,
-        rcd.ref_text AS refText,
-        rcd.audio_url AS audioUrl,
-        rcd.tags AS tags
+		rcd.id AS cpsrcdId,
+		t.cpsgrp_id AS cpsgrpId,
+		CONCAT(grp.description,t.title,"第",tc.c_num,"题") AS description,
+		tc.topic_id AS topicId,
+		t.title AS topicTitle,
+		tc.c_num AS cNum,
+		rcd.eval_mode AS evalModel,
+		rcd.type AS type,
+		rcd.difficulty AS difficulty,
+		tc.score AS score,
+		rcd.pinyin AS pinyin,
+		rcd.ref_text AS refText,
+		rcd.audio_url AS audioUrl
     from
         cpsrcd rcd
     LEFT JOIN
-        cpsgrp grp ON rcd.cpsgrp_id = grp.id AND grp.del = 0
+        topic_cps tc ON rcd.id = tc.cpsrcd_id
+    LEFT JOIN
+        topic t ON t.id = tc.topic_id
+    LEFT JOIN
+        cpsgrp grp ON t.cpsgrp_id = grp.id AND grp.del = 0
     where
-      rcd.id in
-    <foreach collection="cpsrcdIdList" item="cpsrcdId" open="(" close=")" separator=",">
-      #{cpsrcdId,jdbcType=VARCHAR}
+        rcd.del = 0
+    and
+    <foreach collection="mistakeInfoList" item="mistakeInfo" open="(" close=")" separator=" or ">
+        (rcd.id = #{mistakeInfo.cpsrcdId,jdbcType=VARCHAR} and t.cpsgrp_id = #{mistakeInfo.cpsgrpId,jdbcType=VARCHAR})
     </foreach>
   </select>
 
@@ -355,6 +375,7 @@
       del_flg = 1
     where del_flg = 0 and user_id = #{userId,jdbcType=VARCHAR}
       and cpsrcd_id = #{cpsrcdId,jdbcType=VARCHAR}
+      and cpsgrp_id = #{cpsgrpId,jdbcType=VARCHAR}
   </update>
 
   <update id="addWrongNumByCpsrcdId">
@@ -364,6 +385,7 @@
       error_sum = error_sum + 1
     where del_flg = 0 and user_id = #{userId,jdbcType=VARCHAR}
       and cpsrcd_id = #{cpsrcdId,jdbcType=VARCHAR}
+      and cpsgrp_id = #{cpsgrpId,jdbcType=VARCHAR}
   </update>
 
   <select id="getQuestionType" resultType="java.lang.Integer">
