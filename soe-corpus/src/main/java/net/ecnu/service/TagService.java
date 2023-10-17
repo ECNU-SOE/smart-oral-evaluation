@@ -24,5 +24,6 @@ public interface TagService extends IService<TagDO> {
     Object addTagging(TaggingReq taggingReq);
     Object listEntityTags(String entityId);
     Object delTagging(TaggingReq taggingReq);
+    Object calWeight();
 
 }

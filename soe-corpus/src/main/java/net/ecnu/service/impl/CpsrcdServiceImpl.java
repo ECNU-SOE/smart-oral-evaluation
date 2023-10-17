@@ -74,7 +74,6 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
             CpsrcdDO finalCpsrcdDO = cpsrcdDO;
             cpsrcdReq.getTagIds().parallelStream().forEach(tagId -> {
                 int taggingRows = taggingMapper.insert(buildTaggingDO(tagId, finalCpsrcdDO.getId()));
-                double weight = updateWeight(tagId);
             });
         }
         //查询添加结果 返回数据
@@ -131,7 +130,6 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
             for (int j = 0; j < cpsrcdReq.getTagIds().size(); j++) {
                 Integer tagId = cpsrcdReq.getTagIds().get(j);
                 int insertNums = taggingMapper.insert(buildTaggingDO(tagId, cpsrcdReq.getId()));
-                double weight = updateWeight(tagId);
             }
         }
         //查询更新结果聚合cpsrcdDTO返回
@@ -166,10 +164,6 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
         //删除cpsrcdDO 与对应的 taggingDO 记录
         int delCpsrcds = cpsrcdMapper.deleteById(cpsrcdId);
         int delTaggings = taggingMapper.delete(new QueryWrapper<TaggingDO>().eq("entity_id", cpsrcdId));
-        //修改权重
-        List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>().eq("cpsrcd_id", cpsrcdId));
-        List<Integer> tagIds = taggingDOS.stream().map(TaggingDO::getTagId).collect(Collectors.toList());
-        tagIds.forEach(this::updateWeight);
         return delCpsrcds + delTaggings;
     }
 
@@ -203,22 +197,5 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
         return buildCpsrcdDTOByCpsrcdDO(cpsrcdDO);
     }
 
-    private double updateWeight(Integer tagId){
-        Integer total = taggingMapper.selectCount(null);
-        if (total == 0)
-            return 0 ;
-        Integer count = taggingMapper.selectCount(new QueryWrapper<TaggingDO>()
-                .eq("tag_id", tagId)
-        );
-        TagDO tagDO = tagMapper.selectById(tagId);
-        TagDO newTagDO = new TagDO();
-        BeanUtils.copyProperties(tagDO,newTagDO,"weight");
-        double result = count / (double)total;
-        DecimalFormat formatter = new DecimalFormat("#.0000");
-        double weight = Double.parseDouble(formatter.format(result));
-        newTagDO.setWeight(weight);
-        int updateid = tagMapper.updateById(newTagDO);
-        return weight;
-    }
 
 }

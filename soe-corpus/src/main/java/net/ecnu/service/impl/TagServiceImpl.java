@@ -10,7 +10,6 @@ import net.ecnu.mapper.TaggingMapper;
 import net.ecnu.model.TaggingDO;
 import net.ecnu.model.TagDO;
 import net.ecnu.mapper.TagMapper;
-import net.ecnu.model.UserDO;
 import net.ecnu.model.common.PageData;
 import net.ecnu.service.TagService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -109,8 +108,6 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
         TaggingDO taggingDO = new TaggingDO();
         BeanUtils.copyProperties(taggingReq, taggingDO);
         int i = taggingMapper.insert(taggingDO);
-        //修改权重
-        double weight = updateWeight(taggingReq.getTagId());
         return i;
 
     }
@@ -139,28 +136,38 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
         if (taggingDO==null)
             return "该实体所对应的标签不存在";
         int i = taggingMapper.deleteById(taggingDO.getId());
-        //修改权重
-        double weight = updateWeight(tagDO.getId());
         return "删除成功，共影响了"+i+"行";
     }
 
-    private double updateWeight(Integer tagId){
+    @Override
+    public Object calWeight() {
         Integer total = taggingMapper.selectCount(null);
         if (total == 0)
-            return 0 ;
+            return null;
+        List<TagDO> tagDOS = tagMapper.selectList(null);
+        tagDOS.forEach(this::updateTagWeight);
+        return "权重计算成功";
+    }
+
+
+    private void updateTagWeight(TagDO tagDO){
+        Integer total = taggingMapper.selectCount(null);
+        if (total == 0)
+            return ;
         Integer count = taggingMapper.selectCount(new QueryWrapper<TaggingDO>()
-                .eq("tag_id", tagId)
+                .eq("tag_id", tagDO.getId())
         );
-        TagDO tagDO = tagMapper.selectById(tagId);
         TagDO newTagDO = new TagDO();
         BeanUtils.copyProperties(tagDO,newTagDO,"weight");
         double result = count / (double)total;
         DecimalFormat formatter = new DecimalFormat("#.0000");
         double weight = Double.parseDouble(formatter.format(result));
         newTagDO.setWeight(weight);
-        int updateid = tagMapper.updateById(newTagDO);
-        return weight;
+        tagMapper.updateById(newTagDO);
     }
+
+
+
 
 
 }

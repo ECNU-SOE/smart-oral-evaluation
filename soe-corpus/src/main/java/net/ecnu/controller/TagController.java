@@ -70,5 +70,11 @@ public class TagController {
         Object data = tagService.delTagging(taggingReq);
         return JsonData.buildSuccess(data);
     }
+
+    @GetMapping("cal_weight")
+    public JsonData calWeight(){
+        Object data = tagService.calWeight();
+        return JsonData.buildSuccess(data);
+    }
 }
 
