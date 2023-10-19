@@ -15,10 +15,12 @@ import net.ecnu.service.TagService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -139,6 +141,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
         return "删除成功，共影响了"+i+"行";
     }
 
+    @Scheduled(fixedDelay = 1000*60*60*24)//每24h自动调用该方法，更新标签权重
     @Override
     public Object calWeight() {
         Integer total = taggingMapper.selectCount(null);

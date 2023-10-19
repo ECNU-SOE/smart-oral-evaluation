@@ -349,6 +349,7 @@
 		rcd.type AS type,
 		rcd.difficulty AS difficulty,
 		tc.score AS score,
+		tc.enable_pinyin AS enablePinYin,
 		rcd.pinyin AS pinyin,
 		rcd.ref_text AS refText,
 		rcd.audio_url AS audioUrl
