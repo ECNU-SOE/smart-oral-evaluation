@@ -61,12 +61,12 @@ public class CpsrcdManagerImpl implements CpsrcdManager {
         if(!Objects.isNull(cpsrcdFilter.getDifficultyEnd())){
             qw.le("difficulty",cpsrcdFilter.getDifficultyEnd());
         }
-
         //文本内容
         if(!StringUtils.isEmpty(cpsrcdFilter.getRefText())){
             qw.like("ref_text",cpsrcdFilter.getRefText());
         }
         qw.in("id",cpsrcdIds);
+        qw.orderByDesc("gmt_create");
         return cpsrcdMapper.selectPage(cpsrcdDOPage, qw);
     }
 
