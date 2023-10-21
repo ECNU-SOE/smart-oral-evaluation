@@ -8,6 +8,7 @@ import net.ecnu.model.vo.MistakeDetailVO;
 import net.ecnu.model.vo.MistakesVO;
 import net.ecnu.service.MistakeAudioService;
 import net.ecnu.util.JsonData;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -59,6 +60,10 @@ public class MistakeController {
      * **/
     @PostMapping("/answer")
     public JsonData answer(@RequestBody MistakeAnswerDto mistakeAnswer){
+        if (StringUtils.isEmpty(mistakeAnswer.getCpsrcdId())) {
+            return JsonData.buildError("cpsrcdId参数缺失");
+        }
+        mistakeAnswer.setCpsgrpId(StringUtils.isEmpty(mistakeAnswer.getCpsgrpId()) ? "" : mistakeAnswer.getCpsgrpId());
         MistakeAnswerVO mistakeAnswerVO = mistakeAudioService.checkAnswer(mistakeAnswer);
         return JsonData.buildSuccess(mistakeAnswerVO);
     }

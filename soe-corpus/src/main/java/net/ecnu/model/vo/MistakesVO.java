@@ -76,4 +76,9 @@ public class MistakesVO implements Serializable {
      */
     private String audioUrl;
 
+    /**
+     * tag列表
+     * **/
+    private List<String> tagList;
+
 }

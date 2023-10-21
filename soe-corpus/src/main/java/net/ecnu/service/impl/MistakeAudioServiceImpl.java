@@ -1,10 +1,12 @@
 package net.ecnu.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.enums.MistakeTypeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.mapper.MistakeAudioMapper;
+import net.ecnu.mapper.TaggingMapper;
 import net.ecnu.model.MistakeAudioDO;
 import net.ecnu.model.MistakeAudioDOExample;
 import net.ecnu.model.dto.MistakeAnswerDto;
@@ -16,14 +18,13 @@ import net.ecnu.model.vo.MistakeTypeVO;
 import net.ecnu.model.vo.MistakesVO;
 import net.ecnu.service.MistakeAudioService;
 import net.ecnu.util.RequestParamUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @description:
@@ -36,6 +37,8 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
 
     @Resource
     private MistakeAudioMapper mistakeAudioMapper;
+    @Resource
+    private TaggingMapper taggingMapper;
 
     @Value("${pass.rate}")
     private Double PASS_RATE;
@@ -132,8 +135,17 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
         //获取cpsrcd快照题目id
         List<MistakeInfoDto> mistakeInfoList = mistakeAudioMapper.getCpsrcdIdByUserIdAndMistakeType(currentAccountNo
                 ,mistakesDto.getMistakeTypeCode(),mistakesDto.getOneWeekKey());
+        /**有些题目是随机一题来的，没有cpsgrpId,需要区分开**/
         //查询对应的题目信息
         mistakesVOS = mistakeAudioMapper.getMistakesInfo(mistakeInfoList);
+
+        //获取题目对应的tag信息
+        for (MistakesVO mistakesVO : mistakesVOS) {
+            if (!StringUtils.isEmpty(mistakesVO.getCpsrcdId())){
+                List<String> tagList = taggingMapper.getTagInfoByCpsrcdId(mistakesVO.getCpsrcdId());
+                mistakesVO.setTagList(tagList);
+            }
+        }
         return mistakesVOS;
     }
 
@@ -141,21 +153,13 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
     public MistakeAnswerVO checkAnswer(MistakeAnswerDto mistakeAnswer) {
         MistakeAnswerVO mistakeAnswerVO = new MistakeAnswerVO();
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        Double resultRate = mistakeAnswer.getSuggestedScore() / mistakeAnswer.getQuestionScore();
-        if (resultRate >= PASS_RATE) {
-            //错题回答成功，将该错题逻辑删除，当数据量过大时，可手动删除数据库错题表中被逻辑删除数据
-            if (mistakeAudioMapper.cleanMistakeByCpsrcdId(currentAccountNo,mistakeAnswer.getCpsrcdId(),
-                    mistakeAnswer.getCpsgrpId()) <= 0) {
-                throw new BizException(BizCodeEnum.MISTAKE_CLEAN_ERROR);
-            }
+        MistakeInfoDto mistakeInfoDto = new MistakeInfoDto();
+        mistakeInfoDto.setCpsrcdId(mistakeAnswer.getCpsrcdId());
+        mistakeInfoDto.setCpsgrpId(mistakeAnswer.getCpsgrpId());
+        if (this.isAddInErrorBook(currentAccountNo, mistakeInfoDto, mistakeAnswer.getSuggestedScore(), mistakeAnswer.getQuestionScore())) {
             mistakeAnswerVO.setResultMsg("答对题目将从错题本移除");
             return mistakeAnswerVO;
         } else {
-            //错题回答失败，增加该错题错误次数
-            if (mistakeAudioMapper.addWrongNumByCpsrcdId(currentAccountNo, mistakeAnswer.getCpsrcdId(),
-                    mistakeAnswer.getCpsgrpId()) <= 0) {
-                throw new BizException(BizCodeEnum.MISTAKE_ADD_WRONG_NUM_ERROR);
-            }
             mistakeAnswerVO.setResultMsg("回答错误");
             return mistakeAnswerVO;
         }
@@ -181,13 +185,27 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
                 //没有查询到它的题目类型，则默认为0语音评测
                 questionType = 0;
             }
-            MistakeAudioDO record = new MistakeAudioDO();
-            record.setCreateTime(new Date()).setCpsrcdId(mistakeInfoDto.getCpsrcdId())
-                    .setCpsgrpId(mistakeInfoDto.getCpsgrpId()).setErrorSum(1)
-                    .setUserId(userId).setUpdateTime(new Date()).setMistakeType(questionType)
-                    .setDelFlg(false);
-            if (mistakeAudioMapper.insertSelective(record) <= 0) {
-                throw new BizException(BizCodeEnum.MISTAKE_ADD_ERROR);
+            /**查询是否已加入错题本**/
+            MistakeAudioDOExample mistakeAudioDOExample = new MistakeAudioDOExample();
+            mistakeAudioDOExample.createCriteria().andUserIdEqualTo(userId).andCpsrcdIdEqualTo(mistakeInfoDto.getCpsrcdId())
+                    .andDelFlgEqualTo(false);
+            List<MistakeAudioDO> mistakeAudioDOS = mistakeAudioMapper.selectByExample(mistakeAudioDOExample);
+            if (CollectionUtils.isEmpty(mistakeAudioDOS)) {
+                MistakeAudioDO record = new MistakeAudioDO();
+                record.setCreateTime(new Date()).setCpsrcdId(mistakeInfoDto.getCpsrcdId())
+                        .setCpsgrpId(mistakeInfoDto.getCpsgrpId()).setErrorSum(1)
+                        .setUserId(userId).setUpdateTime(new Date()).setMistakeType(questionType)
+                        .setDelFlg(false);
+                if (mistakeAudioMapper.insertSelective(record) <= 0) {
+                    throw new BizException(BizCodeEnum.MISTAKE_ADD_ERROR);
+                }
+            } else {
+                MistakeAudioDO mistakeAudioDO = mistakeAudioDOS.get(0);
+                //答题错误次数增加
+                mistakeAudioDO.setErrorSum(mistakeAudioDO.getErrorSum() + 1);
+                //更新时间
+                mistakeAudioDO.setUpdateTime(new Date());
+                mistakeAudioMapper.updateByPrimaryKey(mistakeAudioDO);
             }
             return false;
         }

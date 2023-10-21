@@ -325,7 +325,7 @@
 
   <select id="getCpsrcdIdByUserIdAndMistakeType" resultType="net.ecnu.model.dto.MistakeInfoDto">
     select
-      cpsgrp_id,
+      IFNULL(cpsgrp_id,''),
       cpsrcd_id
     from
       mistake_audio
@@ -341,8 +341,12 @@
     select
 		rcd.id AS cpsrcdId,
 		t.cpsgrp_id AS cpsgrpId,
-		CONCAT(grp.description,t.title,"第",tc.c_num,"题") AS description,
-		tc.topic_id AS topicId,
+        (CASE
+        WHEN (t.id IS NULL OR t.id = '')  THEN ''
+        ELSE
+            CONCAT(grp.description,t.title,"第",tc.c_num,"题")
+        END) AS description,
+		IFNULL(tc.topic_id,'') AS topicId,
 		t.title AS topicTitle,
 		tc.c_num AS cNum,
 		rcd.eval_mode AS evalModel,
@@ -364,8 +368,9 @@
     where
         rcd.del = 0
     and
-    <foreach collection="mistakeInfoList" item="mistakeInfo" open="(" close=")" separator=" or ">
-        (rcd.id = #{mistakeInfo.cpsrcdId,jdbcType=VARCHAR} and t.cpsgrp_id = #{mistakeInfo.cpsgrpId,jdbcType=VARCHAR})
+        rcd.id IN
+    <foreach collection="mistakeInfoList" item="mistakeInfo" open="(" close=")" separator=",">
+        #{mistakeInfo.cpsrcdId,jdbcType=VARCHAR}
     </foreach>
   </select>
 
