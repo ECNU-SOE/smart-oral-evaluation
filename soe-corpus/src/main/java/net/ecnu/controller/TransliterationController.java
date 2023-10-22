@@ -24,7 +24,7 @@ public class TransliterationController {
     private TransliterationService transliterationService;
 
     @GetMapping("/getTransliterationInfo")
-    public JsonData getTransliterationInfo(@RequestParam("audioTest") String audioText){
+    public JsonData getTransliterationInfo(@RequestParam("audioText") String audioText){
         if (StringUtils.isEmpty(audioText)) {
             return JsonData.buildError("缺少音译文本");
         }
