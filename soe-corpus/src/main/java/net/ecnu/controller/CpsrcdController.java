@@ -65,7 +65,7 @@ public class CpsrcdController {
 
     /**
      * 查询语料详情
-     * **/
+     */
     @GetMapping("/getCpsrcdDetail")
     public JsonData getCpsrcdDetail(@RequestParam("cpsrcdId") String cpsrcdId) {
         if (StringUtils.isEmpty(cpsrcdId)) {
@@ -75,6 +75,9 @@ public class CpsrcdController {
         return JsonData.buildSuccess(o);
     }
 
+    /**
+     * 随机一题
+     */
     @PostMapping("rand")
     public JsonData rand(@RequestBody CpsrcdFilterReq cpsrcdFilter) {
         Object data = cpsrcdService.random(cpsrcdFilter);

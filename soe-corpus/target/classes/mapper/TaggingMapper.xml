@@ -15,4 +15,15 @@
         id, tag_id, entity_id, entity_type
     </sql>
 
+    <select id="getTagInfoByCpsrcdId" resultType="java.lang.String">
+        select
+          t.name
+        from
+          tagging tagkey
+        INNER JOIN
+          tag t ON tagkey.tag_id = t.id
+        where
+          tagkey.entity_id = #{cpsrcdId,jdbcType=VARCHAR}
+    </select>
+
 </mapper>
