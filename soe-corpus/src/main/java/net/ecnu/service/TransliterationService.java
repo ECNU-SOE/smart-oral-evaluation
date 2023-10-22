@@ -1,5 +1,6 @@
 package net.ecnu.service;
 
+import net.ecnu.model.vo.TransliterationVO;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -33,5 +34,7 @@ public interface TransliterationService {
     int updateByPrimaryKeySelective(Transliteration record);
 
     int updateByPrimaryKey(Transliteration record);
+
+    TransliterationVO getTransliterationInfo(String audioText);
 }
 

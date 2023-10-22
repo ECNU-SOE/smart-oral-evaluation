@@ -1,8 +1,10 @@
 package net.ecnu.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import net.ecnu.mapper.TransliterationMapper;
 import net.ecnu.model.Transliteration;
 import net.ecnu.model.TransliterationExample;
+import net.ecnu.model.vo.TransliterationVO;
 import net.ecnu.service.TranscriptService;
 import net.ecnu.service.TransliterationService;
 import org.springframework.stereotype.Service;
@@ -68,6 +70,22 @@ public class TransliterationServiceImpl implements TransliterationService {
 
     public int updateByPrimaryKey(Transliteration record) {
         return transliterationMapper.updateByPrimaryKey(record);
+    }
+
+    @Override
+    public TransliterationVO getTransliterationInfo(String audioText) {
+        TransliterationVO transliterationVO = new TransliterationVO();
+        TransliterationExample transliterationExample = new TransliterationExample();
+        transliterationExample.createCriteria().andDelFlgEqualTo(false).andAudioTextEqualTo(audioText);
+        List<Transliteration> transliterations = transliterationMapper.selectByExample(transliterationExample);
+        if (CollectionUtil.isEmpty(transliterations)) {
+            return transliterationVO;
+        }
+        Transliteration transliteration = transliterations.get(0);
+        transliterationVO.setId(transliteration.getId().intValue());
+        transliterationVO.setAudioUrl(transliteration.getAudioUrl());
+        transliterationVO.setAudioText(audioText);
+        return transliterationVO;
     }
 
 }
