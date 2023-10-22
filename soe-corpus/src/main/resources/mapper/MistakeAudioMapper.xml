@@ -284,7 +284,7 @@
 
   <select id="selectMistakeTotal" resultType="java.lang.Integer">
     select
-      count(*)
+      count(DISTINCT cpsrcd_id)
     from
       mistake_audio
     where
@@ -293,7 +293,7 @@
 
   <select id="selectStubbornMistakeNumber" resultType="java.lang.Integer">
     select
-      count(*)
+      count(DISTINCT cpsrcd_id)
     from
       mistake_audio
     where user_id = #{userId,jdbcType=VARCHAR} and error_sum > 1 and  del_flg = 0
@@ -302,7 +302,7 @@
 
   <select id="selectEachMistakeTypeData" resultType="net.ecnu.model.vo.MistakeTypeVO">
     select
-      count(mistake_id) AS mistakeNum,
+      count(DISTINCT cpsrcd_id) AS mistakeNum,
       mistake_type AS mistakeTypeCode
     from
       mistake_audio
@@ -313,7 +313,7 @@
 
   <select id="selectEachMistakeTypeDataNearWeek" resultType="net.ecnu.model.vo.MistakeTypeVO">
     select
-      count(mistake_id) AS mistakeNum,
+      count(DISTINCT cpsrcd_id) AS mistakeNum,
       mistake_type AS mistakeTypeCode
     from
       mistake_audio
@@ -335,6 +335,7 @@
     <if test="oneWeekKey.intValue() != 0">
       and create_time BETWEEN DATE_SUB(NOW(), INTERVAL 7 DAY) AND NOW()
     </if>
+    group by cpsrcd_id
   </select>
 
   <select id="getMistakesInfo" resultType="net.ecnu.model.vo.MistakesVO">
@@ -372,6 +373,7 @@
     <foreach collection="mistakeInfoList" item="mistakeInfo" open="(" close=")" separator=",">
         #{mistakeInfo.cpsrcdId,jdbcType=VARCHAR}
     </foreach>
+    GROUP BY cpsrcdId
   </select>
 
   <update id="cleanMistakeByCpsrcdId">
