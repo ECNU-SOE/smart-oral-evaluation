@@ -3,6 +3,7 @@ package net.ecnu.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
 import net.ecnu.controller.request.CpsrcdFilterReq;
 import net.ecnu.controller.request.CpsrcdReq;
 import net.ecnu.enums.BizCodeEnum;
@@ -12,7 +13,6 @@ import net.ecnu.mapper.*;
 import net.ecnu.model.*;
 import net.ecnu.model.common.PageData;
 import net.ecnu.model.dto.CpsrcdDTO;
-import net.ecnu.model.vo.CpsrcdVO;
 import net.ecnu.service.CpsrcdService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.util.IDUtil;
@@ -21,10 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -59,7 +57,6 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     @Autowired
     private CpsgrpMapper cpsgrpMapper;
 
-
     @Override
     public Object add(CpsrcdReq cpsrcdReq) {
         //向cpsrcd表中插入新记录
@@ -93,14 +90,14 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     public Object pageByFilter(CpsrcdFilterReq cpsrcdFilter, Page<CpsrcdDO> cpsrcdDOPage) {
         PageData pageData = new PageData();
         List<String> cpsrcdIds = cpsrcdManager.getCpsrcdIdsByTagIds(cpsrcdFilter.getTagIds());
-        if (CollectionUtils.isEmpty(cpsrcdIds)){
+        if (CollectionUtils.isEmpty(cpsrcdIds)) {
             pageData.setSize(10);
             pageData.setTotal(0);
             pageData.setRecords(new ArrayList<>());
             pageData.setCurrent(1);
             return pageData;
         }
-        IPage<CpsrcdDO> cpsrcdDOIPage = cpsrcdManager.pageByFilter(cpsrcdFilter, cpsrcdDOPage,cpsrcdIds);
+        IPage<CpsrcdDO> cpsrcdDOIPage = cpsrcdManager.pageByFilter(cpsrcdFilter, cpsrcdDOPage, cpsrcdIds);
         List<CpsrcdDO> cpsrcdDOS = cpsrcdDOIPage.getRecords();
         List<CpsrcdDTO> cpsrcdDTOS = cpsrcdDOS.stream().map(this::buildCpsrcdDTOByCpsrcdDO).collect(Collectors.toList());
         BeanUtils.copyProperties(cpsrcdDOIPage, pageData);
@@ -113,11 +110,11 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
         CpsrcdDO cpsrcdDO = cpsrcdMapper.selectById(cpsrcdReq.getId());
         if (cpsrcdDO == null) throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
         List<TopicCpsDO> topicCpsDOS = topicCpsMapper.selectList(new QueryWrapper<TopicCpsDO>().eq("cpsrcd_id", cpsrcdReq.getId()));
-        if (!CollectionUtils.isEmpty(topicCpsDOS)){
+        if (!CollectionUtils.isEmpty(topicCpsDOS)) {
             List<String> topicIds = topicCpsDOS.stream().map(TopicCpsDO::getTopicId).collect(Collectors.toList());
             List<TopicDO> topicDOS = topicMapper.selectBatchIds(topicIds);
             List<String> cpsgrpIds = topicDOS.stream().map(TopicDO::getCpsgrpId).collect(Collectors.toList());
-            return "修改失败，语料正被:"+cpsgrpIds.stream().distinct().collect(Collectors.toList())+"使用";
+            return "修改失败，语料正被:" + cpsgrpIds.stream().distinct().collect(Collectors.toList()) + "使用";
         }
         //更新cpsrcdDO 全量更新 但不会更新null值
         BeanUtils.copyProperties(cpsrcdReq, cpsrcdDO);
@@ -154,12 +151,14 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     public Object del(String cpsrcdId) {
         CpsrcdDO cpsrcdDO = cpsrcdMapper.selectById(cpsrcdId);
         if (cpsrcdDO == null) throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
+        //校验是否有语料组在使用
         List<TopicCpsDO> topicCpsDOS = topicCpsMapper.selectList(new QueryWrapper<TopicCpsDO>().eq("cpsrcd_id", cpsrcdId));
-        if (!CollectionUtils.isEmpty(topicCpsDOS)){
-            List<String> topicIds = topicCpsDOS.stream().map(TopicCpsDO::getTopicId).collect(Collectors.toList());
-            List<TopicDO> topicDOS = topicMapper.selectBatchIds(topicIds);
-            List<String> cpsgrpIds = topicDOS.stream().map(TopicDO::getCpsgrpId).collect(Collectors.toList());
-            return "删除失败，语料正被:"+cpsgrpIds.stream().distinct().collect(Collectors.toList())+"使用";
+        if (!CollectionUtils.isEmpty(topicCpsDOS)) {
+//            List<String> topicIds = topicCpsDOS.stream().map(TopicCpsDO::getTopicId).distinct().collect(Collectors.toList());
+//            List<TopicDO> topicDOS = topicMapper.selectBatchIds(topicIds);
+//            List<String> cpsgrpIds = topicDOS.stream().map(TopicDO::getCpsgrpId).collect(Collectors.toList());
+//            List<CpsgrpDO> cpsgrpDOS = cpsgrpMapper.selectBatchIds(cpsgrpIds);
+            throw new BizException(BizCodeEnum.CPSRCD_IS_USING);
         }
         //删除cpsrcdDO 与对应的 taggingDO 记录
         int delCpsrcds = cpsrcdMapper.deleteById(cpsrcdId);
@@ -170,8 +169,7 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     @Override
     public Object getCpsrcdDetail(String cpsrcdId) {
         CpsrcdDO cpsrcdDO = cpsrcdMapper.selectById(cpsrcdId);
-        if (cpsrcdDO==null)
-            throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
+        if (cpsrcdDO == null) throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
         CpsrcdDTO cpsrcdDTO = buildCpsrcdDTOByCpsrcdDO(cpsrcdDO);
         List<TopicCpsDO> count = topicCpsMapper.selectList(new QueryWrapper<TopicCpsDO>()
                 .eq("cpsrcd_id", cpsrcdId)
@@ -183,16 +181,16 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     @Override
     public Object random(CpsrcdFilterReq cpsrcdFilterReq) {
         QueryWrapper<CpsrcdDO> qw = new QueryWrapper<>();
-        if (!CollectionUtils.isEmpty(cpsrcdFilterReq.getTagIds())){
+        if (!CollectionUtils.isEmpty(cpsrcdFilterReq.getTagIds())) {
             List<String> cpsrcdIds = cpsrcdManager.getCpsrcdIdsByTagIds(cpsrcdFilterReq.getTagIds());
             if (CollectionUtils.isEmpty(cpsrcdIds))
                 throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
-            qw.in("id",cpsrcdIds);
+            qw.in("id", cpsrcdIds);
         }
         List<CpsrcdDO> cpsrcdDOS = cpsrcdMapper.selectList(qw);
         if (CollectionUtils.isEmpty(cpsrcdDOS))
             throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
-        int index = (int) (Math.random()* cpsrcdDOS.size());
+        int index = (int) (Math.random() * cpsrcdDOS.size());
         CpsrcdDO cpsrcdDO = cpsrcdDOS.get(index);
         return buildCpsrcdDTOByCpsrcdDO(cpsrcdDO);
     }

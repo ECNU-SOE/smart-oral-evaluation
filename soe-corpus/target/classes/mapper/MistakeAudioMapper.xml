@@ -284,7 +284,7 @@
 
   <select id="selectMistakeTotal" resultType="java.lang.Integer">
     select
-      count(*)
+      count(DISTINCT cpsrcd_id)
     from
       mistake_audio
     where
@@ -293,7 +293,7 @@
 
   <select id="selectStubbornMistakeNumber" resultType="java.lang.Integer">
     select
-      count(*)
+      count(DISTINCT cpsrcd_id)
     from
       mistake_audio
     where user_id = #{userId,jdbcType=VARCHAR} and error_sum > 1 and  del_flg = 0
@@ -302,7 +302,7 @@
 
   <select id="selectEachMistakeTypeData" resultType="net.ecnu.model.vo.MistakeTypeVO">
     select
-      count(mistake_id) AS mistakeNum,
+      count(DISTINCT cpsrcd_id) AS mistakeNum,
       mistake_type AS mistakeTypeCode
     from
       mistake_audio
@@ -313,7 +313,7 @@
 
   <select id="selectEachMistakeTypeDataNearWeek" resultType="net.ecnu.model.vo.MistakeTypeVO">
     select
-      count(mistake_id) AS mistakeNum,
+      count(DISTINCT cpsrcd_id) AS mistakeNum,
       mistake_type AS mistakeTypeCode
     from
       mistake_audio
@@ -325,7 +325,7 @@
 
   <select id="getCpsrcdIdByUserIdAndMistakeType" resultType="net.ecnu.model.dto.MistakeInfoDto">
     select
-      cpsgrp_id,
+      IFNULL(cpsgrp_id,''),
       cpsrcd_id
     from
       mistake_audio
@@ -335,14 +335,19 @@
     <if test="oneWeekKey.intValue() != 0">
       and create_time BETWEEN DATE_SUB(NOW(), INTERVAL 7 DAY) AND NOW()
     </if>
+    group by cpsrcd_id
   </select>
 
   <select id="getMistakesInfo" resultType="net.ecnu.model.vo.MistakesVO">
     select
 		rcd.id AS cpsrcdId,
 		t.cpsgrp_id AS cpsgrpId,
-		CONCAT(grp.description,t.title,"第",tc.c_num,"题") AS description,
-		tc.topic_id AS topicId,
+        (CASE
+        WHEN (t.id IS NULL OR t.id = '')  THEN ''
+        ELSE
+            CONCAT(grp.description,t.title,"第",tc.c_num,"题")
+        END) AS description,
+		IFNULL(tc.topic_id,'') AS topicId,
 		t.title AS topicTitle,
 		tc.c_num AS cNum,
 		rcd.eval_mode AS evalModel,
@@ -364,9 +369,11 @@
     where
         rcd.del = 0
     and
-    <foreach collection="mistakeInfoList" item="mistakeInfo" open="(" close=")" separator=" or ">
-        (rcd.id = #{mistakeInfo.cpsrcdId,jdbcType=VARCHAR} and t.cpsgrp_id = #{mistakeInfo.cpsgrpId,jdbcType=VARCHAR})
+        rcd.id IN
+    <foreach collection="mistakeInfoList" item="mistakeInfo" open="(" close=")" separator=",">
+        #{mistakeInfo.cpsrcdId,jdbcType=VARCHAR}
     </foreach>
+    GROUP BY cpsrcdId
   </select>
 
   <update id="cleanMistakeByCpsrcdId">

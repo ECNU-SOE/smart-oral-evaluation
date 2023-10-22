@@ -1,11 +1,7 @@
 package net.ecnu.model.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import net.ecnu.model.TagDO;
 
 import java.io.Serializable;
@@ -23,7 +19,6 @@ import java.util.List;
 @Data
 public class CpsrcdDTO implements Serializable {
 
-    private static final long serialVersionUID = 1L;
 
     /**
      * 主键id
@@ -60,6 +55,9 @@ public class CpsrcdDTO implements Serializable {
      */
     private String audioUrl;
 
+    /**
+     * 语料组使用频次
+     */
     private Integer usedBy;
 
     /**
