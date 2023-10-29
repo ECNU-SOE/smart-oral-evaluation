@@ -13,7 +13,6 @@ public class CpsrcdFilterReq {
      */
     private String type;
 
-
     /**
      * 起始难度
      */

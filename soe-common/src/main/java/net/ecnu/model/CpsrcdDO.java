@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 
 import java.io.Serializable;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -19,7 +18,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author LYW
- * @since 2023-09-29
+ * @since 2023-10-29
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -60,6 +59,11 @@ public class CpsrcdDO implements Serializable {
     private String refText;
 
     /**
+     * 文本对齐方式：-1左对齐、0居中、1右对齐、2两端对齐
+     */
+    private Integer textAlign;
+
+    /**
      * 示范音频播放url
      */
     private String audioUrl;
@@ -72,13 +76,11 @@ public class CpsrcdDO implements Serializable {
     /**
      * 创建时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date gmtCreate;
 
     /**
      * 更新时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date gmtModified;
 
 

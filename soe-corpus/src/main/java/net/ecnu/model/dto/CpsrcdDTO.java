@@ -19,7 +19,6 @@ import java.util.List;
 @Data
 public class CpsrcdDTO implements Serializable {
 
-
     /**
      * 主键id
      */
@@ -49,6 +48,11 @@ public class CpsrcdDTO implements Serializable {
      * 语料文本内容
      */
     private String refText;
+
+    /**
+     * 文本对齐方式：-1左对齐、0居中、1右对齐、2两端对齐
+     */
+    private Integer textAlign;
 
     /**
      * 示范音频播放url

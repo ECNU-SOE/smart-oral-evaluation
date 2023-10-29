@@ -10,6 +10,7 @@
         <result column="difficulty" property="difficulty" />
         <result column="pinyin" property="pinyin" />
         <result column="ref_text" property="refText" />
+        <result column="text_align" property="textAlign" />
         <result column="audio_url" property="audioUrl" />
         <result column="del" property="del" />
         <result column="gmt_create" property="gmtCreate" />
@@ -18,7 +19,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, type, eval_mode, difficulty, pinyin, ref_text, audio_url, del, gmt_create, gmt_modified
+        id, type, eval_mode, difficulty, pinyin, ref_text, text_align, audio_url, del, gmt_create, gmt_modified
     </sql>
 
 </mapper>

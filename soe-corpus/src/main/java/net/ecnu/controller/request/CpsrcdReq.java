@@ -47,6 +47,11 @@ public class CpsrcdReq {
     private String refText;
 
     /**
+     * 文本对齐方式：-1左对齐、0居中、1右对齐、2两端对齐
+     */
+    private Integer textAlign;
+
+    /**
      * 示范音频播放url
      */
     private String audioUrl;

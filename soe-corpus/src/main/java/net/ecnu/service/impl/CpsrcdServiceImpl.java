@@ -23,6 +23,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -109,12 +110,10 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     public Object mod(CpsrcdReq cpsrcdReq) {
         CpsrcdDO cpsrcdDO = cpsrcdMapper.selectById(cpsrcdReq.getId());
         if (cpsrcdDO == null) throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
+        //校验如果有语料组正在使用，不允许更新文本refText
         List<TopicCpsDO> topicCpsDOS = topicCpsMapper.selectList(new QueryWrapper<TopicCpsDO>().eq("cpsrcd_id", cpsrcdReq.getId()));
-        if (!CollectionUtils.isEmpty(topicCpsDOS)) {
-            List<String> topicIds = topicCpsDOS.stream().map(TopicCpsDO::getTopicId).collect(Collectors.toList());
-            List<TopicDO> topicDOS = topicMapper.selectBatchIds(topicIds);
-            List<String> cpsgrpIds = topicDOS.stream().map(TopicDO::getCpsgrpId).collect(Collectors.toList());
-            return "修改失败，语料正被:" + cpsgrpIds.stream().distinct().collect(Collectors.toList()) + "使用";
+        if (!CollectionUtils.isEmpty(topicCpsDOS) && !Objects.equals(cpsrcdReq.getRefText(), cpsrcdDO.getRefText())) {
+            throw new BizException(BizCodeEnum.CPSRCD_IS_USING);
         }
         //更新cpsrcdDO 全量更新 但不会更新null值
         BeanUtils.copyProperties(cpsrcdReq, cpsrcdDO);
@@ -129,6 +128,7 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
                 int insertNums = taggingMapper.insert(buildTaggingDO(tagId, cpsrcdReq.getId()));
             }
         }
+
         //查询更新结果聚合cpsrcdDTO返回
         cpsrcdDO = cpsrcdMapper.selectById(cpsrcdDO.getId());
         CpsrcdDTO cpsrcdDTO = buildCpsrcdDTOByCpsrcdDO(cpsrcdDO);
@@ -138,6 +138,7 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     private CpsrcdDTO buildCpsrcdDTOByCpsrcdDO(CpsrcdDO cpsrcdDO) {
         CpsrcdDTO cpsrcdDTO = new CpsrcdDTO();
         BeanUtils.copyProperties(cpsrcdDO, cpsrcdDTO);
+        //聚合题目标签
         List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>().eq("entity_id", cpsrcdDO.getId()));
         if (!CollectionUtils.isEmpty(taggingDOS)) {
             List<TagDO> tagDOs = tagMapper.selectList(new QueryWrapper<TagDO>()
