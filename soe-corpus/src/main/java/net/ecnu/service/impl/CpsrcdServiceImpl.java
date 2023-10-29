@@ -3,7 +3,6 @@ package net.ecnu.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import lombok.extern.slf4j.Slf4j;
 import net.ecnu.controller.request.CpsrcdFilterReq;
 import net.ecnu.controller.request.CpsrcdReq;
 import net.ecnu.enums.BizCodeEnum;
@@ -21,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -44,9 +42,6 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     private CpsrcdMapper cpsrcdMapper;
 
     @Autowired
-    private TopicMapper topicMapper;
-
-    @Autowired
     private TopicCpsMapper topicCpsMapper;
 
     @Autowired
@@ -54,9 +49,6 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
 
     @Autowired
     private TaggingMapper taggingMapper;
-
-    @Autowired
-    private CpsgrpMapper cpsgrpMapper;
 
     @Override
     public Object add(CpsrcdReq cpsrcdReq) {
@@ -89,18 +81,17 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
 
     @Override
     public Object pageByFilter(CpsrcdFilterReq cpsrcdFilter, Page<CpsrcdDO> cpsrcdDOPage) {
-        PageData pageData = new PageData();
-        List<String> cpsrcdIds = cpsrcdManager.getCpsrcdIdsByTagIds(cpsrcdFilter.getTagIds());
-        if (CollectionUtils.isEmpty(cpsrcdIds)) {
-            pageData.setSize(10);
-            pageData.setTotal(0);
-            pageData.setRecords(new ArrayList<>());
-            pageData.setCurrent(1);
-            return pageData;
+        //tagIds不为空，过滤查询包含tagId的cpsrcd
+        if (!CollectionUtils.isEmpty(cpsrcdFilter.getTagIds())) {
+            List<String> cpsrcdIds = cpsrcdManager.getCpsrcdIdsByTagIds(cpsrcdFilter.getTagIds());//TODO 非常耗时 可以优化
+            cpsrcdFilter.setCpsrcdIds(cpsrcdIds); //设置cpsrcdIds的查询范围
+            if (CollectionUtils.isEmpty(cpsrcdIds)) return new PageData(1, 10);
         }
-        IPage<CpsrcdDO> cpsrcdDOIPage = cpsrcdManager.pageByFilter(cpsrcdFilter, cpsrcdDOPage, cpsrcdIds);
+        IPage<CpsrcdDO> cpsrcdDOIPage = cpsrcdManager.pageByFilter(cpsrcdFilter, cpsrcdDOPage);
         List<CpsrcdDO> cpsrcdDOS = cpsrcdDOIPage.getRecords();
-        List<CpsrcdDTO> cpsrcdDTOS = cpsrcdDOS.stream().map(this::buildCpsrcdDTOByCpsrcdDO).collect(Collectors.toList());
+        List<CpsrcdDTO> cpsrcdDTOS = cpsrcdDOS.parallelStream().map(this::buildCpsrcdDTOByCpsrcdDO).collect(Collectors.toList());
+        //聚合返回数据
+        PageData pageData = new PageData();
         BeanUtils.copyProperties(cpsrcdDOIPage, pageData);
         pageData.setRecords(cpsrcdDTOS);
         return pageData;
@@ -145,6 +136,9 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
                     .in("id", taggingDOS.stream().map(TaggingDO::getTagId).collect(Collectors.toList())));
             cpsrcdDTO.setTags(tagDOs);
         }
+        //统计使用频次
+        Integer cnt = topicCpsMapper.selectCount(new QueryWrapper<TopicCpsDO>().eq("cpsrcd_id", cpsrcdDO.getId()));
+        cpsrcdDTO.setUsageCnt(cnt);
         return cpsrcdDTO;
     }
 
@@ -175,7 +169,7 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
         List<TopicCpsDO> count = topicCpsMapper.selectList(new QueryWrapper<TopicCpsDO>()
                 .eq("cpsrcd_id", cpsrcdId)
         );
-        cpsrcdDTO.setUsedBy(count.size());
+        cpsrcdDTO.setUsageCnt(count.size());
         return cpsrcdDTO;
     }
 

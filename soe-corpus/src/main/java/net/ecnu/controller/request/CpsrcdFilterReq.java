@@ -6,7 +6,11 @@ import java.util.List;
 
 @Data
 public class CpsrcdFilterReq {
-
+    
+    /**
+     * cpsrcdIds,限制cpsrcdId的查询范围
+     */
+    private List<String> cpsrcdIds;
 
     /**
      * 语料类型

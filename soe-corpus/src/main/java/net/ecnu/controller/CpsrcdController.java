@@ -26,7 +26,7 @@ public class CpsrcdController {
     private CpsrcdService cpsrcdService;
 
     /**
-     * 添加题目原型
+     * 添加语料原型
      */
     @PostMapping("add")
     public JsonData add(@RequestBody @Validated(Create.class) CpsrcdReq cpsrcdReq) {
@@ -35,7 +35,7 @@ public class CpsrcdController {
     }
 
     /**
-     * 查询题目列表cpsrcd
+     * 查询语料列表cpsrcd
      */
     @PostMapping("list")
     public JsonData list(@RequestParam(value = "cur", defaultValue = "1") int cur,

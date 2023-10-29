@@ -60,9 +60,9 @@ public class CpsrcdDTO implements Serializable {
     private String audioUrl;
 
     /**
-     * 语料组使用频次
+     * 语料cpsrcd使用频次
      */
-    private Integer usedBy;
+    private Integer usageCnt;
 
     /**
      * tags
