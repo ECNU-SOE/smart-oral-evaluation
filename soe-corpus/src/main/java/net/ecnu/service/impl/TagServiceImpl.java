@@ -82,7 +82,7 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
 
     @Override
     public Object list(TagFilterReq tagFilterReq, PageData pageData) {
-        if (tagFilterReq.getIds()==null||tagFilterReq.getIds().size()==0){
+        if (CollectionUtils.isEmpty(tagFilterReq.getIds())){
             //条件查询
             List<TagDO> tagDOS = tagManager.pageByFilter(tagFilterReq,pageData);
             int total = tagManager.countByFilter(tagFilterReq);
