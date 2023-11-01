@@ -29,4 +29,13 @@
         account_no, identify_id, nick_name, real_name, avatar_url, first_language, sex, birth, sign, phone, mail, pwd, secret, del, gmt_create, gmt_modified, enabled, org_id
     </sql>
 
+    <select id="selectOneByPhone" resultMap="BaseResultMap">
+        select
+          <include refid="Base_Column_List"/>
+        from
+          user
+        where
+          phone = #{phone,jdbcType=VARCHAR} and del = 0
+    </select>
+
 </mapper>

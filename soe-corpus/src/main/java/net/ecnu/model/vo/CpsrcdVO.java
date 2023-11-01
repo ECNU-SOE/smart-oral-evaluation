@@ -30,7 +30,6 @@ public class CpsrcdVO implements Serializable {
      * 所属题型id
      */
     private String topicId;
-    private String cpsgrpId;
 
     /**
      * cpsrcd次序
@@ -87,8 +86,6 @@ public class CpsrcdVO implements Serializable {
      * 题目标签
      */
     private List<String> tags;
-
-    private Integer usedBy;
 
     /**
      * 创建时间

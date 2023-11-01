@@ -119,11 +119,12 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         List<TopicCpsDO> topicCpsDOS = topicCpsMapper.selectList(new QueryWrapper<TopicCpsDO>()
                 .in("topic_id", topicDOS.parallelStream().map(TopicDO::getId).collect(Collectors.toList())));
         if (CollectionUtils.isEmpty(topicCpsDOS)) return cpsgrpVO;    //没有子题，返回cpsgrp
-        List<CpsrcdVO> cpsrcdVOS = topicCpsDOS.parallelStream().map(this::beanProcess).collect(Collectors.toList());
+        List<CpsrcdVO> cpsrcdVOS = topicCpsDOS.parallelStream().map(this::beanProcess).filter(Objects::nonNull)
+                .collect(Collectors.toList());
         //聚合cpsrcd子题到topic大题中
         topicVOS.forEach(topicVO -> {
-            List<CpsrcdVO> subCpsrcdVOs = cpsrcdVOS.stream().filter(
-                    cpsrcdVO -> cpsrcdVO.getTopicId().equals(topicVO.getId())).collect(Collectors.toList());
+            List<CpsrcdVO> subCpsrcdVOs = cpsrcdVOS.stream().filter(cpsrcdVO -> cpsrcdVO.getTopicId()
+                    .equals(topicVO.getId())).collect(Collectors.toList());
             topicVO.setSubCpsrcds(subCpsrcdVOs);
         });
         return cpsgrpVO;
@@ -132,58 +133,20 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
 
     @Override
     public Object pageByFilter(CpsgrpFilterReq cpsgrpFilter, PageData pageData) {
-        if (!ObjectUtils.isEmpty(cpsgrpFilter.getClassId())) {
-//            Date date = new Date();
-//            SimpleDateFormat now = new SimpleDateFormat("YYYY-mm-dd HH:mm:ss");
-            LocalDateTime now = LocalDateTime.now();
-            //查询班级下的语料组 仅classId字段有效 返回所有isPrivate=0的记录（无分页）
-            //TODO 考虑gmtCreate与gmtModified以那个为准
-            List<ClassCpsgrpDO> classCpsgrpDOS = classCpsgrpMapper.selectList(new QueryWrapper<ClassCpsgrpDO>()
-                    .eq("class_id", cpsgrpFilter.getClassId())
-                    .gt(cpsgrpFilter.getStatus() != null && cpsgrpFilter.getStatus() == 1, "start_time", now)
-                    .lt(cpsgrpFilter.getStatus() != null && cpsgrpFilter.getStatus() == 3, "end_time", now)
-                    .lt(cpsgrpFilter.getStatus() != null && cpsgrpFilter.getStatus() == 2, "start_time", now)
-                    .gt(cpsgrpFilter.getStatus() != null && cpsgrpFilter.getStatus() == 2, "end_time", now)
-            );
-            if (classCpsgrpDOS.size() == 0) {
-                pageData.setSize(0);
-                List<CpsgrpVO> cpsgrpVOS = new ArrayList<>();
-                pageData.setRecords(cpsgrpVOS);
-                return pageData;
-            }
-            Map<String, ClassCpsgrpDO> cpsgrpIdMap = classCpsgrpDOS.stream().collect(
-                    Collectors.toMap(ClassCpsgrpDO::getCpsgrpId, item -> item));
-            //查询cpsgrpDO列表 TODO 过滤出isPrivate=0的cpsgrpDO
-            List<String> cpsgrpIds = classCpsgrpDOS.stream().map(ClassCpsgrpDO::getCpsgrpId).collect(Collectors.toList());
-            List<CpsgrpDO> cpsgrpDOS = cpsgrpMapper.selectBatchIds(cpsgrpIds);
-//            List<CpsgrpDO> cpsgrpDOS = cpsgrpMapper.selectList(
-//                    new QueryWrapper<CpsgrpDO>().in("id", cpsgrpIds).eq("is_private", 0));
-            //拷贝classCpsgrpDO的内容到cpsgrpVO中去
-            List<CpsgrpVO> cpsgrpVOS = cpsgrpDOS.stream().map(this::beanProcess).collect(Collectors.toList());
-            cpsgrpVOS.forEach(cpsgrpVO -> BeanUtils.copyProperties(
-                    cpsgrpIdMap.get(cpsgrpVO.getId()), cpsgrpVO, "gmtCreate", "gmtModified")
-            );
-            pageData.setRecords(cpsgrpVOS);
+        //查询语料组列表->生成处理cpsgrpVOS对象
+        List<CpsgrpDO> cpsgrpDOS = cpsgrpManager.listByFilter(cpsgrpFilter, pageData);
+        int totalCount = cpsgrpManager.countByFilter(cpsgrpFilter);
+        List<CpsgrpVO> cpsgrpVOS = cpsgrpDOS.stream().map(this::beanProcess).collect(Collectors.toList());
 
+        //查询当前语料组被几个所班级使用
+        cpsgrpVOS.forEach(cpsgrpVO -> {
+            Integer classCnt = classCpsgrpMapper.selectCount(new QueryWrapper<ClassCpsgrpDO>().eq("cpsgrp_id", cpsgrpVO.getId()));
+            cpsgrpVO.setReleaseStatus(classCnt);
+        });
 
-        } else {
-            //查询所有语料组
-            List<CpsgrpDO> cpsgrpDOS = cpsgrpManager.listByFilter(cpsgrpFilter, pageData);
-            //统计过滤后的记录总数
-            int totalCount = cpsgrpManager.countByFilter(cpsgrpFilter);
-            pageData.setTotal(totalCount);
-            //生成处理cpsgrpVOS对象
-            List<CpsgrpVO> cpsgrpVOS = cpsgrpDOS.stream().map(this::beanProcess).collect(Collectors.toList());
-//            List<String> userIds = cpsgrpVOS.stream().map(CpsgrpVO::getCreator).distinct().collect(Collectors.toList());
-            //查询当前语料组被几个所班级使用
-            cpsgrpVOS.forEach(cpsgrpVO -> {
-                Integer classCnt = classCpsgrpMapper.selectCount(
-                        new QueryWrapper<ClassCpsgrpDO>().eq("cpsgrp_id", cpsgrpVO.getId()));
-                cpsgrpVO.setReleaseStatus(classCnt);
-            });
-            pageData.setRecords(cpsgrpVOS);
-        }
         //TODO feign远程调用 获取userIds的user信息，将creator用realName进行展示
+        pageData.setRecords(cpsgrpVOS);
+        pageData.setTotal(totalCount);
         return pageData;
     }
 
@@ -293,6 +256,7 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
     public CpsrcdVO beanProcess(TopicCpsDO topicCpsDO) {
         CpsrcdVO cpsrcdVO = new CpsrcdVO();
         CpsrcdDO cpsrcdDO = cpsrcdMapper.selectById(topicCpsDO.getCpsrcdId());
+        if (cpsrcdDO == null) return null; //过滤掉已删除的题目
         BeanUtils.copyProperties(cpsrcdDO, cpsrcdVO);
 
         //聚合topicCpsDO类
@@ -303,17 +267,13 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         cpsrcdVO.setDescription(topicCpsDO.getDescription());
 
         //tags单独处理String->List<String>
-        List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>()
-                .eq("entity_id", cpsrcdDO.getId())
-        );
+        List<TaggingDO> taggingDOS = taggingMapper.selectList(new QueryWrapper<TaggingDO>().eq("entity_id", cpsrcdDO.getId()));
         if (taggingDOS.size() != 0) {
             List<Integer> tagIds = taggingDOS.stream().map(TaggingDO::getTagId).collect(Collectors.toList());
             List<TagDO> tagDOS = tagMapper.selectBatchIds(tagIds);
             List<String> tagNames = tagDOS.stream().map(TagDO::getName).collect(Collectors.toList());
             cpsrcdVO.setTags(tagNames);
         }
-//        List<String> tags = JSONUtil.parseArray(cpsrcdDO.getTags()).toList(String.class);
-//        cpsrcdVO.setTags(tags);
         return cpsrcdVO;
     }
 

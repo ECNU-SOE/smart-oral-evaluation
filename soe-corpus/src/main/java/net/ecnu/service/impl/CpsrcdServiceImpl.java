@@ -55,16 +55,15 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
         //向cpsrcd表中插入新记录
         CpsrcdDO cpsrcdDO = new CpsrcdDO();
         BeanUtils.copyProperties(cpsrcdReq, cpsrcdDO);
-        cpsrcdDO.setId(IDUtil.nextCpsrcdId());
+        String cpsrcdId = IDUtil.nextCpsrcdId();
+        cpsrcdDO.setId(cpsrcdId);
         cpsrcdDO.setDel(false);
-        int insert = cpsrcdMapper.insert(cpsrcdDO);
+        int rows = cpsrcdMapper.insert(cpsrcdDO);
         cpsrcdDO = cpsrcdMapper.selectById(cpsrcdDO.getId());
         //tagIds不为空 -> 添加标签
         if (!CollectionUtils.isEmpty(cpsrcdReq.getTagIds())) {
-            CpsrcdDO finalCpsrcdDO = cpsrcdDO;
-            cpsrcdReq.getTagIds().parallelStream().forEach(tagId -> {
-                int taggingRows = taggingMapper.insert(buildTaggingDO(tagId, finalCpsrcdDO.getId()));
-            });
+            cpsrcdReq.getTagIds().forEach(tagId -> taggingMapper.insert(buildTaggingDO(tagId, cpsrcdId)));
+            rows += cpsrcdReq.getTagIds().size();
         }
         //查询添加结果 返回数据
         CpsrcdDTO cpsrcdDTO = buildCpsrcdDTOByCpsrcdDO(cpsrcdDO);
@@ -149,10 +148,6 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
         //校验是否有语料组在使用
         List<TopicCpsDO> topicCpsDOS = topicCpsMapper.selectList(new QueryWrapper<TopicCpsDO>().eq("cpsrcd_id", cpsrcdId));
         if (!CollectionUtils.isEmpty(topicCpsDOS)) {
-//            List<String> topicIds = topicCpsDOS.stream().map(TopicCpsDO::getTopicId).distinct().collect(Collectors.toList());
-//            List<TopicDO> topicDOS = topicMapper.selectBatchIds(topicIds);
-//            List<String> cpsgrpIds = topicDOS.stream().map(TopicDO::getCpsgrpId).collect(Collectors.toList());
-//            List<CpsgrpDO> cpsgrpDOS = cpsgrpMapper.selectBatchIds(cpsgrpIds);
             throw new BizException(BizCodeEnum.CPSRCD_IS_USING);
         }
         //删除cpsrcdDO 与对应的 taggingDO 记录

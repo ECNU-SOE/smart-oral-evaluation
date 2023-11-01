@@ -29,7 +29,6 @@ public class CpsgrpDO implements Serializable {
     @TableId(value = "id", type = IdType.NONE)
     private String id;
 
-
     /**
      * 语料组名称
      */
@@ -55,6 +54,9 @@ public class CpsgrpDO implements Serializable {
      */
     private Integer modStatus;
 
+    /**
+     * TODO标签
+     */
     private String tags;
 
     /**

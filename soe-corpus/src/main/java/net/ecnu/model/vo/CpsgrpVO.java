@@ -26,11 +26,6 @@ public class CpsgrpVO implements Serializable {
     private String id;
 
     /**
-     * 所属班级id
-     */
-    private String classId;
-
-    /**
      * 语料组名称
      */
     private String title;
@@ -65,6 +60,9 @@ public class CpsgrpVO implements Serializable {
      */
     private Integer modStatus;
 
+    /**
+     * 语料组标签列表
+     */
     private String tags;
 
     /**
