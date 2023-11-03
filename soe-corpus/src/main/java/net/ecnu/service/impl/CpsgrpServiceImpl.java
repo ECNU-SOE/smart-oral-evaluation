@@ -1,5 +1,6 @@
 package net.ecnu.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import net.ecnu.controller.request.CpsgrpReq;
 import net.ecnu.controller.request.CpsgrpFilterReq;
@@ -7,6 +8,7 @@ import net.ecnu.controller.request.TranscriptReq;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 //import net.ecnu.interceptor.LoginInterceptor;
+import net.ecnu.feign.UserFeignService;
 import net.ecnu.manager.CpsgrpManager;
 import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.manager.TopicManager;
@@ -20,6 +22,7 @@ import net.ecnu.model.vo.TopicVO;
 import net.ecnu.service.CpsgrpService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.util.IDUtil;
+import net.ecnu.util.JsonData;
 import net.ecnu.util.RequestParamUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +58,9 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
 
     @Autowired
     private TopicManager topicManager;
+
+    @Autowired
+    private UserFeignService userFeignService;
 
     @Autowired
     private CpsgrpMapper cpsgrpMapper;
@@ -282,6 +288,8 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
      */
     private CpsgrpVO beanProcess(CpsgrpDO cpsgrpDO) {
         CpsgrpVO cpsgrpVO = new CpsgrpVO();
+        JsonData course = userFeignService.getCourse("course_1654025145813176320");
+        System.out.println(course);
         BeanUtils.copyProperties(cpsgrpDO, cpsgrpVO);
         return cpsgrpVO;
     }

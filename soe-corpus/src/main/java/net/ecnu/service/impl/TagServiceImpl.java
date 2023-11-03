@@ -144,12 +144,13 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
     @Scheduled(fixedDelay = 1000*60*60*24)//每24h自动调用该方法，更新标签权重
     @Override
     public Object calWeight() {
-        Integer total = taggingMapper.selectCount(null);
-        if (total == 0)
-            return null;
-        List<TagDO> tagDOS = tagMapper.selectList(null);
-        tagDOS.forEach(this::updateTagWeight);
-        return "权重计算成功";
+//        Integer total = taggingMapper.selectCount(null);
+//        if (total == 0)
+//            return null;
+//        List<TagDO> tagDOS = tagMapper.selectList(null);
+//        tagDOS.forEach(this::updateTagWeight);
+//        return "权重计算成功";
+        return null;
     }
 
 

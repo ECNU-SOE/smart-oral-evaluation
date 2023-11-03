@@ -3,6 +3,7 @@ package net.ecnu.feign.req;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class UserFilterReq {
@@ -10,7 +11,7 @@ public class UserFilterReq {
     /**
      * 用户账号id
      */
-    private String accountNo;
+    private List<String> accountNos;
 
     /**
      * 身份认证id

@@ -36,6 +36,7 @@ public class CourseServiceImpl implements CourseService {
     private CourseMapper courseMapper;
     @Autowired
     private CourseManager courseManager;
+
     @Autowired
     private ClassMapper classMapper;
     @Autowired
@@ -128,6 +129,7 @@ public class CourseServiceImpl implements CourseService {
         );
         if (courseDO == null)
             throw new BizException(BizCodeEnum.CLASS_UNEXISTS);
+
         CourseVO courseVO = new CourseVO();
         BeanUtils.copyProperties(courseDO, courseVO);
         return courseVO;

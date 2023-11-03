@@ -1,9 +1,10 @@
 package net.ecnu.biz;
 
 
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.json.XML;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.soe.v20180724.SoeClient;
@@ -13,22 +14,32 @@ import lombok.extern.slf4j.Slf4j;
 import net.ecnu.CorpusApplication;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
+import net.ecnu.feign.UserFeignService;
+import net.ecnu.feign.req.UserFilterReq;
 import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.mapper.CpsrcdMapper;
 import net.ecnu.model.CpsrcdDO;
+import net.ecnu.model.UserDO;
+import net.ecnu.model.vo.UserVO;
 import net.ecnu.service.EvaluateService;
+import net.ecnu.util.JsonData;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
-
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import com.alibaba.fastjson.JSON;
+import org.springframework.web.client.RestTemplate;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CorpusApplication.class)
@@ -38,8 +49,13 @@ public class SOETest {
     @Autowired
     private EvaluateService evaluateService;
 
+    private RestTemplate restTemplate;
+
     @Autowired
     private CpsrcdMapper cpsrcdMapper;
+
+    @Autowired
+    private UserFeignService userFeignService;
     @Autowired
     private CpsrcdManager cpsrcdManager;
 
@@ -171,13 +187,31 @@ public class SOETest {
 
     }
 
+
     @Test
     public void IDTest() {
-        List<Integer> tagIds = new ArrayList<>();
-        tagIds.add(5);
-        tagIds.add(2);
-        List<String> res = cpsrcdManager.getCpsrcdIdsByTagIds(tagIds);
-        System.out.println(res);
-    }
+//        String url = "http://47.101.58.72:8888/user-server/api/user/v1/list?cur=1&size=10";
+//        String token = "soe-token-eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzbWFydC1vcmFsLWV2YWx1YXRpb24iLCJsb2dpblVzZXIiOnsiYWNjb3VudE5vIjoidXNlcl8xNTg3NDIyOTk5MDQzMjQ4MTI4IiwiaWRlbnRpZnlJZCI6IjUxMjU1OTAyMDciLCJyb2xlSWQiOm51bGwsIm5pY2tOYW1lIjoi5a6M576O55qE5rKJ552hIiwicmVhbE5hbWUiOiLllJDlm73lhbQiLCJmaXJzdExhbmd1YWdlIjpudWxsLCJwaG9uZSI6IjE4Nzg2OTc4MjcyIiwibWFpbCI6IjE0MzMzODE1MzRAcXEuY29tIn0sImlhdCI6MTY5ODgwNDA0NCwiZXhwIjoxNjk5NDA4ODQ0fQ.Am2ETfnzuZXNo3eelm9M03Isz1PLM0HTApApdRkQTwY";
+//        UserFilterReq userFilterReq = new UserFilterReq();
+//        List<String> accountNos = new ArrayList<>();
+//        accountNos.add("user_1587395702114357248");
+//        userFilterReq.setAccountNos(accountNos);
+//        //headers
+//        HttpHeaders requestHeaders = new HttpHeaders();
+//        requestHeaders.add("token", token);
+//        //body
+//        HttpEntity<UserFilterReq> requestEntity = new HttpEntity<>(userFilterReq, requestHeaders);
+//        RestTemplate restTemplate = new RestTemplate();
+//        //post
+//        ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
+//        JSONObject responseBody = JSONObject.parseObject(response.getBody());
+//        List<JSONObject> o = (List<JSONObject>)responseBody.get("data");
+//        System.out.println(o);
 
+        JsonData course = userFeignService.getCourse("course_1654025145813176320");
+        Object data = course.getData();
+        System.out.println("----------");
+        System.out.println("课程是："+data);
+        System.out.println("----------");
+    }
 }
