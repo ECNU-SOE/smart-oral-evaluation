@@ -9,15 +9,15 @@ import java.util.List;
 public enum QuestionTypeEnum {
 
 
-    READ_WORDS(1,"朗读字词",2,"read_word"),
-    READ_SENTENCE(2,"朗读句子",3,"read_sentence"),
-    READ_POETRY(3,"朗读诗词",3,"read_sentence"),
-    READ_ARTICLE(4,"朗读文章",4,"read_chapter"),
-    SINGLE_CHOICE(5,"单选题",5,"answer_based"),
-    MULTIPLE_CHOICE(6,"多选题",5,"answer_based"),
-    WRITE_CHINESE_CHARACTERS(7,"写汉字",5,"answer_based"),
-    ANSWER_BY_WATCH_VIDEO(8,"看视频答题",6,"open_ended"),
-    OTHERS(9,"其他类型",6,"open_ended");
+    READ_WORDS(1,"朗读字词"),
+    READ_SENTENCE(2,"朗读句子"),
+    READ_POETRY(3,"朗读诗词"),
+    READ_ARTICLE(4,"朗读文章"),
+    SINGLE_CHOICE(5,"单选题"),
+    MULTIPLE_CHOICE(6,"多选题"),
+    WRITE_CHINESE_CHARACTERS(7,"写汉字"),
+    ANSWER_BY_WATCH_VIDEO(8,"看视频答题"),
+    OTHERS(9,"其他类型");
 
     /**
      * 题型Code
@@ -29,21 +29,11 @@ public enum QuestionTypeEnum {
      * **/
     private String msg;
 
-    /**
-     * 评测模式Code
-     * **/
-    private Integer modelCode;
 
-    /**
-     * 评测名称
-     * **/
-    private String modelMsg;
 
-    QuestionTypeEnum(Integer code, String msg, Integer modelCode, String modelMsg) {
+    QuestionTypeEnum(Integer code, String msg) {
         this.code = code;
         this.msg = msg;
-        this.modelCode = modelCode;
-        this.modelMsg = modelMsg;
     }
 
     public Integer getCode() {
@@ -62,21 +52,6 @@ public enum QuestionTypeEnum {
         this.msg = msg;
     }
 
-    public Integer getModelCode() {
-        return modelCode;
-    }
-
-    public void setModelCode(Integer modelCode) {
-        this.modelCode = modelCode;
-    }
-
-    public String getModelMsg() {
-        return modelMsg;
-    }
-
-    public void setModelMsg(String modelMsg) {
-        this.modelMsg = modelMsg;
-    }
     /**
      * 根据题型Code，获取对应枚举信息
      * **/
@@ -90,15 +65,14 @@ public enum QuestionTypeEnum {
     }
 
     /**
-     * 根据评测模式Code，获取同评测模式题型枚举对象
+     * 根据题型名称来获取Code
      * **/
-    private static List<QuestionTypeEnum> getSameModeTypeEnumByModelCode(Integer modelCode){
-        List<QuestionTypeEnum> list = new ArrayList<>();
+    public static Integer getCodeByMsg(String questionMsg) {
         for (QuestionTypeEnum value : QuestionTypeEnum.values()) {
-            if(value.getModelCode().intValue() == modelCode.intValue()){
-                list.add(value);
+            if(value.getMsg().equals(questionMsg)){
+                return value.getCode();
             }
         }
-        return list;
+        return null;
     }
 }
