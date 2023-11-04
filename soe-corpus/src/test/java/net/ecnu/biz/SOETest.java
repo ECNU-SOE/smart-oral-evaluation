@@ -23,6 +23,7 @@ import net.ecnu.model.UserDO;
 import net.ecnu.model.vo.UserVO;
 import net.ecnu.service.EvaluateService;
 import net.ecnu.util.JsonData;
+import net.ecnu.util.RequestParamUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeanUtils;
@@ -207,11 +208,15 @@ public class SOETest {
 //        JSONObject responseBody = JSONObject.parseObject(response.getBody());
 //        List<JSONObject> o = (List<JSONObject>)responseBody.get("data");
 //        System.out.println(o);
-
-        JsonData course = userFeignService.getCourse("course_1654025145813176320");
-        Object data = course.getData();
+        String token = "soe-token-eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzbWFydC1vcmFsLWV2YWx1YXRpb24iLCJsb2dpblVzZXIiOnsiYWNjb3VudE5vIjoidXNlcl8xNTg3NDIyOTk5MDQzMjQ4MTI4IiwiaWRlbnRpZnlJZCI6IjUxMjU1OTAyMDciLCJyb2xlSWQiOm51bGwsIm5pY2tOYW1lIjoi5a6M576O55qE5rKJ552hIiwicmVhbE5hbWUiOiLllJDlm73lhbQiLCJmaXJzdExhbmd1YWdlIjpudWxsLCJwaG9uZSI6IjE4Nzg2OTc4MjcyIiwibWFpbCI6IjE0MzMzODE1MzRAcXEuY29tIn0sImlhdCI6MTY5ODgwNDA0NCwiZXhwIjoxNjk5NDA4ODQ0fQ.Am2ETfnzuZXNo3eelm9M03Isz1PLM0HTApApdRkQTwY";
+        UserFilterReq userFilterReq = new UserFilterReq();
+        List<String> accountNos = new ArrayList<>();
+        accountNos.add("user_1587395702114357248");
+        userFilterReq.setAccountNos(accountNos);
+        JsonData users = userFeignService.getUsers(1,10, userFilterReq,token);
+        List<Map> data = (List<Map>) users.getData();
         System.out.println("----------");
-        System.out.println("课程是："+data);
+        System.out.println("课程是："+data.get(0).get("realName"));
         System.out.println("----------");
     }
 }

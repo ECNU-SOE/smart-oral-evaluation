@@ -9,6 +9,7 @@ import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.exception.BizException;
 //import net.ecnu.interceptor.LoginInterceptor;
 import net.ecnu.feign.UserFeignService;
+import net.ecnu.feign.req.UserFilterReq;
 import net.ecnu.manager.CpsgrpManager;
 import net.ecnu.manager.CpsrcdManager;
 import net.ecnu.manager.TopicManager;
@@ -288,9 +289,15 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
      */
     private CpsgrpVO beanProcess(CpsgrpDO cpsgrpDO) {
         CpsgrpVO cpsgrpVO = new CpsgrpVO();
-        JsonData course = userFeignService.getCourse("course_1654025145813176320");
-        System.out.println(course);
-        BeanUtils.copyProperties(cpsgrpDO, cpsgrpVO);
+
+        UserFilterReq userFilterReq = new UserFilterReq();
+        List<String> accountNos = new ArrayList<String>(){{add(cpsgrpDO.getCreator());}};
+        userFilterReq.setAccountNos(accountNos);
+        JsonData users = userFeignService.getUsers(1,10,userFilterReq,RequestParamUtil.getToken());
+        List<Map> data = (List<Map>) users.getData();
+        String name = (String) data.get(0).get("realName");
+        BeanUtils.copyProperties(cpsgrpDO, cpsgrpVO,"creator");
+        cpsgrpVO.setCreator(name);
         return cpsgrpVO;
     }
 
