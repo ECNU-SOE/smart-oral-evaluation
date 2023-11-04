@@ -1,16 +1,12 @@
 package net.ecnu.feign;
 
-import com.alibaba.fastjson.JSONObject;
 import net.ecnu.feign.req.UserFilterReq;
 import net.ecnu.util.JsonData;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "soe-user-server")
+@FeignClient(name = "soe-user-server",url = "http://47.101.58.72:8888/user-server")
 public interface UserFeignService {
 
     /**
@@ -19,6 +15,12 @@ public interface UserFeignService {
 //    @PostMapping(value = "/api/user/v1/reduce", headers = {"rpc-token=${rpc.token}"})
 //    JsonData getUsers(@RequestBody UserFilterReq request);
 
-    @GetMapping(value = "/api/cour/v1/detail",headers = {"token=soe-token-eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzbWFydC1vcmFsLWV2YWx1YXRpb24iLCJsb2dpblVzZXIiOnsiYWNjb3VudE5vIjoidXNlcl8xNTg3NDIyOTk5MDQzMjQ4MTI4IiwiaWRlbnRpZnlJZCI6IjUxMjU1OTAyMDciLCJyb2xlSWQiOm51bGwsIm5pY2tOYW1lIjoi5a6M576O55qE5rKJ552hIiwicmVhbE5hbWUiOiLllJDlm73lhbQiLCJmaXJzdExhbmd1YWdlIjpudWxsLCJwaG9uZSI6IjE4Nzg2OTc4MjcyIiwibWFpbCI6IjE0MzMzODE1MzRAcXEuY29tIn0sImlhdCI6MTY5ODgwNDA0NCwiZXhwIjoxNjk5NDA4ODQ0fQ.Am2ETfnzuZXNo3eelm9M03Isz1PLM0HTApApdRkQTwY"})
-    JsonData getCourse(@RequestParam("id")String id);
+//    @GetMapping(value = "/api/cour/v1/detail")
+//    JsonData getCourse(@RequestParam("id")String id, @RequestHeader("token")String token);
+
+    @PostMapping("/api/user/v1/list")
+    JsonData getUsers(@RequestParam(value = "cur", defaultValue = "1") int cur,
+                      @RequestParam(value = "size", defaultValue = "50") int size,
+                      @RequestBody UserFilterReq userFilterReq,
+                      @RequestHeader("token") String token);
 }
