@@ -182,10 +182,14 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
             return true;
         } else {
             //回答失败，将该题加入用户的错题集
-            Integer questionType = mistakeAudioMapper.getQuestionType(mistakeInfoDto.getCpsrcdId());
-            if (Objects.isNull(questionType) || questionType < 0) {
+            String questionTypeName = mistakeAudioMapper.getQuestionType(mistakeInfoDto.getCpsrcdId());
+            /*if (Objects.isNull(questionType) || questionType < 0) {
                 //没有查询到它的题目类型，则默认为0语音评测
                 questionType = 0;
+            }*/
+            Integer questionType = QuestionTypeEnum.OTHERS.getCode();
+            if (!StringUtils.isEmpty(questionTypeName)) {
+                questionType = QuestionTypeEnum.getCodeByMsg(questionTypeName);
             }
             /**查询是否已加入错题本**/
             MistakeAudioDOExample mistakeAudioDOExample = new MistakeAudioDOExample();
