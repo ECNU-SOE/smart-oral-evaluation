@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.enums.BizCodeEnum;
 import net.ecnu.enums.MistakeTypeEnum;
+import net.ecnu.enums.QuestionTypeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.mapper.MistakeAudioMapper;
 import net.ecnu.mapper.TaggingMapper;
@@ -115,7 +116,7 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
         }
         for (MistakeTypeVO mistakeTypeVO : mistakeTypeVOList) {
             //题型名称
-            String typeName = Objects.isNull(mistakeTypeVO.getMistakeTypeCode()) ? MistakeTypeEnum.DEFAULT.getMsg() : MistakeTypeEnum.getMsgByCode(mistakeTypeVO.getMistakeTypeCode());
+            String typeName = Objects.isNull(mistakeTypeVO.getMistakeTypeCode()) ? QuestionTypeEnum.OTHERS.getMsg() : QuestionTypeEnum.getMsgByCode(mistakeTypeVO.getMistakeTypeCode());
             mistakeTypeVO.setMistakeTypeCode(Objects.isNull(mistakeTypeVO.getMistakeTypeCode()) ? MistakeTypeEnum.DEFAULT.getCode() : mistakeTypeVO.getMistakeTypeCode());
             mistakeTypeVO.setMistakeTypeName(typeName);
             //各题型的错题数
@@ -137,8 +138,9 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
                 ,mistakesDto.getMistakeTypeCode(),mistakesDto.getOneWeekKey());
         /**有些题目是随机一题来的，没有cpsgrpId,需要区分开**/
         //查询对应的题目信息
-        mistakesVOS = mistakeAudioMapper.getMistakesInfo(mistakeInfoList);
-
+        if (!CollectionUtils.isEmpty(mistakeInfoList)) {
+            mistakesVOS = mistakeAudioMapper.getMistakesInfo(mistakeInfoList);
+        }
         //获取题目对应的tag信息
         for (MistakesVO mistakesVO : mistakesVOS) {
             if (!StringUtils.isEmpty(mistakesVO.getCpsrcdId())){
@@ -201,6 +203,7 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
                 }
             } else {
                 MistakeAudioDO mistakeAudioDO = mistakeAudioDOS.get(0);
+                mistakeAudioDO.setCpsgrpId(mistakeInfoDto.getCpsgrpId());
                 //答题错误次数增加
                 mistakeAudioDO.setErrorSum(mistakeAudioDO.getErrorSum() + 1);
                 //更新时间

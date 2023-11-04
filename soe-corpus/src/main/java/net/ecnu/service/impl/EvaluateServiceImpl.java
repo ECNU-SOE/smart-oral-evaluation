@@ -230,7 +230,7 @@ public class EvaluateServiceImpl implements EvaluateService {
      * 语音评测（讯飞版）
      */
     @Override
-    public Object evaluateByXF(File audio, String refText, String pinyin, String category,String cpsrcdId) {
+    public Object evaluateByXF(File audio, String refText, String pinyin, String category,String cpsrcdId,String cpsgrpId) {
         System.out.println("text:" + refText);
         String authUrl = getAuthUrl(hostUrl, apiKey, apiSecret);// 构建鉴权url
         //将url中的 schema http://和https://分别替换为ws:// 和 wss://
@@ -264,10 +264,7 @@ public class EvaluateServiceImpl implements EvaluateService {
             }
             MistakeInfoDto mistakeInfoDto = new MistakeInfoDto();
             mistakeInfoDto.setCpsrcdId(cpsrcdId);
-            /**
-             * TODO 语料组id也需要传值
-             * **/
-            mistakeInfoDto.setCpsgrpId("");
+            mistakeInfoDto.setCpsgrpId(StringUtils.isEmpty(cpsgrpId) ? "" : cpsgrpId);
             mistakeAudioService.isAddInErrorBook(currentAccountNo, mistakeInfoDto, totalSocre, 100.00);
         }
 

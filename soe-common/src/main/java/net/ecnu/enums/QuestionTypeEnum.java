@@ -8,7 +8,6 @@ import java.util.List;
  * **/
 public enum QuestionTypeEnum {
 
-
     READ_WORDS(1,"朗读字词"),
     READ_SENTENCE(2,"朗读句子"),
     READ_POETRY(3,"朗读诗词"),
@@ -55,10 +54,10 @@ public enum QuestionTypeEnum {
     /**
      * 根据题型Code，获取对应枚举信息
      * **/
-    public static QuestionTypeEnum getEnumObjectByCode(Integer code) {
+    public static String getMsgByCode(Integer code) {
         for (QuestionTypeEnum value : QuestionTypeEnum.values()) {
             if(value.getCode().intValue() == code.intValue()){
-                return value;
+                return value.getMsg();
             }
         }
         return null;
