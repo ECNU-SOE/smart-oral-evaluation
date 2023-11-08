@@ -144,7 +144,7 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         List<CpsgrpDO> cpsgrpDOS = cpsgrpManager.listByFilter(cpsgrpFilter, pageData);
         int totalCount = cpsgrpManager.countByFilter(cpsgrpFilter);
         List<CpsgrpVO> cpsgrpVOS = cpsgrpDOS.stream().map(this::beanProcess).collect(Collectors.toList());
-
+        System.out.println("到这了");
         //查询当前语料组被几个所班级使用
         cpsgrpVOS.forEach(cpsgrpVO -> {
             Integer classCnt = classCpsgrpMapper.selectCount(new QueryWrapper<ClassCpsgrpDO>().eq("cpsgrp_id", cpsgrpVO.getId()));
@@ -289,15 +289,9 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
      */
     private CpsgrpVO beanProcess(CpsgrpDO cpsgrpDO) {
         CpsgrpVO cpsgrpVO = new CpsgrpVO();
-
-        UserFilterReq userFilterReq = new UserFilterReq();
-        List<String> accountNos = new ArrayList<String>(){{add(cpsgrpDO.getCreator());}};
-        userFilterReq.setAccountNos(accountNos);
-        JsonData users = userFeignService.getUsers(1,10,userFilterReq,RequestParamUtil.getToken());
-        List<Map> data = (List<Map>) users.getData();
-        String name = (String) data.get(0).get("realName");
+        JsonData name = userFeignService.getName(cpsgrpDO.getCreator(),RequestParamUtil.getToken());
         BeanUtils.copyProperties(cpsgrpDO, cpsgrpVO,"creator");
-        cpsgrpVO.setCreator(name);
+        cpsgrpVO.setCreator((String)name.getData());
         return cpsgrpVO;
     }
 
