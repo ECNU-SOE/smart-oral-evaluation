@@ -76,6 +76,14 @@ public class UserController {
         return JsonData.buildSuccess(data);
     }
 
+    @ApiOperation("查询用户姓名")
+    @GetMapping("name")
+    public JsonData name(@RequestParam("accountNo")String accountNo) {
+        Object data = userService.getName(accountNo);
+        return JsonData.buildSuccess(data);
+    }
+
+
     @ApiOperation("更新用户信息")
     @PostMapping("update")
     public JsonData update(@RequestBody @Validated(Update.class) UserReq userReq) {

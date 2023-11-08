@@ -421,6 +421,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public Object getName(String accountNo) {
+        UserDO userDO = userMapper.selectById(accountNo);
+        if (userDO==null)
+            throw new BizException(BizCodeEnum.ACCOUNT_UNREGISTER);
+        return userDO.getRealName();
+    }
+
 
     private boolean hasOpRight(Integer roleA, Integer roleB) {
         //角色a为管理员，且b不是超管
