@@ -79,7 +79,14 @@ public enum BizCodeEnum {
      * Excel模板异常
      **/
     EXCEL_ERROR(500000, "Excel异常报错"),
-    EXCEL_TEMPLATE_IS_NOT_EXIST(500001, "Excel模板不存在");
+    EXCEL_TEMPLATE_IS_NOT_EXIST(500001, "Excel模板不存在"),
+
+    /**
+     * 自研语音评测异常
+     * **/
+    JIEBA_ERROR(550000,"jieba分词异常-"),
+    EVALUATE_ERROR(550001,"自研语音评测异常-")
+    ;
     @Getter
     private final int code;
 

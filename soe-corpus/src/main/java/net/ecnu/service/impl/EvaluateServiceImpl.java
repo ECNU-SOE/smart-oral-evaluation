@@ -7,20 +7,24 @@ import com.tencentcloudapi.soe.v20180724.SoeClient;
 import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitRequest;
 import com.tencentcloudapi.soe.v20180724.models.TransmitOralProcessWithInitResponse;
 import com.tencentcloudapi.soe.v20180724.models.WordRsp;
+import lombok.extern.slf4j.Slf4j;
 import net.ecnu.constant.SOEConst;
 import net.ecnu.enums.BizCodeEnum;
+import net.ecnu.enums.EvaluateTypeEnum;
 import net.ecnu.exception.BizException;
-import net.ecnu.manager.CpsrcdManager;
-import net.ecnu.mapper.CpsgrpMapper;
+import net.ecnu.feign.EvaluateFeignService;
 import net.ecnu.mapper.EvalRecordMapper;
 import net.ecnu.model.EvalListener;
 import net.ecnu.model.EvalRecordDO;
 import net.ecnu.model.common.EvaluationXF;
+import net.ecnu.model.common.RecPaper;
+import net.ecnu.model.common.readSentenceByXF.ReadSentence;
 import net.ecnu.model.dto.MistakeInfoDto;
 import net.ecnu.model.vo.EvalResultVO;
 import net.ecnu.service.EvaluateService;
 import net.ecnu.util.CommonUtil;
 import net.ecnu.util.FileUtil;
+import net.ecnu.util.JsonData;
 import net.ecnu.util.RequestParamUtil;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -29,15 +33,18 @@ import okhttp3.WebSocket;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ws.schild.jave.*;
 //import ws.schild.jave.encode.AudioAttributes;
 //import ws.schild.jave.encode.EncodingAttributes;
 
+import javax.annotation.Resource;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -61,6 +68,7 @@ import ws.schild.jave.MultimediaObject;
  * @author LYW
  * @since 2022-10-20
  */
+@Slf4j
 @Service
 public class EvaluateServiceImpl implements EvaluateService {
 
@@ -82,18 +90,14 @@ public class EvaluateServiceImpl implements EvaluateService {
     @Value("${xunfei.ve.api-key}")
     private String apiKey;
 
-
-    @Autowired
-    private CpsrcdManager cpsrcdManager;
-
-    @Autowired
-    private CpsgrpMapper cpsgrpMapper;
-
     @Autowired
     private EvalRecordMapper evalRecordMapper;
 
     @Autowired
     private MistakeAudioServiceImpl mistakeAudioService;
+
+    @Resource
+    private EvaluateFeignService evaluateFeignService;
 
     @Override
     public Object evaluate(File file, String refText, String pinyin, long evalMode) {
@@ -228,51 +232,109 @@ public class EvaluateServiceImpl implements EvaluateService {
 
     /**
      * 语音评测（讯飞版）
+     * @param audio 音频文件
+     * @param refText 文本
+     * @param pinyin 拼音
+     * @param category
+     * @param cpsrcdId 题目id
+     * @param cpsgrpId 试题组id
+     * @param evaluateType 评测方式 0-科大讯飞接口，1-自研接口
      */
     @Override
-    public Object evaluateByXF(File audio, String refText, String pinyin, String category,String cpsrcdId,String cpsgrpId) {
+    public Object evaluateByXF(File audio, String refText, String pinyin, String category,String cpsrcdId,String cpsgrpId,Integer evaluateType) {
         System.out.println("text:" + refText);
-        String authUrl = getAuthUrl(hostUrl, apiKey, apiSecret);// 构建鉴权url
-        //将url中的 schema http://和https://分别替换为ws:// 和 wss://
-        String url = authUrl.replace("http://", "ws://").replace("https://", "wss://");
-        OkHttpClient client = new OkHttpClient.Builder().build();
-        Request request = new Request.Builder().url(url).build();
-        EvalListener evalListener = new EvalListener();
-        evalListener.setFile(audio);
-        evalListener.setText(refText);
-        evalListener.setCategory(category);//category校验
-        WebSocket webSocket = client.newWebSocket(request, evalListener);
-        //循环等待结果
-        while (evalListener.getEvalRes() == null) {
+        /**向老版本兼容，评测方式若不传，则默认为科大讯飞评测**/
+        evaluateType = Objects.isNull(evaluateType) ? EvaluateTypeEnum.XF_EVALUATE.getCode() : evaluateType;
+        EvalListener evalListener;
+        if (EvaluateTypeEnum.XF_EVALUATE.getCode().intValue() == evaluateType.intValue()) {
+            /**科大讯飞评测**/
+            String authUrl = getAuthUrl(hostUrl, apiKey, apiSecret);// 构建鉴权url
+            //将url中的 schema http://和https://分别替换为ws:// 和 wss://
+            String url = authUrl.replace("http://", "ws://").replace("https://", "wss://");
+            OkHttpClient client = new OkHttpClient.Builder().build();
+            Request request = new Request.Builder().url(url).build();
+            evalListener = new EvalListener();
+            evalListener.setFile(audio);
+            evalListener.setText(refText);
+            evalListener.setCategory(category);//category校验
+            WebSocket webSocket = client.newWebSocket(request, evalListener);
+            //循环等待结果
+            while (evalListener.getEvalRes() == null) {
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            //新增评测记录evalRecord
+            //EvaluationXF evalJsonRes = JSON.parseObject(JSON.toJSONString(((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category)), EvaluationXF.class);
+            Object evalJsonRes = ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
+            //若cpsrcdId不为空，则调用错题记录逻辑
+            if (cpsrcdId != null) {
+                JSONObject resJson = (JSONObject) ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
+                JSONObject sentenceInfo = (JSONObject) ((JSONObject) resJson.get("rec_paper")).get(category);
+                Double totalSocre = Double.parseDouble(sentenceInfo.get("total_score").toString());
+                String currentAccountNo = RequestParamUtil.currentAccountNo();
+                if (StringUtils.isBlank(currentAccountNo)) {
+                    throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
+                }
+                MistakeInfoDto mistakeInfoDto = new MistakeInfoDto();
+                mistakeInfoDto.setCpsrcdId(cpsrcdId);
+                mistakeInfoDto.setCpsgrpId(StringUtils.isEmpty(cpsgrpId) ? "" : cpsgrpId);
+                mistakeAudioService.isAddInErrorBook(currentAccountNo, mistakeInfoDto, totalSocre, 100.00);
+            }
+            EvalRecordDO evalRecordDO = new EvalRecordDO();
+            evalRecordDO.setAlgRes(evalJsonRes.toString());
+            evalRecordMapper.insert(evalRecordDO);
+            //返回结果
+            return evalJsonRes;
+        } else if (EvaluateTypeEnum.ZY_EVALUATE.getCode().intValue() == evaluateType.intValue()) {
+            //自研语音评测
+            String tempStr = refText.replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5)]", "");
+            log.info("去除所有的标点符号的字符串:{}",JSON.toJSON(tempStr));
+            /**jieba分词**/
+            JsonData jsonData = evaluateFeignService.dealTextDataByJieBa(tempStr);
+            if(SOEConst.SUCCESS.intValue() != jsonData.getCode().intValue()){
+                log.info("jieba分词异常,出参:{}", JSON.toJSON(jsonData));
+                throw new BizException(BizCodeEnum.JIEBA_ERROR);
+            }
+            /**jieba处理后的文本**/
+            String testByJieba = String.valueOf(jsonData.getData());
+            log.info("jieba处理后的文本:{}",JSON.toJSON(testByJieba));
+            /**语音评测**/
             try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                FileInputStream inputStream = new FileInputStream(audio);
+                MultipartFile multipartFile = new MockMultipartFile(
+                        "audio",
+                        audio.getName(),
+                        "APPLICATION_OCTET_STREAM",
+                        inputStream);
+                JsonData evaluateData = evaluateFeignService.evalByZY(multipartFile, testByJieba);
+                if (SOEConst.SUCCESS.intValue() != evaluateData.getCode().intValue()) {
+                    log.info("自研语音评测异常,出参:{}",JSON.toJSON(evaluateData));
+                    String errorInfo = StringUtils.isEmpty(evaluateData.getMsg()) ? "" : evaluateData.getMsg();
+                    throw new BizException(BizCodeEnum.EVALUATE_ERROR.getCode(),BizCodeEnum.EVALUATE_ERROR.getMessage() + errorInfo);
+                }
+                EvaluationXF evalJsonRes = JSON.parseObject(JSON.toJSONString(evaluateData.getData()),EvaluationXF.class);
+                if (!StringUtils.isEmpty(cpsrcdId)) {
+                    RecPaper recPaper = evalJsonRes.getRecPaper();
+                    ReadSentence readSentence = recPaper.getReadSentence();
+                    double totalScore = readSentence.getTotalScore();
+                    String currentAccountNo = RequestParamUtil.currentAccountNo();
+                    MistakeInfoDto mistakeInfoDto = new MistakeInfoDto();
+                    mistakeInfoDto.setCpsrcdId(cpsrcdId);
+                    mistakeInfoDto.setCpsgrpId(StringUtils.isEmpty(cpsgrpId) ? "" : cpsgrpId);
+                    mistakeAudioService.isAddInErrorBook(currentAccountNo, mistakeInfoDto, totalScore, 100.00);
+                }
+                EvalRecordDO evalRecordDO = new EvalRecordDO();
+                evalRecordDO.setAlgRes(evalJsonRes.toString());
+                evalRecordMapper.insert(evalRecordDO);
+                return evalJsonRes;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
-        //新增评测记录evalRecord
-        //EvaluationXF evalJsonRes = JSON.parseObject(JSON.toJSONString(((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category)), EvaluationXF.class);
-        Object evalJsonRes = ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
-        //若cpsrcdId不为空，则调用错题记录逻辑
-        if (cpsrcdId != null) {
-            JSONObject resJson = (JSONObject) ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
-            JSONObject sentenceInfo = (JSONObject) ((JSONObject) resJson.get("rec_paper")).get(category);
-            Double totalSocre = Double.parseDouble(sentenceInfo.get("total_score").toString());
-            String currentAccountNo = RequestParamUtil.currentAccountNo();
-            if (StringUtils.isBlank(currentAccountNo)) {
-                throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
-            }
-            MistakeInfoDto mistakeInfoDto = new MistakeInfoDto();
-            mistakeInfoDto.setCpsrcdId(cpsrcdId);
-            mistakeInfoDto.setCpsgrpId(StringUtils.isEmpty(cpsgrpId) ? "" : cpsgrpId);
-            mistakeAudioService.isAddInErrorBook(currentAccountNo, mistakeInfoDto, totalSocre, 100.00);
-        }
-
-        EvalRecordDO evalRecordDO = new EvalRecordDO();
-        evalRecordDO.setAlgRes(evalJsonRes.toString());
-        evalRecordMapper.insert(evalRecordDO);
-        //返回结果
-        return evalJsonRes;
+        return null;
     }
 
     @Override

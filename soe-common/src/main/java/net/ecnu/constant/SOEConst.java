@@ -30,4 +30,6 @@ public class SOEConst {
      */
     public static final String USER_INIT_PASSWORD = "abcd1234";
 
+    public static final Integer SUCCESS = 0;
+
 }

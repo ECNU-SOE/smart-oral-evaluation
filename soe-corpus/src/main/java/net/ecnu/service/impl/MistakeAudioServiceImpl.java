@@ -3,7 +3,6 @@ package net.ecnu.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.enums.BizCodeEnum;
-import net.ecnu.enums.MistakeTypeEnum;
 import net.ecnu.enums.QuestionTypeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.mapper.MistakeAudioMapper;
@@ -117,7 +116,7 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
         for (MistakeTypeVO mistakeTypeVO : mistakeTypeVOList) {
             //题型名称
             String typeName = Objects.isNull(mistakeTypeVO.getMistakeTypeCode()) ? QuestionTypeEnum.OTHERS.getMsg() : QuestionTypeEnum.getMsgByCode(mistakeTypeVO.getMistakeTypeCode());
-            mistakeTypeVO.setMistakeTypeCode(Objects.isNull(mistakeTypeVO.getMistakeTypeCode()) ? MistakeTypeEnum.DEFAULT.getCode() : mistakeTypeVO.getMistakeTypeCode());
+            mistakeTypeVO.setMistakeTypeCode(Objects.isNull(mistakeTypeVO.getMistakeTypeCode()) ? QuestionTypeEnum.OTHERS.getCode() : mistakeTypeVO.getMistakeTypeCode());
             mistakeTypeVO.setMistakeTypeName(typeName);
             //各题型的错题数
             Integer typeNum = Objects.isNull(mistakeTypeVO.getMistakeNum()) ? 0 : mistakeTypeVO.getMistakeNum();
