@@ -20,4 +20,7 @@ import java.util.List;
  */
 @Mapper
 public interface CpsrcdMapper extends BaseMapper<CpsrcdDO> {
+
+//    @Select("select * from cpsrcd where type = #{type} and difficulty>= #{difficultyBegin} and difficulty<= #{difficultyEnd} and ref_text like '%${refText}%' order by rand() limit 1")
+    CpsrcdDO getRand(CpsrcdFilterReq cpsrcdFilterReq);
 }

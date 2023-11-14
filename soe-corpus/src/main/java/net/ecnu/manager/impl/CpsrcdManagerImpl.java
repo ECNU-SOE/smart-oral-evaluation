@@ -66,6 +66,28 @@ public class CpsrcdManagerImpl implements CpsrcdManager {
     }
 
     @Override
+    public List<CpsrcdDO> getCpsrcdDOs(CpsrcdFilterReq cpsrcdFilter) {
+        QueryWrapper<CpsrcdDO> qw = new QueryWrapper<>();
+        //语料类型
+        if (!StringUtils.isEmpty(cpsrcdFilter.getType())) {
+            qw.eq("type", cpsrcdFilter.getType());
+        }
+        //难易程度
+        if (!Objects.isNull(cpsrcdFilter.getDifficultyBegin()) || !Objects.isNull(cpsrcdFilter.getDifficultyEnd())) {
+            qw.ge("difficulty", cpsrcdFilter.getDifficultyBegin() != null ? cpsrcdFilter.getDifficultyBegin() : 0)
+                    .le("difficulty", cpsrcdFilter.getDifficultyEnd() != null ? cpsrcdFilter.getDifficultyEnd() : 12);
+        }
+        //文本内容
+        if (!StringUtils.isEmpty(cpsrcdFilter.getRefText())) {
+            qw.like("ref_text", cpsrcdFilter.getRefText());
+        }
+        //cpsrcdIds不为空，说名tagIds过滤出了cpsrcd从其中查
+            qw.in("id", cpsrcdFilter.getCpsrcdIds());
+        qw.orderByDesc("gmt_create");
+        return cpsrcdMapper.selectList(qw);
+    }
+
+    @Override
     public List<String> getCpsrcdIdsByTagIds(List<Integer> tagIds) {
         if (CollectionUtils.isEmpty(tagIds)) {
             List<CpsrcdDO> cpsrcdDOS = cpsrcdMapper.selectList(null);

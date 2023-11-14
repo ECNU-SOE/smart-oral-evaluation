@@ -17,6 +17,8 @@ public interface CpsrcdManager {
 
     IPage<CpsrcdDO> pageByFilter(CpsrcdFilterReq cpsrcdFilter, Page<CpsrcdDO> cpsrcdDOPage);
 
+    List<CpsrcdDO> getCpsrcdDOs(CpsrcdFilterReq cpsrcdFilterReq);
+
     List<String> getCpsrcdIdsByTagIds(List<Integer> tagIds);
 
 }

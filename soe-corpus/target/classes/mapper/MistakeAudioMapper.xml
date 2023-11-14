@@ -396,9 +396,9 @@
       and cpsgrp_id = #{cpsgrpId,jdbcType=VARCHAR}
   </update>
 
-  <select id="getQuestionType" resultType="java.lang.Integer">
+  <select id="getQuestionType" resultType="java.lang.String">
     select
-      eval_mode
+      type
     from
       cpsrcd
     where
