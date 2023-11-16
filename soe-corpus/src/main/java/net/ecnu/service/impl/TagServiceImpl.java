@@ -11,6 +11,7 @@ import net.ecnu.model.TaggingDO;
 import net.ecnu.model.TagDO;
 import net.ecnu.mapper.TagMapper;
 import net.ecnu.model.common.PageData;
+import net.ecnu.model.vo.TagVO;
 import net.ecnu.service.TagService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.text.DecimalFormat;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -85,18 +87,30 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
         if (CollectionUtils.isEmpty(tagFilterReq.getIds())){
             //条件查询
             List<TagDO> tagDOS = tagManager.pageByFilter(tagFilterReq,pageData);
+            List<TagVO> tagVOS = tagDOS.stream().map(this::beanProcess)
+                    .sorted(Comparator.comparing(TagVO::getFrequency).reversed()).collect(Collectors.toList());
             int total = tagManager.countByFilter(tagFilterReq);
             pageData.setTotal(total);
-            pageData.setRecords(tagDOS);
+            pageData.setRecords(tagVOS);
             return pageData;
         }
         else {
             //按照tagIds查询
             List<TagDO> tagDOS = tagMapper.selectBatchIds(tagFilterReq.getIds());
+            List<TagVO> tagVOS = tagDOS.stream().map(this::beanProcess)
+                    .sorted(Comparator.comparing(TagVO::getFrequency).reversed()).collect(Collectors.toList());
             pageData.setTotal(tagDOS.size());
-            pageData.setRecords(tagDOS);
+            pageData.setRecords(tagVOS);
             return pageData;
         }
+    }
+
+    private TagVO beanProcess(TagDO tagDO) {
+        TagVO tagVO = new TagVO();
+        Integer count = taggingMapper.selectCount(new QueryWrapper<TaggingDO>().eq("tag_id", tagDO.getId()));
+        tagVO.setFrequency(count);
+        BeanUtils.copyProperties(tagDO,tagVO);
+        return tagVO;
     }
 
     @Override
