@@ -85,7 +85,7 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     public Object pageByFilter(CpsrcdFilterReq cpsrcdFilter, Page<CpsrcdDO> cpsrcdDOPage) {
         //tagIds不为空，过滤查询包含tagId的cpsrcd
         if (!CollectionUtils.isEmpty(cpsrcdFilter.getTagIds())) {
-            List<String> cpsrcdIds = cpsrcdManager.getCpsrcdIdsByTagIds(cpsrcdFilter.getTagIds());//TODO 非常耗时 可以优化
+            List<String> cpsrcdIds = cpsrcdManager.getCpsrcdIdsByTagIds(cpsrcdFilter.getTagIds());
             cpsrcdFilter.setCpsrcdIds(cpsrcdIds); //设置cpsrcdIds的查询范围
             if (CollectionUtils.isEmpty(cpsrcdIds)) return new PageData(1, 10);
         }

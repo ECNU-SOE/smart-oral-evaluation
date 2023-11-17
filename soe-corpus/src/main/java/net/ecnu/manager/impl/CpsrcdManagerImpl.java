@@ -15,8 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -89,22 +88,12 @@ public class CpsrcdManagerImpl implements CpsrcdManager {
 
     @Override
     public List<String> getCpsrcdIdsByTagIds(List<Integer> tagIds) {
-        if (CollectionUtils.isEmpty(tagIds)) {
-            List<CpsrcdDO> cpsrcdDOS = cpsrcdMapper.selectList(null);
-            return cpsrcdDOS.stream().map(CpsrcdDO::getId).collect(Collectors.toList());
-        }
+        // 构建查询条件
         QueryWrapper<TaggingDO> qw = new QueryWrapper<>();
-        qw.eq("entity_type", 1);//1:cpsrcd
-        qw.and(wq -> {
-            wq.eq("tag_id", tagIds.get(0));
-            for (int i = 1; i < tagIds.size(); i++) {
-                wq.or().eq("tag_id", tagIds.get(i));
-            }
-        });
+        qw.select("entity_id").in("tag_id",tagIds).groupBy("entity_id")
+                .having("count(distinct tag_id) = {0}",tagIds.size());
+        // 查询符合条件的cpsrcdIds
         List<TaggingDO> taggingDOS = taggingMapper.selectList(qw);
         return taggingDOS.stream().map(TaggingDO::getEntityId).collect(Collectors.toList());
-
     }
-
-
 }
