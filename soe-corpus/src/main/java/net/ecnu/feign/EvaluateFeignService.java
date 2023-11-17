@@ -29,8 +29,9 @@ public interface EvaluateFeignService {
      * @param audio 音频文件（.wav格式）
      * @param refText 音频文本（jieba分词处理后的文本数据）
      * **/
-    @PostMapping(value = "/api/evaluate/v1/eval_test",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    JsonData evalByZY(@RequestPart("audio") MultipartFile audio, @RequestParam("refText") String refText);
+    @PostMapping(value = "/api/evaluate/v1/eval_test"
+            ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    JsonData evalByZY(@RequestPart("audio") MultipartFile audio, @RequestPart("refText") String refText);
 
 
 }

@@ -1,5 +1,6 @@
 package net.ecnu.controller;
 
+import net.ecnu.enums.EvaluateTypeEnum;
 import net.ecnu.service.EvaluateService;
 import net.ecnu.util.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/evaluate/v1")
@@ -49,10 +51,9 @@ public class EvaluateController {
                             @RequestParam(value = "cpsgrpId",required = false) String cpsgrpId,
                             @RequestParam(value = "evaluateType",required = false) Integer evaluateType
                             ) {
-        long startTime = System.currentTimeMillis();
-        File convertAudio = evaluateService.convert_lyw(audio);
-        System.out.println("语音格式转换耗时：" + (System.currentTimeMillis() - startTime) + "ms");
-        Object data = evaluateService.evaluateByXF(convertAudio, refText, pinyin, category,cpsrcdId,cpsgrpId,evaluateType);
+        /**向老版本兼容，评测方式若不传，则默认为科大讯飞评测**/
+        evaluateType = Objects.isNull(evaluateType) ? EvaluateTypeEnum.XF_EVALUATE.getCode() : evaluateType;
+        Object data = evaluateService.evaluateByXF(audio, refText, pinyin, category,cpsrcdId,cpsgrpId,evaluateType);
         return JsonData.buildSuccess(data);
     }
 

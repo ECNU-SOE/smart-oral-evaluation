@@ -241,12 +241,13 @@ public class EvaluateServiceImpl implements EvaluateService {
      * @param evaluateType 评测方式 0-科大讯飞接口，1-自研接口
      */
     @Override
-    public Object evaluateByXF(File audio, String refText, String pinyin, String category,String cpsrcdId,String cpsgrpId,Integer evaluateType) {
+    public Object evaluateByXF(MultipartFile audio, String refText, String pinyin, String category,String cpsrcdId,String cpsgrpId,Integer evaluateType) {
         System.out.println("text:" + refText);
-        /**向老版本兼容，评测方式若不传，则默认为科大讯飞评测**/
-        evaluateType = Objects.isNull(evaluateType) ? EvaluateTypeEnum.XF_EVALUATE.getCode() : evaluateType;
         EvalListener evalListener;
         if (EvaluateTypeEnum.XF_EVALUATE.getCode().intValue() == evaluateType.intValue()) {
+            long startTime = System.currentTimeMillis();
+            File convertAudio = this.convert_lyw(audio);
+            log.info("语音格式转换耗时：{}", JSON.toJSON((System.currentTimeMillis() - startTime) + "ms"));
             /**科大讯飞评测**/
             String authUrl = getAuthUrl(hostUrl, apiKey, apiSecret);// 构建鉴权url
             //将url中的 schema http://和https://分别替换为ws:// 和 wss://
@@ -254,7 +255,7 @@ public class EvaluateServiceImpl implements EvaluateService {
             OkHttpClient client = new OkHttpClient.Builder().build();
             Request request = new Request.Builder().url(url).build();
             evalListener = new EvalListener();
-            evalListener.setFile(audio);
+            evalListener.setFile(convertAudio);
             evalListener.setText(refText);
             evalListener.setCategory(category);//category校验
             WebSocket webSocket = client.newWebSocket(request, evalListener);
@@ -303,13 +304,9 @@ public class EvaluateServiceImpl implements EvaluateService {
             log.info("jieba处理后的文本:{}",JSON.toJSON(testByJieba));
             /**语音评测**/
             try {
-                FileInputStream inputStream = new FileInputStream(audio);
-                MultipartFile multipartFile = new MockMultipartFile(
-                        "audio",
-                        audio.getName(),
-                        "APPLICATION_OCTET_STREAM",
-                        inputStream);
-                JsonData evaluateData = evaluateFeignService.evalByZY(multipartFile, testByJieba);
+                //FileInputStream inputStream = new FileInputStream(audio);
+                //MockMultipartFile multipartFile = new MockMultipartFile("audio", audio.getName(), "audio/wav", inputStream);
+                JsonData evaluateData = evaluateFeignService.evalByZY(audio, testByJieba);
                 if (SOEConst.SUCCESS.intValue() != evaluateData.getCode().intValue()) {
                     log.info("自研语音评测异常,出参:{}",JSON.toJSON(evaluateData));
                     String errorInfo = StringUtils.isEmpty(evaluateData.getMsg()) ? "" : evaluateData.getMsg();
