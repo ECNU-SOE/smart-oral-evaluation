@@ -15,8 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -66,23 +65,35 @@ public class CpsrcdManagerImpl implements CpsrcdManager {
     }
 
     @Override
-    public List<String> getCpsrcdIdsByTagIds(List<Integer> tagIds) {
-        if (CollectionUtils.isEmpty(tagIds)) {
-            List<CpsrcdDO> cpsrcdDOS = cpsrcdMapper.selectList(null);
-            return cpsrcdDOS.stream().map(CpsrcdDO::getId).collect(Collectors.toList());
+    public List<CpsrcdDO> getCpsrcdDOs(CpsrcdFilterReq cpsrcdFilter) {
+        QueryWrapper<CpsrcdDO> qw = new QueryWrapper<>();
+        //语料类型
+        if (!StringUtils.isEmpty(cpsrcdFilter.getType())) {
+            qw.eq("type", cpsrcdFilter.getType());
         }
-        QueryWrapper<TaggingDO> qw = new QueryWrapper<>();
-        qw.eq("entity_type", 1);//1:cpsrcd
-        qw.and(wq -> {
-            wq.eq("tag_id", tagIds.get(0));
-            for (int i = 1; i < tagIds.size(); i++) {
-                wq.or().eq("tag_id", tagIds.get(i));
-            }
-        });
-        List<TaggingDO> taggingDOS = taggingMapper.selectList(qw);
-        return taggingDOS.stream().map(TaggingDO::getEntityId).collect(Collectors.toList());
-
+        //难易程度
+        if (!Objects.isNull(cpsrcdFilter.getDifficultyBegin()) || !Objects.isNull(cpsrcdFilter.getDifficultyEnd())) {
+            qw.ge("difficulty", cpsrcdFilter.getDifficultyBegin() != null ? cpsrcdFilter.getDifficultyBegin() : 0)
+                    .le("difficulty", cpsrcdFilter.getDifficultyEnd() != null ? cpsrcdFilter.getDifficultyEnd() : 12);
+        }
+        //文本内容
+        if (!StringUtils.isEmpty(cpsrcdFilter.getRefText())) {
+            qw.like("ref_text", cpsrcdFilter.getRefText());
+        }
+        //cpsrcdIds不为空，说名tagIds过滤出了cpsrcd从其中查
+            qw.in("id", cpsrcdFilter.getCpsrcdIds());
+        qw.orderByDesc("gmt_create");
+        return cpsrcdMapper.selectList(qw);
     }
 
-
+    @Override
+    public List<String> getCpsrcdIdsByTagIds(List<Integer> tagIds) {
+        // 构建查询条件
+        QueryWrapper<TaggingDO> qw = new QueryWrapper<>();
+        qw.select("entity_id").in("tag_id",tagIds).groupBy("entity_id")
+                .having("count(distinct tag_id) = {0}",tagIds.size());
+        // 查询符合条件的cpsrcdIds
+        List<TaggingDO> taggingDOS = taggingMapper.selectList(qw);
+        return taggingDOS.stream().map(TaggingDO::getEntityId).collect(Collectors.toList());
+    }
 }

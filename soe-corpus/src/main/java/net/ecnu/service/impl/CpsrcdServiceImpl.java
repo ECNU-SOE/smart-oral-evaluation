@@ -15,11 +15,14 @@ import net.ecnu.model.dto.CpsrcdDTO;
 import net.ecnu.service.CpsrcdService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import net.ecnu.util.IDUtil;
+import net.ecnu.util.TimeUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.xml.crypto.Data;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -82,7 +85,7 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
     public Object pageByFilter(CpsrcdFilterReq cpsrcdFilter, Page<CpsrcdDO> cpsrcdDOPage) {
         //tagIds不为空，过滤查询包含tagId的cpsrcd
         if (!CollectionUtils.isEmpty(cpsrcdFilter.getTagIds())) {
-            List<String> cpsrcdIds = cpsrcdManager.getCpsrcdIdsByTagIds(cpsrcdFilter.getTagIds());//TODO 非常耗时 可以优化
+            List<String> cpsrcdIds = cpsrcdManager.getCpsrcdIdsByTagIds(cpsrcdFilter.getTagIds());
             cpsrcdFilter.setCpsrcdIds(cpsrcdIds); //设置cpsrcdIds的查询范围
             if (CollectionUtils.isEmpty(cpsrcdIds)) return new PageData(1, 10);
         }
@@ -170,19 +173,24 @@ public class CpsrcdServiceImpl extends ServiceImpl<CpsrcdMapper, CpsrcdDO> imple
 
     @Override
     public Object random(CpsrcdFilterReq cpsrcdFilterReq) {
-        QueryWrapper<CpsrcdDO> qw = new QueryWrapper<>();
-        if (!CollectionUtils.isEmpty(cpsrcdFilterReq.getTagIds())) {
-            List<String> cpsrcdIds = cpsrcdManager.getCpsrcdIdsByTagIds(cpsrcdFilterReq.getTagIds());
-            if (CollectionUtils.isEmpty(cpsrcdIds))
+        if (CollectionUtils.isEmpty(cpsrcdFilterReq.getTagIds())) {
+            CpsrcdDO cpsrcdDO = cpsrcdMapper.getRand(cpsrcdFilterReq);
+            if (cpsrcdDO==null)
                 throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
-            qw.in("id", cpsrcdIds);
+            return buildCpsrcdDTOByCpsrcdDO(cpsrcdDO);
+        }else {
+            List<String> cpsrcdIds = cpsrcdManager.getCpsrcdIdsByTagIds(cpsrcdFilterReq.getTagIds());
+            if (cpsrcdIds==null||cpsrcdIds.size()==0)
+                throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
+            cpsrcdFilterReq.setCpsrcdIds(cpsrcdIds);
+            Page<CpsrcdDO> cpsrcdDOPage = new Page<>();
+            List<CpsrcdDO> cpsrcdDOs = cpsrcdManager.getCpsrcdDOs(cpsrcdFilterReq);
+            if (CollectionUtils.isEmpty(cpsrcdDOs))
+                throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
+            int index = (int) (Math.random() * cpsrcdDOs.size());
+            CpsrcdDO cpsrcdDO = cpsrcdDOs.get(index);
+            return buildCpsrcdDTOByCpsrcdDO(cpsrcdDO);
         }
-        List<CpsrcdDO> cpsrcdDOS = cpsrcdMapper.selectList(qw);
-        if (CollectionUtils.isEmpty(cpsrcdDOS))
-            throw new BizException(BizCodeEnum.CPSRCD_NOT_EXIST);
-        int index = (int) (Math.random() * cpsrcdDOS.size());
-        CpsrcdDO cpsrcdDO = cpsrcdDOS.get(index);
-        return buildCpsrcdDTOByCpsrcdDO(cpsrcdDO);
     }
 
 

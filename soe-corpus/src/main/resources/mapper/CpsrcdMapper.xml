@@ -22,4 +22,24 @@
         id, type, eval_mode, difficulty, pinyin, ref_text, text_align, audio_url, del, gmt_create, gmt_modified
     </sql>
 
+    <select id="getRand" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from
+        cpsrcd
+        <where>
+            <if test="type!=null and type!=''">
+                and type = #{type}
+            </if>
+            <if test="difficultyBegin != null and difficultyEnd != null">
+                and difficulty between #{difficultyBegin} and #{difficultyEnd}
+            </if>
+
+            <if test="refText!=null and refText!=''">
+                and ref_text like CONCAT('%',#{refText},'%')
+            </if>
+        </where>
+        order by rand() limit 1
+    </select>
+
 </mapper>

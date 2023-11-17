@@ -18,6 +18,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
+
 @RestController
 @RequestMapping("/api/cpsrcd/v1")
 public class CpsrcdController {
@@ -80,7 +82,10 @@ public class CpsrcdController {
      */
     @PostMapping("rand")
     public JsonData rand(@RequestBody CpsrcdFilterReq cpsrcdFilter) {
+        long startTime = new Date().getTime();
         Object data = cpsrcdService.random(cpsrcdFilter);
+        long endTime = new Date().getTime();
+        System.out.println("随机一题总耗时："+(endTime-startTime)+"ms");
         return JsonData.buildSuccess(data);
     }
 }
