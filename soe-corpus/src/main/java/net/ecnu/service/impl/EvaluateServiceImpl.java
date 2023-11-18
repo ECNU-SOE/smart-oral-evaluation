@@ -306,12 +306,13 @@ public class EvaluateServiceImpl implements EvaluateService {
             try {
                 //FileInputStream inputStream = new FileInputStream(audio);
                 //MockMultipartFile multipartFile = new MockMultipartFile("audio", audio.getName(), "audio/wav", inputStream);
-                JsonData evaluateData = evaluateFeignService.evalByZY(audio, testByJieba);
+                JsonData evaluateData = evaluateFeignService.evalByZY(audio, testByJieba,category);
                 if (SOEConst.SUCCESS.intValue() != evaluateData.getCode().intValue()) {
                     log.info("自研语音评测异常,出参:{}",JSON.toJSON(evaluateData));
                     String errorInfo = StringUtils.isEmpty(evaluateData.getMsg()) ? "" : evaluateData.getMsg();
                     throw new BizException(BizCodeEnum.EVALUATE_ERROR.getCode(),BizCodeEnum.EVALUATE_ERROR.getMessage() + errorInfo);
                 }
+                log.info("自研语音评测成功，出参:{}",JSON.toJSON(evaluateData));
                 EvaluationXF evalJsonRes = JSON.parseObject(JSON.toJSONString(evaluateData.getData()),EvaluationXF.class);
                 if (!StringUtils.isEmpty(cpsrcdId)) {
                     RecPaper recPaper = evalJsonRes.getRecPaper();

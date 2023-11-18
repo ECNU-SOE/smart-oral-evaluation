@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import net.ecnu.model.common.Word;
 
+import java.util.List;
+
 /**
  * @description:
  * @Author lsy
@@ -60,5 +62,6 @@ public class Sentence {
     @JsonProperty("total_score")
     private double totalScore;
 
-    private Word word;
+
+    private List<Word> word;
 }

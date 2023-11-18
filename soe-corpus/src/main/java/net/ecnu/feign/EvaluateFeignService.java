@@ -15,7 +15,7 @@ import java.io.File;
  * @description: 自研测评接口调用Feign类
  * @date 2023/11/11 14:06
  */
-@FeignClient(name = "corpus-service",url = "http://59.78.194.202:8081/corpus-server")
+@FeignClient(name = "corpus-service",url = "http://6a5nz5.natappfree.cc/corpus-server"/*url = "http://59.78.194.202:8081/corpus-server"*/)
 public interface EvaluateFeignService {
     /**
      * jieba分词接口
@@ -31,7 +31,7 @@ public interface EvaluateFeignService {
      * **/
     @PostMapping(value = "/api/evaluate/v1/eval_test"
             ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    JsonData evalByZY(@RequestPart("audio") MultipartFile audio, @RequestPart("refText") String refText);
+    JsonData evalByZY(@RequestPart("audio") MultipartFile audio, @RequestPart("refText") String refText,@RequestPart("category") String category);
 
 
 }

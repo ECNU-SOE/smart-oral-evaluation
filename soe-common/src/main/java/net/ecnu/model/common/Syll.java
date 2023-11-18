@@ -3,6 +3,8 @@ package net.ecnu.model.common;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @description:
  * @Author lsy
@@ -46,5 +48,5 @@ public class Syll {
     @JsonProperty("time_len")
     private int timeLen;
 
-    private Phone phone;
+    private List<Phone> phone;
 }
