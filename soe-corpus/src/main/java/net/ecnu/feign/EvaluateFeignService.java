@@ -15,7 +15,7 @@ import java.io.File;
  * @description: 自研测评接口调用Feign类
  * @date 2023/11/11 14:06
  */
-@FeignClient(name = "corpus-service",url = "http://6a5nz5.natappfree.cc/corpus-server"/*url = "http://59.78.194.202:8081/corpus-server"*/)
+@FeignClient(name = "corpus-service",url = "${feign.client.url.evaluateUrl}"/*url = "http://59.78.194.202:8081/corpus-server"*/)
 public interface EvaluateFeignService {
     /**
      * jieba分词接口
