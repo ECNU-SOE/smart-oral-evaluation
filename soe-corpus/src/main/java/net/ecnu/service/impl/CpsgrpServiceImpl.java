@@ -115,8 +115,7 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         CpsgrpDO cpsgrpDO = cpsgrpMapper.selectById(cpsgrpId);
         if (cpsgrpDO == null) throw new BizException(BizCodeEnum.UNAUTHORIZED_OPERATION);
         //生成cpsgrpVO语料组对象
-        CpsgrpVO cpsgrpVO = new CpsgrpVO();
-        BeanUtils.copyProperties(cpsgrpDO, cpsgrpVO);
+        CpsgrpVO cpsgrpVO = beanProcess(cpsgrpDO);
         //获取topic大题列表
         List<TopicDO> topicDOS = topicManager.listByCpsgrpId(cpsgrpDO.getId());
         if (CollectionUtils.isEmpty(topicDOS)) return cpsgrpVO;    //没有大题，返回cpsgrp
@@ -144,7 +143,6 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
         List<CpsgrpDO> cpsgrpDOS = cpsgrpManager.listByFilter(cpsgrpFilter, pageData);
         int totalCount = cpsgrpManager.countByFilter(cpsgrpFilter);
         List<CpsgrpVO> cpsgrpVOS = cpsgrpDOS.stream().map(this::beanProcess).collect(Collectors.toList());
-        System.out.println("到这了");
         //查询当前语料组被几个所班级使用
         cpsgrpVOS.forEach(cpsgrpVO -> {
             Integer classCnt = classCpsgrpMapper.selectCount(new QueryWrapper<ClassCpsgrpDO>().eq("cpsgrp_id", cpsgrpVO.getId()));
