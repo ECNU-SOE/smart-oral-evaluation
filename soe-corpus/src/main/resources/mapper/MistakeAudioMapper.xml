@@ -352,7 +352,7 @@
 		tc.c_num AS cNum,
 		rcd.eval_mode AS evalModel,
 		rcd.type AS type,
-		rcd.difficulty AS difficulty,
+        CONVERT(rcd.difficulty, CHAR) AS difficulty,
 		tc.score AS score,
 		tc.enable_pinyin AS enablePinYin,
 		rcd.pinyin AS pinyin,

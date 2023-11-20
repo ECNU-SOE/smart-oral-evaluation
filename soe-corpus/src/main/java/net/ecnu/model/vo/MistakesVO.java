@@ -54,7 +54,7 @@ public class MistakesVO implements Serializable {
     /**
      * 语料难度
      */
-    private Integer difficulty;
+    private String difficulty;
 
     /**
      * 是否启用拼音
