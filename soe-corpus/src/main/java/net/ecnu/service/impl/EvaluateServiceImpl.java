@@ -282,6 +282,7 @@ public class EvaluateServiceImpl implements EvaluateService {
                 MistakeInfoDto mistakeInfoDto = new MistakeInfoDto();
                 mistakeInfoDto.setCpsrcdId(cpsrcdId);
                 mistakeInfoDto.setCpsgrpId(StringUtils.isEmpty(cpsgrpId) ? "" : cpsgrpId);
+
                 mistakeAudioService.isAddInErrorBook(currentAccountNo, mistakeInfoDto, totalSocre, 100.00);
             }
             EvalRecordDO evalRecordDO = new EvalRecordDO();

@@ -5,7 +5,7 @@
     <!--@mbg.generated-->
     <!--@Table mistake_audio-->
     <id column="mistake_id" jdbcType="BIGINT" property="mistakeId" />
-    <result column="cpsgrp_id" jdbcType="VARCHAR" property="cpsgrpId" />
+    <result column="topic_cps_id" jdbcType="INTEGER" property="topicCpsId" />
     <result column="cpsrcd_id" jdbcType="VARCHAR" property="cpsrcdId" />
     <result column="mistake_type" jdbcType="INTEGER" property="mistakeType" />
     <result column="user_id" jdbcType="VARCHAR" property="userId" />
@@ -76,7 +76,7 @@
   </sql>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    mistake_id, cpsgrp_id, cpsrcd_id, mistake_type, user_id, error_sum, del_flg, create_time,
+    mistake_id, topic_cps_id, cpsrcd_id, mistake_type, user_id, error_sum, del_flg, create_time,
     update_time
   </sql>
   <select id="selectByExample" parameterType="net.ecnu.model.MistakeAudioDOExample" resultMap="BaseResultMap">
@@ -115,19 +115,19 @@
   </delete>
   <insert id="insert" keyColumn="mistake_id" keyProperty="mistakeId" parameterType="net.ecnu.model.MistakeAudioDO" useGeneratedKeys="true">
     <!--@mbg.generated-->
-    insert into mistake_audio (cpsgrp_id, cpsrcd_id, mistake_type,
-      user_id, error_sum, del_flg,
-      create_time, update_time)
-    values (#{cpsgrpId,jdbcType=VARCHAR}, #{cpsrcdId,jdbcType=VARCHAR}, #{mistakeType,jdbcType=INTEGER},
-      #{userId,jdbcType=VARCHAR}, #{errorSum,jdbcType=INTEGER}, #{delFlg,jdbcType=BOOLEAN},
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+    insert into mistake_audio (topic_cps_id, cpsrcd_id, mistake_type,
+    user_id, error_sum, del_flg,
+    create_time, update_time)
+    values (#{topicCpsId,jdbcType=INTEGER}, #{cpsrcdId,jdbcType=VARCHAR}, #{mistakeType,jdbcType=INTEGER},
+    #{userId,jdbcType=VARCHAR}, #{errorSum,jdbcType=INTEGER}, #{delFlg,jdbcType=BOOLEAN},
+    #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" keyColumn="mistake_id" keyProperty="mistakeId" parameterType="net.ecnu.model.MistakeAudioDO" useGeneratedKeys="true">
     <!--@mbg.generated-->
     insert into mistake_audio
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="cpsgrpId != null">
-        cpsgrp_id,
+      <if test="topicCpsId != null">
+        topic_cps_id,
       </if>
       <if test="cpsrcdId != null">
         cpsrcd_id,
@@ -152,8 +152,8 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="cpsgrpId != null">
-        #{cpsgrpId,jdbcType=VARCHAR},
+      <if test="topicCpsId != null">
+        #{topicCpsId,jdbcType=INTEGER},
       </if>
       <if test="cpsrcdId != null">
         #{cpsrcdId,jdbcType=VARCHAR},
@@ -192,8 +192,8 @@
       <if test="record.mistakeId != null">
         mistake_id = #{record.mistakeId,jdbcType=BIGINT},
       </if>
-      <if test="record.cpsgrpId != null">
-        cpsgrp_id = #{record.cpsgrpId,jdbcType=VARCHAR},
+      <if test="record.topicCpsId != null">
+        topic_cps_id = #{record.topicCpsId,jdbcType=INTEGER},
       </if>
       <if test="record.cpsrcdId != null">
         cpsrcd_id = #{record.cpsrcdId,jdbcType=VARCHAR},
@@ -225,14 +225,14 @@
     <!--@mbg.generated-->
     update mistake_audio
     set mistake_id = #{record.mistakeId,jdbcType=BIGINT},
-      cpsgrp_id = #{record.cpsgrpId,jdbcType=VARCHAR},
-      cpsrcd_id = #{record.cpsrcdId,jdbcType=VARCHAR},
-      mistake_type = #{record.mistakeType,jdbcType=INTEGER},
-      user_id = #{record.userId,jdbcType=VARCHAR},
-      error_sum = #{record.errorSum,jdbcType=INTEGER},
-      del_flg = #{record.delFlg,jdbcType=BOOLEAN},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+    topic_cps_id = #{record.topicCpsId,jdbcType=INTEGER},
+    cpsrcd_id = #{record.cpsrcdId,jdbcType=VARCHAR},
+    mistake_type = #{record.mistakeType,jdbcType=INTEGER},
+    user_id = #{record.userId,jdbcType=VARCHAR},
+    error_sum = #{record.errorSum,jdbcType=INTEGER},
+    del_flg = #{record.delFlg,jdbcType=BOOLEAN},
+    create_time = #{record.createTime,jdbcType=TIMESTAMP},
+    update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -241,8 +241,8 @@
     <!--@mbg.generated-->
     update mistake_audio
     <set>
-      <if test="cpsgrpId != null">
-        cpsgrp_id = #{cpsgrpId,jdbcType=VARCHAR},
+      <if test="topicCpsId != null">
+        topic_cps_id = #{topicCpsId,jdbcType=INTEGER},
       </if>
       <if test="cpsrcdId != null">
         cpsrcd_id = #{cpsrcdId,jdbcType=VARCHAR},
@@ -271,16 +271,78 @@
   <update id="updateByPrimaryKey" parameterType="net.ecnu.model.MistakeAudioDO">
     <!--@mbg.generated-->
     update mistake_audio
-    set cpsgrp_id = #{cpsgrpId,jdbcType=VARCHAR},
-      cpsrcd_id = #{cpsrcdId,jdbcType=VARCHAR},
-      mistake_type = #{mistakeType,jdbcType=INTEGER},
-      user_id = #{userId,jdbcType=VARCHAR},
-      error_sum = #{errorSum,jdbcType=INTEGER},
-      del_flg = #{delFlg,jdbcType=BOOLEAN},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    set topic_cps_id = #{topicCpsId,jdbcType=INTEGER},
+    cpsrcd_id = #{cpsrcdId,jdbcType=VARCHAR},
+    mistake_type = #{mistakeType,jdbcType=INTEGER},
+    user_id = #{userId,jdbcType=VARCHAR},
+    error_sum = #{errorSum,jdbcType=INTEGER},
+    del_flg = #{delFlg,jdbcType=BOOLEAN},
+    create_time = #{createTime,jdbcType=TIMESTAMP},
+    update_time = #{updateTime,jdbcType=TIMESTAMP}
     where mistake_id = #{mistakeId,jdbcType=BIGINT}
   </update>
+  <update id="updateBatch" parameterType="java.util.List">
+    <!--@mbg.generated-->
+    update mistake_audio
+    <trim prefix="set" suffixOverrides=",">
+      <trim prefix="topic_cps_id = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when mistake_id = #{item.mistakeId,jdbcType=BIGINT} then #{item.topicCpsId,jdbcType=INTEGER}
+        </foreach>
+      </trim>
+      <trim prefix="cpsrcd_id = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when mistake_id = #{item.mistakeId,jdbcType=BIGINT} then #{item.cpsrcdId,jdbcType=VARCHAR}
+        </foreach>
+      </trim>
+      <trim prefix="mistake_type = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when mistake_id = #{item.mistakeId,jdbcType=BIGINT} then #{item.mistakeType,jdbcType=INTEGER}
+        </foreach>
+      </trim>
+      <trim prefix="user_id = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when mistake_id = #{item.mistakeId,jdbcType=BIGINT} then #{item.userId,jdbcType=VARCHAR}
+        </foreach>
+      </trim>
+      <trim prefix="error_sum = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when mistake_id = #{item.mistakeId,jdbcType=BIGINT} then #{item.errorSum,jdbcType=INTEGER}
+        </foreach>
+      </trim>
+      <trim prefix="del_flg = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when mistake_id = #{item.mistakeId,jdbcType=BIGINT} then #{item.delFlg,jdbcType=BOOLEAN}
+        </foreach>
+      </trim>
+      <trim prefix="create_time = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when mistake_id = #{item.mistakeId,jdbcType=BIGINT} then #{item.createTime,jdbcType=TIMESTAMP}
+        </foreach>
+      </trim>
+      <trim prefix="update_time = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          when mistake_id = #{item.mistakeId,jdbcType=BIGINT} then #{item.updateTime,jdbcType=TIMESTAMP}
+        </foreach>
+      </trim>
+    </trim>
+    where mistake_id in
+    <foreach close=")" collection="list" item="item" open="(" separator=", ">
+      #{item.mistakeId,jdbcType=BIGINT}
+    </foreach>
+  </update>
+  <insert id="batchInsert" keyColumn="mistake_id" keyProperty="mistakeId" parameterType="map" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into mistake_audio
+    (topic_cps_id, cpsrcd_id, mistake_type, user_id, error_sum, del_flg, create_time,
+    update_time)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.topicCpsId,jdbcType=INTEGER}, #{item.cpsrcdId,jdbcType=VARCHAR}, #{item.mistakeType,jdbcType=INTEGER},
+      #{item.userId,jdbcType=VARCHAR}, #{item.errorSum,jdbcType=INTEGER}, #{item.delFlg,jdbcType=BOOLEAN},
+      #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateTime,jdbcType=TIMESTAMP})
+    </foreach>
+  </insert>
 
   <select id="selectMistakeTotal" resultType="java.lang.Integer">
     select
@@ -325,8 +387,8 @@
 
   <select id="getCpsrcdIdByUserIdAndMistakeType" resultType="net.ecnu.model.dto.MistakeInfoDto">
     select
-      IFNULL(cpsgrp_id,''),
-      cpsrcd_id
+      cpsrcd_id AS cpsrcdId,
+      topic_cps_id AS topicCpsId
     from
       mistake_audio
     where
@@ -341,31 +403,16 @@
   <select id="getMistakesInfo" resultType="net.ecnu.model.vo.MistakesVO">
     select
 		rcd.id AS cpsrcdId,
-		t.cpsgrp_id AS cpsgrpId,
-        (CASE
-        WHEN (t.id IS NULL OR t.id = '')  THEN ''
-        ELSE
-            CONCAT(grp.description,t.title,"第",tc.c_num,"题")
-        END) AS description,
-		IFNULL(tc.topic_id,'') AS topicId,
-		t.title AS topicTitle,
-		tc.c_num AS cNum,
+        "随机一题" AS description,
 		rcd.eval_mode AS evalModel,
 		rcd.type AS type,
         CONVERT(rcd.difficulty, CHAR) AS difficulty,
-		tc.score AS score,
-		tc.enable_pinyin AS enablePinYin,
+        1 AS enablePinYin,
 		rcd.pinyin AS pinyin,
 		rcd.ref_text AS refText,
 		rcd.audio_url AS audioUrl
     from
         cpsrcd rcd
-    LEFT JOIN
-        topic_cps tc ON rcd.id = tc.cpsrcd_id
-    LEFT JOIN
-        topic t ON t.id = tc.topic_id
-    LEFT JOIN
-        cpsgrp grp ON t.cpsgrp_id = grp.id AND grp.del = 0
     where
         rcd.del = 0
     and
@@ -405,5 +452,41 @@
       id = #{cpsrcdId,jdbcType=VARCHAR}
   </select>
 
-
+  <select id="getGrpMistakesInfo" resultType="net.ecnu.model.vo.MistakesVO">
+    select
+        rcd.id AS cpsrcdId,
+        t.cpsgrp_id AS cpsgrpId,
+        tc.id AS topicCpsId,
+        (CASE
+        WHEN (t.id IS NULL OR t.id = '')  THEN ''
+        ELSE
+        CONCAT(grp.description,t.title,"第",tc.c_num,"题")
+        END) AS description,
+        IFNULL(tc.topic_id,'') AS topicId,
+        t.title AS topicTitle,
+        tc.c_num AS cNum,
+        rcd.eval_mode AS evalModel,
+        rcd.type AS type,
+        CONVERT(rcd.difficulty, CHAR) AS difficulty,
+        tc.score AS score,
+        tc.enable_pinyin AS enablePinYin,
+        rcd.pinyin AS pinyin,
+        rcd.ref_text AS refText,
+        rcd.audio_url AS audioUrl
+    from
+        cpsrcd rcd
+    LEFT JOIN
+        topic_cps tc ON rcd.id = tc.cpsrcd_id
+    LEFT JOIN
+        topic t ON t.id = tc.topic_id
+    LEFT JOIN
+        cpsgrp grp ON t.cpsgrp_id = grp.id AND grp.del = 0
+    where
+        rcd.del = 0
+    and
+    <foreach collection="topicCpsrcdList" item="mistakeInfo" open="(" close=")" separator=" or ">
+      ( rcd.id = #{mistakeInfo.cpsrcdId,jdbcType=VARCHAR} AND tc.id = #{mistakeInfo.topicCpsId,jdbcType=INTEGER} )
+    </foreach>
+    GROUP BY cpsrcdId
+  </select>
 </mapper>

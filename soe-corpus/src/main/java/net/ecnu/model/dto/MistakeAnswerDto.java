@@ -20,6 +20,11 @@ public class MistakeAnswerDto {
     private String cpsrcdId;
 
     /**
+     * topic_cps.id 关联字段
+     * **/
+    private Integer topicCpsId;
+
+    /**
      * 题目组id
      * **/
     private String cpsgrpId;

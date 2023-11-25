@@ -19,53 +19,27 @@ public interface MistakeAudioMapper {
 
     int deleteByExample(MistakeAudioDOExample example);
 
-    /**
-     * delete by primary key
-     * @param mistakeId primaryKey
-     * @return deleteCount
-     */
     int deleteByPrimaryKey(Long mistakeId);
 
-    /**
-     * insert record to table
-     * @param record the record
-     * @return insert count
-     */
     int insert(MistakeAudioDO record);
 
-    /**
-     * insert record to table selective
-     * @param record the record
-     * @return insert count
-     */
     int insertSelective(MistakeAudioDO record);
 
     List<MistakeAudioDO> selectByExample(MistakeAudioDOExample example);
 
-    /**
-     * select by primary key
-     * @param mistakeId primary key
-     * @return object by primary key
-     */
     MistakeAudioDO selectByPrimaryKey(Long mistakeId);
 
     int updateByExampleSelective(@Param("record") MistakeAudioDO record, @Param("example") MistakeAudioDOExample example);
 
     int updateByExample(@Param("record") MistakeAudioDO record, @Param("example") MistakeAudioDOExample example);
 
-    /**
-     * update record selective
-     * @param record the updated record
-     * @return update count
-     */
     int updateByPrimaryKeySelective(MistakeAudioDO record);
 
-    /**
-     * update record
-     * @param record the updated record
-     * @return update count
-     */
     int updateByPrimaryKey(MistakeAudioDO record);
+
+    int updateBatch(List<MistakeAudioDO> list);
+
+    int batchInsert(@Param("list") List<MistakeAudioDO> list);
 
     Integer selectMistakeTotal(@Param("userId") String userId);
 
@@ -86,4 +60,6 @@ public interface MistakeAudioMapper {
     int addWrongNumByCpsrcdId(@Param("userId") String userId,@Param("cpsrcdId") String cpsrcdId,@Param("cpsgrpId")String cpsgrpId);
 
     String getQuestionType(@Param("cpsrcdId") String cpsrcdId);
+
+    List<MistakesVO> getGrpMistakesInfo(@Param("topicCpsrcdList") List<MistakeInfoDto> topicCpsrcdList);
 }

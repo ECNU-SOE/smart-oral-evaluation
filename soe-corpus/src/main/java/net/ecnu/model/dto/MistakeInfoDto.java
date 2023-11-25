@@ -11,6 +11,11 @@ import lombok.Data;
 public class MistakeInfoDto {
 
     /**
+     * topic_cps关联id
+     * **/
+    private Integer topicCpsId;
+
+    /**
      * 题组id
      * **/
     private String cpsgrpId;

@@ -5,9 +5,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @description:
- * @Author lsy
- * @Date 2023/10/10 0:22
+ * @description 
+ * @author Joshua
+ * @date 2023/11/25 12:46
  */
 public class MistakeAudioDOExample {
     protected String orderByClause;
@@ -170,73 +170,63 @@ public class MistakeAudioDOExample {
             return (Criteria) this;
         }
 
-        public Criteria andCpsgrpIdIsNull() {
-            addCriterion("cpsgrp_id is null");
+        public Criteria andTopicCpsIdIsNull() {
+            addCriterion("topic_cps_id is null");
             return (Criteria) this;
         }
 
-        public Criteria andCpsgrpIdIsNotNull() {
-            addCriterion("cpsgrp_id is not null");
+        public Criteria andTopicCpsIdIsNotNull() {
+            addCriterion("topic_cps_id is not null");
             return (Criteria) this;
         }
 
-        public Criteria andCpsgrpIdEqualTo(String value) {
-            addCriterion("cpsgrp_id =", value, "cpsgrpId");
+        public Criteria andTopicCpsIdEqualTo(Integer value) {
+            addCriterion("topic_cps_id =", value, "topicCpsId");
             return (Criteria) this;
         }
 
-        public Criteria andCpsgrpIdNotEqualTo(String value) {
-            addCriterion("cpsgrp_id <>", value, "cpsgrpId");
+        public Criteria andTopicCpsIdNotEqualTo(Integer value) {
+            addCriterion("topic_cps_id <>", value, "topicCpsId");
             return (Criteria) this;
         }
 
-        public Criteria andCpsgrpIdGreaterThan(String value) {
-            addCriterion("cpsgrp_id >", value, "cpsgrpId");
+        public Criteria andTopicCpsIdGreaterThan(Integer value) {
+            addCriterion("topic_cps_id >", value, "topicCpsId");
             return (Criteria) this;
         }
 
-        public Criteria andCpsgrpIdGreaterThanOrEqualTo(String value) {
-            addCriterion("cpsgrp_id >=", value, "cpsgrpId");
+        public Criteria andTopicCpsIdGreaterThanOrEqualTo(Integer value) {
+            addCriterion("topic_cps_id >=", value, "topicCpsId");
             return (Criteria) this;
         }
 
-        public Criteria andCpsgrpIdLessThan(String value) {
-            addCriterion("cpsgrp_id <", value, "cpsgrpId");
+        public Criteria andTopicCpsIdLessThan(Integer value) {
+            addCriterion("topic_cps_id <", value, "topicCpsId");
             return (Criteria) this;
         }
 
-        public Criteria andCpsgrpIdLessThanOrEqualTo(String value) {
-            addCriterion("cpsgrp_id <=", value, "cpsgrpId");
+        public Criteria andTopicCpsIdLessThanOrEqualTo(Integer value) {
+            addCriterion("topic_cps_id <=", value, "topicCpsId");
             return (Criteria) this;
         }
 
-        public Criteria andCpsgrpIdLike(String value) {
-            addCriterion("cpsgrp_id like", value, "cpsgrpId");
+        public Criteria andTopicCpsIdIn(List<Integer> values) {
+            addCriterion("topic_cps_id in", values, "topicCpsId");
             return (Criteria) this;
         }
 
-        public Criteria andCpsgrpIdNotLike(String value) {
-            addCriterion("cpsgrp_id not like", value, "cpsgrpId");
+        public Criteria andTopicCpsIdNotIn(List<Integer> values) {
+            addCriterion("topic_cps_id not in", values, "topicCpsId");
             return (Criteria) this;
         }
 
-        public Criteria andCpsgrpIdIn(List<String> values) {
-            addCriterion("cpsgrp_id in", values, "cpsgrpId");
+        public Criteria andTopicCpsIdBetween(Integer value1, Integer value2) {
+            addCriterion("topic_cps_id between", value1, value2, "topicCpsId");
             return (Criteria) this;
         }
 
-        public Criteria andCpsgrpIdNotIn(List<String> values) {
-            addCriterion("cpsgrp_id not in", values, "cpsgrpId");
-            return (Criteria) this;
-        }
-
-        public Criteria andCpsgrpIdBetween(String value1, String value2) {
-            addCriterion("cpsgrp_id between", value1, value2, "cpsgrpId");
-            return (Criteria) this;
-        }
-
-        public Criteria andCpsgrpIdNotBetween(String value1, String value2) {
-            addCriterion("cpsgrp_id not between", value1, value2, "cpsgrpId");
+        public Criteria andTopicCpsIdNotBetween(Integer value1, Integer value2) {
+            addCriterion("topic_cps_id not between", value1, value2, "topicCpsId");
             return (Criteria) this;
         }
 

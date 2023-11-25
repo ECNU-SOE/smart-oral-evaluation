@@ -21,6 +21,11 @@ public class MistakesVO implements Serializable {
     private String cpsrcdId;
 
     /**
+     * topic_cps.id 关联字段
+     * **/
+    private Integer topicCpsId;
+
+    /**
      * 所属语料组id
      */
     private String cpsgrpId;

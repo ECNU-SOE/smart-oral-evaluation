@@ -25,6 +25,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @description:
@@ -131,15 +132,26 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
     @Override
     public List<MistakesVO> getMistake(MistakesDto mistakesDto) {
         String currentAccountNo = RequestParamUtil.currentAccountNo();
-        List<MistakesVO> mistakesVOS = new ArrayList<>();
+        List<MistakesVO> randomMistakesVOS = new ArrayList<>();
+        List<MistakesVO> cpsgrpMistakesVOS = new ArrayList<>();
         //获取cpsrcd快照题目id
         List<MistakeInfoDto> mistakeInfoList = mistakeAudioMapper.getCpsrcdIdByUserIdAndMistakeType(currentAccountNo
                 ,mistakesDto.getMistakeTypeCode(),mistakesDto.getOneWeekKey());
         /**有些题目是随机一题来的，没有cpsgrpId,需要区分开**/
         //查询对应的题目信息
         if (!CollectionUtils.isEmpty(mistakeInfoList)) {
-            mistakesVOS = mistakeAudioMapper.getMistakesInfo(mistakeInfoList);
+            List<MistakeInfoDto> randomList = mistakeInfoList.stream().filter(t -> Objects.isNull(t.getTopicCpsId())).collect(Collectors.toList());
+            List<MistakeInfoDto> grpList = mistakeInfoList.stream().filter(t -> Objects.nonNull(t.getTopicCpsId())).collect(Collectors.toList());
+            if(!CollectionUtils.isEmpty(randomList)){
+                randomMistakesVOS = mistakeAudioMapper.getMistakesInfo(randomList);
+            }
+            if(!CollectionUtils.isEmpty(grpList)){
+                cpsgrpMistakesVOS = mistakeAudioMapper.getGrpMistakesInfo(grpList);
+            }
         }
+        List<MistakesVO> mistakesVOS = new ArrayList<>();
+        mistakesVOS.addAll(randomMistakesVOS);
+        mistakesVOS.addAll(cpsgrpMistakesVOS);
         //获取题目对应的tag信息
         for (MistakesVO mistakesVO : mistakesVOS) {
             if (!StringUtils.isEmpty(mistakesVO.getCpsrcdId())){
@@ -157,6 +169,7 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
         MistakeInfoDto mistakeInfoDto = new MistakeInfoDto();
         mistakeInfoDto.setCpsrcdId(mistakeAnswer.getCpsrcdId());
         mistakeInfoDto.setCpsgrpId(mistakeAnswer.getCpsgrpId());
+        mistakeInfoDto.setTopicCpsId(mistakeAnswer.getTopicCpsId());
         if (this.isAddInErrorBook(currentAccountNo, mistakeInfoDto, mistakeAnswer.getSuggestedScore(), mistakeAnswer.getQuestionScore())) {
             mistakeAnswerVO.setResultMsg("答对题目将从错题本移除");
             return mistakeAnswerVO;
@@ -197,8 +210,8 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
             List<MistakeAudioDO> mistakeAudioDOS = mistakeAudioMapper.selectByExample(mistakeAudioDOExample);
             if (CollectionUtils.isEmpty(mistakeAudioDOS)) {
                 MistakeAudioDO record = new MistakeAudioDO();
-                record.setCreateTime(new Date()).setCpsrcdId(mistakeInfoDto.getCpsrcdId())
-                        .setCpsgrpId(mistakeInfoDto.getCpsgrpId()).setErrorSum(1)
+                record.setCreateTime(new Date()).setTopicCpsId(mistakeInfoDto.getTopicCpsId())
+                        .setCpsrcdId(mistakeInfoDto.getCpsrcdId()).setErrorSum(1)
                         .setUserId(userId).setUpdateTime(new Date()).setMistakeType(questionType)
                         .setDelFlg(false);
                 if (mistakeAudioMapper.insertSelective(record) <= 0) {
@@ -206,7 +219,7 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
                 }
             } else {
                 MistakeAudioDO mistakeAudioDO = mistakeAudioDOS.get(0);
-                mistakeAudioDO.setCpsgrpId(mistakeInfoDto.getCpsgrpId());
+                mistakeAudioDO.setTopicCpsId(mistakeInfoDto.getTopicCpsId());
                 //答题错误次数增加
                 mistakeAudioDO.setErrorSum(mistakeAudioDO.getErrorSum() + 1);
                 //更新时间

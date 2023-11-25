@@ -3,13 +3,12 @@ package net.ecnu.model;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
- * @description:
- * @Author lsy
- * @Date 2023/10/10 0:22
+ * @description 
+ * @author Joshua
+ * @date 2023/11/25 12:46
  */
 
 /**
@@ -17,7 +16,6 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-@NoArgsConstructor
 public class MistakeAudioDO implements Serializable {
     /**
      * 错题id
@@ -25,9 +23,9 @@ public class MistakeAudioDO implements Serializable {
     private Long mistakeId;
 
     /**
-     * 题组id
+     * 题型-题目关联code(topic_cps.id)
      */
-    private String cpsgrpId;
+    private Integer topicCpsId;
 
     /**
      * 快照id（cpsrcd.id）
@@ -35,7 +33,7 @@ public class MistakeAudioDO implements Serializable {
     private String cpsrcdId;
 
     /**
-     * 错题类型，默认为0-语音评测
+     * 错题类型，1-朗读字词,2-朗读句子,3-朗读诗词,4-朗读文章，5-单选题，6-多选题，7-写汉字，8-看视频答题，9-其他类型，没有类型默认为9
      */
     private Integer mistakeType;
 
