@@ -10,6 +10,7 @@ import com.tencentcloudapi.soe.v20180724.models.WordRsp;
 import lombok.extern.slf4j.Slf4j;
 import net.ecnu.constant.SOEConst;
 import net.ecnu.enums.BizCodeEnum;
+import net.ecnu.enums.CategoryEnum;
 import net.ecnu.enums.EvaluateTypeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.feign.EvaluateFeignService;
@@ -18,7 +19,10 @@ import net.ecnu.model.EvalListener;
 import net.ecnu.model.EvalRecordDO;
 import net.ecnu.model.common.EvaluationXF;
 import net.ecnu.model.common.RecPaper;
+import net.ecnu.model.common.readChapterByXF.ReadChapter;
 import net.ecnu.model.common.readSentenceByXF.ReadSentence;
+import net.ecnu.model.common.readSyllableByXF.ReadSyllable;
+import net.ecnu.model.common.readWordByXF.ReadWord;
 import net.ecnu.model.dto.MistakeInfoDto;
 import net.ecnu.model.vo.EvalResultVO;
 import net.ecnu.service.EvaluateService;
@@ -305,8 +309,6 @@ public class EvaluateServiceImpl implements EvaluateService {
             log.info("jieba处理后的文本:{}",JSON.toJSON(testByJieba));
             /**语音评测**/
             try {
-                //FileInputStream inputStream = new FileInputStream(audio);
-                //MockMultipartFile multipartFile = new MockMultipartFile("audio", audio.getName(), "audio/wav", inputStream);
                 JsonData evaluateData = evaluateFeignService.evalByZY(audio, testByJieba,category);
                 if (SOEConst.SUCCESS.intValue() != evaluateData.getCode().intValue()) {
                     log.info("自研语音评测异常,出参:{}",JSON.toJSON(evaluateData));
@@ -317,8 +319,20 @@ public class EvaluateServiceImpl implements EvaluateService {
                 EvaluationXF evalJsonRes = JSON.parseObject(JSON.toJSONString(evaluateData.getData()),EvaluationXF.class);
                 if (!StringUtils.isEmpty(cpsrcdId)) {
                     RecPaper recPaper = evalJsonRes.getRecPaper();
-                    ReadSentence readSentence = recPaper.getReadSentence();
-                    double totalScore = readSentence.getTotalScore();
+                    double totalScore = 0.0;
+                    if (CategoryEnum.READ_SYLLABLE.getMsg().equals(category)) {
+                        ReadSyllable readSyllable = recPaper.getReadSyllable();
+                        totalScore = readSyllable.getTotalScore();
+                    } else if (CategoryEnum.READ_WORD.getMsg().equals(category)) {
+                        ReadWord readWord = recPaper.getReadWord();
+                        totalScore = readWord.getTotalScore();
+                    } else if (CategoryEnum.READ_SENTENCE.getMsg().equals(category)) {
+                        ReadSentence readSentence = recPaper.getReadSentence();
+                        totalScore = readSentence.getTotalScore();
+                    } else if (CategoryEnum.READ_CHAPTER.getMsg().equals(category)) {
+                        ReadChapter readChapter = recPaper.getReadChapter();
+                        totalScore = readChapter.getTotalScore();
+                    }
                     String currentAccountNo = RequestParamUtil.currentAccountNo();
                     MistakeInfoDto mistakeInfoDto = new MistakeInfoDto();
                     mistakeInfoDto.setCpsrcdId(cpsrcdId);
