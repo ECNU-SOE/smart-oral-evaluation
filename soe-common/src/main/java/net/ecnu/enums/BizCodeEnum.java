@@ -85,7 +85,12 @@ public enum BizCodeEnum {
      * 自研语音评测异常
      * **/
     JIEBA_ERROR(550000,"jieba分词异常-"),
-    EVALUATE_ERROR(550001,"自研语音评测异常-")
+    EVALUATE_ERROR(550001,"自研语音评测异常-"),
+
+    /**
+     * 答题报告异常
+     * **/
+    TRANSCRIPT_ERROR(600000,"答题报告业务异常")
     ;
     @Getter
     private final int code;

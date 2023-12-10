@@ -41,10 +41,10 @@
             c.`name` AS name,
             cc.cpsgrp_id AS cpsgrpId,
             count(uc.account_no) AS studentNums,
-            AVG(temp.pron_completion) AS pronCompletionAverage,
+            <!--AVG(temp.pron_completion) AS pronCompletionAverage,
             AVG(temp.pron_accuracy) AS pronAccuracyAverage,
-            AVG(temp.pron_fluency) AS pronFluencyAverage,
-            AVG(temp.suggested_score) AS suggestedScoreAverage
+            AVG(temp.pron_fluency) AS pronFluencyAverage,-->
+            AVG(temp.system_score) AS suggestedScoreAverage
         FROM
             class c
         LEFT JOIN
@@ -55,13 +55,13 @@
             (SELECT
                 t.respondent,
                 t.cpsgrp_id,
-                t.pron_completion,
+                <!--t.pron_completion,
                 t.pron_accuracy,
-                t.pron_fluency,
-                t.suggested_score
+                t.pron_fluency,-->
+                t.system_score
             FROM
                 (SELECT
-                    respondent,cpsgrp_id,pron_completion,pron_accuracy,pron_fluency,suggested_score
+                    respondent,cpsgrp_id,<!--pron_completion,pron_accuracy,pron_fluency,-->system_score
                 FROM transcript
                 ORDER BY gmt_create DESC
                 LIMIT 99999999999
@@ -79,23 +79,23 @@
         SELECT
             u.real_name AS studentName,
             IF( u.sex > 0, '男', '女' ) AS sex,
-            temp.pron_completion AS pronCompletionScore,
+            <!--temp.pron_completion AS pronCompletionScore,
             temp.pron_accuracy AS pronAccuracyScore,
-            temp.pron_fluency AS pronFluencyScore,
-            IFNULL(temp.suggested_score,0.0) AS suggestedScoreScore
+            temp.pron_fluency AS pronFluencyScore,-->
+            IFNULL(temp.system_score,0.0) AS suggestedScoreScore
         FROM
             user_class uc
             LEFT JOIN user u ON uc.account_no = u.account_no
             LEFT JOIN (SELECT
                         t.respondent,
                         t.cpsgrp_id,
-                        t.pron_completion,
+                        <!--t.pron_completion,
                         t.pron_accuracy,
-                        t.pron_fluency,
-                        t.suggested_score
+                        t.pron_fluency,-->
+                        t.system_score
                     FROM
                         (SELECT
-                            respondent,cpsgrp_id,pron_completion,pron_accuracy,pron_fluency,suggested_score
+                            respondent,cpsgrp_id,<!--pron_completion,pron_accuracy,pron_fluency,-->system_score
                         FROM transcript
                         ORDER BY gmt_create DESC
                         LIMIT 99999999999
@@ -172,7 +172,7 @@
       select
         temp.cpsgrp_id AS cpsgrpId,
         temp.respondent AS respondent,
-        temp.suggested_score AS suggestedScore,
+        temp.system_score AS suggestedScore,
         temp.gmt_create AS gmtCreate
       FROM
         (SELECT * FROM transcript ORDER BY gmt_create DESC LIMIT 9999999999) temp

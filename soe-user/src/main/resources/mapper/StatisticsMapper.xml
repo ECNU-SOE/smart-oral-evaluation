@@ -10,7 +10,7 @@
             select
               t.respondent,
               t.cpsgrp_id,
-              t.suggested_score
+              t.system_score
             from
               transcript t
             where

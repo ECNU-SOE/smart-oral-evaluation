@@ -1,38 +1,24 @@
 package net.ecnu.model;
 
-import java.math.BigDecimal;
-
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-
-import java.util.Date;
-
-import com.baomidou.mybatisplus.annotation.TableId;
-
 import java.io.Serializable;
-
+import java.math.BigDecimal;
+import java.util.Date;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
- * <p>
+ * @description 
+ * @author Joshua
+ * @date 2023/12/10 17:22
+ */
+
+/**
  * 成绩单
- * </p>
- *
- * @author LYW
- * @since 2023-03-28
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
-@TableName("transcript")
 public class TranscriptDO implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
     /**
      * 评测报告id
      */
-    @TableId(value = "id", type = IdType.NONE)
     private String id;
 
     /**
@@ -46,29 +32,24 @@ public class TranscriptDO implements Serializable {
     private String respondent;
 
     /**
-     * 完整度得分
+     * 系统评测得分
      */
-    private BigDecimal pronCompletion;
-
-    /**
-     * 准确度得分
-     */
-    private BigDecimal pronAccuracy;
-
-    /**
-     * 流畅度得分
-     */
-    private BigDecimal pronFluency;
-
-    /**
-     * 系统建议得分
-     */
-    private BigDecimal suggestedScore;
+    private BigDecimal systemScore;
 
     /**
      * 人工评测得分
      */
     private BigDecimal manualScore;
+
+    /**
+     * 批阅时间
+     * **/
+    private Date markTime;
+
+    /**
+     * 批阅人Code（user.account_no）
+     * **/
+    private String markUser;
 
     /**
      * json格式报告
@@ -85,5 +66,5 @@ public class TranscriptDO implements Serializable {
      */
     private Date gmtModified;
 
-
+    private static final long serialVersionUID = 1L;
 }
