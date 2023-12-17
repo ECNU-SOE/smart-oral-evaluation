@@ -7,8 +7,10 @@ import net.ecnu.enums.QuestionTypeEnum;
 import net.ecnu.exception.BizException;
 import net.ecnu.mapper.MistakeAudioMapper;
 import net.ecnu.mapper.TaggingMapper;
+import net.ecnu.mapper.TopicCpsMapper;
 import net.ecnu.model.MistakeAudioDO;
 import net.ecnu.model.MistakeAudioDOExample;
+import net.ecnu.model.TopicCpsDO;
 import net.ecnu.model.dto.MistakeAnswerDto;
 import net.ecnu.model.dto.MistakeInfoDto;
 import net.ecnu.model.dto.MistakesDto;
@@ -40,6 +42,9 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
     private MistakeAudioMapper mistakeAudioMapper;
     @Resource
     private TaggingMapper taggingMapper;
+
+    @Resource
+    private TopicCpsMapper topicCpsMapper;
 
     @Value("${pass.rate}")
     private Double PASS_RATE;
@@ -167,8 +172,6 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
         MistakeAnswerVO mistakeAnswerVO = new MistakeAnswerVO();
         String currentAccountNo = RequestParamUtil.currentAccountNo();
         MistakeInfoDto mistakeInfoDto = new MistakeInfoDto();
-        mistakeInfoDto.setCpsrcdId(mistakeAnswer.getCpsrcdId());
-        mistakeInfoDto.setCpsgrpId(mistakeAnswer.getCpsgrpId());
         mistakeInfoDto.setTopicCpsId(mistakeAnswer.getTopicCpsId());
         if (this.isAddInErrorBook(currentAccountNo, mistakeInfoDto, mistakeAnswer.getSuggestedScore(), mistakeAnswer.getQuestionScore())) {
             mistakeAnswerVO.setResultMsg("答对题目将从错题本移除");
@@ -193,8 +196,12 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
             //回答成功
             return true;
         } else {
+            TopicCpsDO topicCpsDO = topicCpsMapper.selectById(mistakeInfoDto.getTopicCpsId());
+            if (Objects.isNull(topicCpsDO)) {
+                throw new BizException(BizCodeEnum.TOPIC_CPS_UNEXIST);
+            }
             //回答失败，将该题加入用户的错题集
-            String questionTypeName = mistakeAudioMapper.getQuestionType(mistakeInfoDto.getCpsrcdId());
+            String questionTypeName = mistakeAudioMapper.getQuestionType(topicCpsDO.getCpsrcdId());
             /*if (Objects.isNull(questionType) || questionType < 0) {
                 //没有查询到它的题目类型，则默认为0语音评测
                 questionType = 0;
@@ -205,13 +212,13 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
             }
             /**查询是否已加入错题本**/
             MistakeAudioDOExample mistakeAudioDOExample = new MistakeAudioDOExample();
-            mistakeAudioDOExample.createCriteria().andUserIdEqualTo(userId).andCpsrcdIdEqualTo(mistakeInfoDto.getCpsrcdId())
+            mistakeAudioDOExample.createCriteria().andUserIdEqualTo(userId).andTopicCpsIdEqualTo(mistakeInfoDto.getTopicCpsId())
                     .andDelFlgEqualTo(false);
             List<MistakeAudioDO> mistakeAudioDOS = mistakeAudioMapper.selectByExample(mistakeAudioDOExample);
             if (CollectionUtils.isEmpty(mistakeAudioDOS)) {
                 MistakeAudioDO record = new MistakeAudioDO();
                 record.setCreateTime(new Date()).setTopicCpsId(mistakeInfoDto.getTopicCpsId())
-                        .setCpsrcdId(mistakeInfoDto.getCpsrcdId()).setErrorSum(1)
+                        .setTopicCpsId(mistakeInfoDto.getTopicCpsId()).setErrorSum(1)
                         .setUserId(userId).setUpdateTime(new Date()).setMistakeType(questionType)
                         .setDelFlg(false);
                 if (mistakeAudioMapper.insertSelective(record) <= 0) {

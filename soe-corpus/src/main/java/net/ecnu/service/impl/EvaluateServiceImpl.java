@@ -240,12 +240,11 @@ public class EvaluateServiceImpl implements EvaluateService {
      * @param refText 文本
      * @param pinyin 拼音
      * @param category
-     * @param cpsrcdId 题目id
-     * @param cpsgrpId 试题组id
+     * @param objectId topic_cps.id
      * @param evaluateType 评测方式 0-科大讯飞接口，1-自研接口
      */
     @Override
-    public Object evaluateByXF(MultipartFile audio, String refText, String pinyin, String category,String cpsrcdId,String cpsgrpId,Integer evaluateType) {
+    public Object evaluateByXF(MultipartFile audio, String refText, String pinyin, String category,String objectId,Integer evaluateType) {
         System.out.println("text:" + refText);
         EvalListener evalListener;
         if (EvaluateTypeEnum.XF_EVALUATE.getCode().intValue() == evaluateType.intValue()) {
@@ -275,7 +274,7 @@ public class EvaluateServiceImpl implements EvaluateService {
             //EvaluationXF evalJsonRes = JSON.parseObject(JSON.toJSONString(((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category)), EvaluationXF.class);
             Object evalJsonRes = ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
             //若cpsrcdId不为空，则调用错题记录逻辑
-            if (cpsrcdId != null) {
+            if (StringUtils.isEmpty(objectId)) {
                 JSONObject resJson = (JSONObject) ((JSONObject) evalListener.getEvalRes().get("xml_result")).get(category);
                 JSONObject sentenceInfo = (JSONObject) ((JSONObject) resJson.get("rec_paper")).get(category);
                 Double totalSocre = Double.parseDouble(sentenceInfo.get("total_score").toString());
@@ -284,9 +283,7 @@ public class EvaluateServiceImpl implements EvaluateService {
                     throw new BizException(BizCodeEnum.TOKEN_EXCEPTION);
                 }
                 MistakeInfoDto mistakeInfoDto = new MistakeInfoDto();
-                mistakeInfoDto.setCpsrcdId(cpsrcdId);
-                mistakeInfoDto.setCpsgrpId(StringUtils.isEmpty(cpsgrpId) ? "" : cpsgrpId);
-
+                mistakeInfoDto.setTopicCpsId(Integer.valueOf(objectId));
                 mistakeAudioService.isAddInErrorBook(currentAccountNo, mistakeInfoDto, totalSocre, 100.00);
             }
             EvalRecordDO evalRecordDO = new EvalRecordDO();
@@ -317,7 +314,7 @@ public class EvaluateServiceImpl implements EvaluateService {
                 }
                 log.info("自研语音评测成功，出参:{}",JSON.toJSON(evaluateData));
                 EvaluationXF evalJsonRes = JSON.parseObject(JSON.toJSONString(evaluateData.getData()),EvaluationXF.class);
-                if (!StringUtils.isEmpty(cpsrcdId)) {
+                if (!StringUtils.isEmpty(objectId)) {
                     RecPaper recPaper = evalJsonRes.getRecPaper();
                     double totalScore = 0.0;
                     if (CategoryEnum.READ_SYLLABLE.getMsg().equals(category)) {
@@ -335,8 +332,7 @@ public class EvaluateServiceImpl implements EvaluateService {
                     }
                     String currentAccountNo = RequestParamUtil.currentAccountNo();
                     MistakeInfoDto mistakeInfoDto = new MistakeInfoDto();
-                    mistakeInfoDto.setCpsrcdId(cpsrcdId);
-                    mistakeInfoDto.setCpsgrpId(StringUtils.isEmpty(cpsgrpId) ? "" : cpsgrpId);
+                    mistakeInfoDto.setTopicCpsId(Integer.valueOf(objectId));
                     mistakeAudioService.isAddInErrorBook(currentAccountNo, mistakeInfoDto, totalScore, 100.00);
                 }
                 EvalRecordDO evalRecordDO = new EvalRecordDO();

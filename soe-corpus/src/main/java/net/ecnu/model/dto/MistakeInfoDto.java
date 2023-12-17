@@ -15,14 +15,4 @@ public class MistakeInfoDto {
      * **/
     private Integer topicCpsId;
 
-    /**
-     * 题组id
-     * **/
-    private String cpsgrpId;
-
-    /**
-     * 快照id
-     * **/
-    private String cpsrcdId;
-
 }

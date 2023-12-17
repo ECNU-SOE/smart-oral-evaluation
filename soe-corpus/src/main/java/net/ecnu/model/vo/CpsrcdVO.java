@@ -32,6 +32,12 @@ public class CpsrcdVO implements Serializable {
     private String topicId;
 
     /**
+     * 题型-题目关联id
+     * **/
+    private Integer topicCpsId;
+
+
+    /**
      * cpsrcd次序
      */
     @JsonProperty("cNum")

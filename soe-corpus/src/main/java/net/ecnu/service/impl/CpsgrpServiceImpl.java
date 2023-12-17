@@ -266,6 +266,7 @@ public class CpsgrpServiceImpl extends ServiceImpl<CpsgrpMapper, CpsgrpDO> imple
 
         //聚合topicCpsDO类
         cpsrcdVO.setTopicId(topicCpsDO.getTopicId());
+        cpsrcdVO.setTopicCpsId(topicCpsDO.getId());
         cpsrcdVO.setCNum(topicCpsDO.getCNum());
         cpsrcdVO.setScore(topicCpsDO.getScore());
         cpsrcdVO.setEnablePinyin(topicCpsDO.getEnablePinyin());

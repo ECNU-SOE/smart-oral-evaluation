@@ -47,13 +47,12 @@ public class EvaluateController {
                             @RequestParam(value = "refText", required = true) String refText,
                             @RequestParam(value = "category", required = true) String category,
                             @RequestParam(value = "pinyin", required = false) String pinyin,
-                            @RequestParam(value = "cpsrcdId",required = false) String cpsrcdId,
-                            @RequestParam(value = "cpsgrpId",required = false) String cpsgrpId,
+                            @RequestParam(value = "objectId",required = false) String objectId,
                             @RequestParam(value = "evaluateType",required = false) Integer evaluateType
                             ) {
         /**向老版本兼容，评测方式若不传，则默认为科大讯飞评测**/
         evaluateType = Objects.isNull(evaluateType) ? EvaluateTypeEnum.XF_EVALUATE.getCode() : evaluateType;
-        Object data = evaluateService.evaluateByXF(audio, refText, pinyin, category,cpsrcdId,cpsgrpId,evaluateType);
+        Object data = evaluateService.evaluateByXF(audio, refText, pinyin, category,objectId,evaluateType);
         return JsonData.buildSuccess(data);
     }
 
