@@ -33,7 +33,8 @@ public interface SystemMapper {
 
     List<SysApi> selectApiTree(@Param("rootApiId") Long rootApiId,
                                @Param("apiNameLike") String apiNameLike,
-                               @Param("apiStatus") Boolean apiStatus);
+                               @Param("apiStatus") Boolean apiStatus,
+                               @Param("apiUrl") String apiUrl);
 
     List<String> selectApiExpandedKeys();
 

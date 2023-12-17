@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface SysApiService {
 
-    List<SysApiNode> getApiTree(String apiNameLike, Boolean apiStatus);
+    List<SysApiNode> getApiTree(String apiNameLike, Boolean apiStatus,String apiUrl);
 
     void addApi(SysApi sysapi);
 

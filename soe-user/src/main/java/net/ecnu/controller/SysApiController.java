@@ -29,8 +29,9 @@ public class SysApiController {
     @ApiOperation("接口管理:查询")
     @PostMapping(value = "/tree")
     public JsonData tree(@RequestParam(value = "apiNameLike",required = false) String apiNameLike,
-                                 @RequestParam(value = "apiStatus",required = true) Boolean apiStatus) {
-        List<SysApiNode> apiTree = sysapiService.getApiTree(apiNameLike, apiStatus);
+                                 @RequestParam(value = "apiStatus",required = false) Boolean apiStatus,
+                                 @RequestParam(value = "apiUrl",required = false) String apiiUrl) {
+        List<SysApiNode> apiTree = sysapiService.getApiTree(apiNameLike, apiStatus,apiiUrl);
         return JsonData.buildSuccess(apiTree);
     }
 
@@ -63,7 +64,7 @@ public class SysApiController {
     @PostMapping(value = "/checkedtree")
     public JsonData checkedtree(@RequestParam Integer roleId) {
         Map<String,Object> ret = new HashMap<>();
-        ret.put("tree",sysapiService.getApiTree("",null));
+        ret.put("tree",sysapiService.getApiTree("",null,""));
         ret.put("expandedKeys",sysapiService.getExpandedKeys());
         ret.put("checkedKeys",sysapiService.getCheckedKeys(roleId));
         return JsonData.buildSuccess(ret);

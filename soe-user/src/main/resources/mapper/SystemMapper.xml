@@ -77,6 +77,9 @@
             <if test="apiStatus != null  " >
                 AND status = #{apiStatus}
             </if>
+            <if test="apiUrl != null and apiUrl != ''">
+                AND url like CONCAT('%',#{apiUrl,jdbcType=VARCHAR},'%')
+            </if>
         </trim>
         ORDER BY level,api_sort
     </select>

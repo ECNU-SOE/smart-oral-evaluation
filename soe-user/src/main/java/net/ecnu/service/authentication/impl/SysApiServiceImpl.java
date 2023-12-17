@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -38,7 +39,7 @@ public class SysApiServiceImpl implements SysApiService {
     private SysRoleApiMapper sysRoleApiMapper;
 
     @Override
-    public List<SysApiNode> getApiTree(String apiNameLike, Boolean apiStatus) {
+    public List<SysApiNode> getApiTree(String apiNameLike, Boolean apiStatus,String apiUrl) {
         //查找api_pid=0的API节点，即：根节点
         SysApi rootSysApi = sysApiMapper.selectOne(
                 new QueryWrapper<SysApi>().eq("api_pid",0));
@@ -46,21 +47,42 @@ public class SysApiServiceImpl implements SysApiService {
         if (rootSysApi != null) {
             Long rootApiId = rootSysApi.getId();
 
-            List<SysApi> sysApis = systemMapper.selectApiTree(rootApiId, apiNameLike, apiStatus);
+            List<SysApi> sysApis = systemMapper.selectApiTree(rootApiId, apiNameLike, apiStatus,apiUrl);
 
             List<SysApiNode> sysApiNodes = sysApis.stream().map(item -> {
                 SysApiNode bean = new SysApiNode();
                 BeanUtils.copyProperties(item, bean);
                 return bean;
             }).collect(Collectors.toList());
-            if (StringUtils.isNotEmpty(apiNameLike) && apiStatus != null) {
+            if (StringUtils.isNotEmpty(apiNameLike) || apiStatus != null || !StringUtils.isEmpty(apiUrl)) {
                 return sysApiNodes;//根据api名称等查询会破坏树形结构，返回平面列表
             } else {//否则返回树型结构列表
-                return DataTreeUtil.buildTree(sysApiNodes, rootApiId);
+                List<SysApiNode> sysApiNodesTree = DataTreeUtil.buildTree(sysApiNodes, rootApiId);
+                /**递归获取结点下存在的接口数**/
+                if(!CollectionUtils.isEmpty(sysApiNodesTree)){
+                    getApiNodesNums(sysApiNodesTree.get(0));
+                }
+                return sysApiNodesTree;
             }
         } else {
             throw new BizException(BizCodeEnum.USER_INPUT_ERROR.getCode(),
                     "请先在数据库内为API配置一个分类的根节点，level=1");
+        }
+    }
+
+    public int getApiNodesNums(SysApiNode node) {
+        if(node.getApiPid() != 0L && !StringUtils.isEmpty(node.getUrl()) && node.getIsLeaf()){
+            return 1;
+        }
+        int apiNums = 0;
+        if(!CollectionUtils.isEmpty(node.getChildren())){
+            for (SysApiNode child : node.getChildren()) {
+                apiNums += getApiNodesNums(child);
+            }
+            node.setApiNums(apiNums);
+            return apiNums;
+        }else{
+            return 0;
         }
     }
 

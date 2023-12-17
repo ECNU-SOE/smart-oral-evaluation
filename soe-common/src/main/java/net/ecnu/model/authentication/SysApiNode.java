@@ -8,6 +8,9 @@ public class SysApiNode extends SysApi implements DataTree<SysApiNode,Long> {
 
     private List<SysApiNode> children;
 
+    /**接口数量**/
+    private Integer apiNums;
+
     @Override
     public Long getParentId() {
         return super.getApiPid();
@@ -21,5 +24,13 @@ public class SysApiNode extends SysApi implements DataTree<SysApiNode,Long> {
     @Override
     public List<SysApiNode> getChildren() {
         return this.children;
+    }
+
+    public Integer getApiNums() {
+        return apiNums;
+    }
+
+    public void setApiNums(Integer apiNums) {
+        this.apiNums = apiNums;
     }
 }
