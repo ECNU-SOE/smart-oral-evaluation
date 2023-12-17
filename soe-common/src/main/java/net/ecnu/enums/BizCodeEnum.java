@@ -86,6 +86,7 @@ public enum BizCodeEnum {
      * **/
     JIEBA_ERROR(550000,"jieba分词异常-"),
     EVALUATE_ERROR(550001,"自研语音评测异常-"),
+    EVALUATE_TYPE_ERROR(550002,"未知的语音评测方式"),
 
     /**
      * 答题报告异常

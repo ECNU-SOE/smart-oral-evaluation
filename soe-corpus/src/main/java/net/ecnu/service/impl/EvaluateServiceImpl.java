@@ -342,8 +342,9 @@ public class EvaluateServiceImpl implements EvaluateService {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+        } else{
+            throw new BizException(BizCodeEnum.EVALUATE_TYPE_ERROR);
         }
-        return null;
     }
 
     @Override
