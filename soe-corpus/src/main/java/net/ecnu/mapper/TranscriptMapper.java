@@ -1,5 +1,6 @@
 package net.ecnu.mapper;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import net.ecnu.model.TranscriptDO;
@@ -21,6 +22,7 @@ import java.util.List;
  * @since 2022-11-19
  */
 @Mapper
+
 public interface TranscriptMapper extends BaseMapper<TranscriptDO> {
 
     long countByExample(TranscriptDOExample example);

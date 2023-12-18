@@ -10,7 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.ecnu.CorpusApplication;
 import net.ecnu.controller.request.CpsrcdFilterReq;
 import net.ecnu.mapper.CpsrcdMapper;
+import net.ecnu.mapper.TranscriptMapper;
 import net.ecnu.model.CpsrcdDO;
+import net.ecnu.model.TranscriptDO;
 import net.ecnu.util.JsonData;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,15 +33,10 @@ import java.util.UUID;
 public class soetest2 {
 
     @Autowired
-    public CpsrcdMapper cpsrcdMapper;
+    public TranscriptMapper transcriptMapper;
     @Test
     public void test() {
-        CpsrcdFilterReq cpsrcdFilterReq = new CpsrcdFilterReq();
-        cpsrcdFilterReq.setType("朗读字词");
-        cpsrcdFilterReq.setRefText("辞职");
-        cpsrcdFilterReq.setDifficultyBegin(3);
-        cpsrcdFilterReq.setDifficultyEnd(11);
-        CpsrcdDO cpsrcdDO = cpsrcdMapper.getRand(cpsrcdFilterReq);
-        System.out.println(cpsrcdDO);
+        TranscriptDO transcriptDO = transcriptMapper.selectById("transcript_1729890733864914944");
+        System.out.println(transcriptDO);
     }
 }

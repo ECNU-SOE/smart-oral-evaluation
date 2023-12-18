@@ -3,7 +3,10 @@ package net.ecnu.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @description 
@@ -15,6 +18,8 @@ import lombok.Data;
  * 成绩单
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
+@TableName("transcript")
 public class TranscriptDO implements Serializable {
     /**
      * 评测报告id

@@ -130,8 +130,7 @@ public class TranscriptServiceImpl extends ServiceImpl<TranscriptMapper, Transcr
         transcriptDO.setResJson(transcriptReq.getResJson());
         //transcript表新增记录
         int insert = transcriptMapper.insert(transcriptDO);
-        transcriptDO = transcriptMapper.selectById(transcriptDO.getId());
-        return transcriptDO;
+        return transcriptMapper.selectById(transcriptDO.getId());
     }
 
     @Override
