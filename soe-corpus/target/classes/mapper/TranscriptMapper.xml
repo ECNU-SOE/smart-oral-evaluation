@@ -4,21 +4,414 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="net.ecnu.model.TranscriptDO">
-        <id column="id" property="id" />
-        <result column="cpsgrp_id" property="cpsgrpId" />
-        <result column="respondent" property="respondent" />
-        <result column="pron_completion" property="pronCompletion" />
-        <result column="pron_accuracy" property="pronAccuracy" />
-        <result column="pron_fluency" property="pronFluency" />
-        <result column="suggested_score" property="suggestedScore" />
-        <result column="manual_score" property="manualScore" />
-        <result column="gmt_create" property="gmtCreate" />
-        <result column="gmt_modified" property="gmtModified" />
+        <!--@mbg.generated-->
+        <!--@Table transcript-->
+        <id column="id" jdbcType="VARCHAR" property="id" />
+        <result column="cpsgrp_id" jdbcType="VARCHAR" property="cpsgrpId" />
+        <result column="respondent" jdbcType="VARCHAR" property="respondent" />
+        <result column="system_score" jdbcType="DECIMAL" property="systemScore" />
+        <result column="manual_score" jdbcType="DECIMAL" property="manualScore" />
+        <result column="mark_time" jdbcType="TIMESTAMP" property="markTime" />
+        <result column="mark_user" jdbcType="VARCHAR" property="markUser" />
+        <result column="res_json" jdbcType="LONGVARCHAR" property="resJson" />
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
     </resultMap>
 
-    <!-- 通用查询结果列 -->
-    <sql id="Base_Column_List">
-        id, cpsgrp_id, respondent, pron_completion, pron_accuracy, pron_fluency, suggested_score, manual_score, gmt_create, gmt_modified
+    <sql id="Example_Where_Clause">
+        <!--@mbg.generated-->
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
     </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <!--@mbg.generated-->
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, cpsgrp_id, respondent, system_score, manual_score, mark_time, mark_user, res_json,
+        gmt_create, gmt_modified
+    </sql>
+    <select id="selectByExample" parameterType="net.ecnu.model.TranscriptDOExample" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+        from transcript
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List" />
+        from transcript
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        <!--@mbg.generated-->
+        delete from transcript
+        where id = #{id,jdbcType=VARCHAR}
+    </delete>
+    <delete id="deleteByExample" parameterType="net.ecnu.model.TranscriptDOExample">
+        <!--@mbg.generated-->
+        delete from transcript
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+    <insert id="insert" parameterType="net.ecnu.model.TranscriptDO">
+        <!--@mbg.generated-->
+        insert into transcript (id, cpsgrp_id, respondent,
+        system_score, manual_score, mark_time,
+        mark_user, res_json, gmt_create,
+        gmt_modified)
+        values (#{id,jdbcType=VARCHAR}, #{cpsgrpId,jdbcType=VARCHAR}, #{respondent,jdbcType=VARCHAR},
+        #{systemScore,jdbcType=DECIMAL}, #{manualScore,jdbcType=DECIMAL}, #{markTime,jdbcType=TIMESTAMP},
+        #{markUser,jdbcType=VARCHAR}, #{resJson,jdbcType=LONGVARCHAR}, #{gmtCreate,jdbcType=TIMESTAMP},
+        #{gmtModified,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="net.ecnu.model.TranscriptDO">
+        <!--@mbg.generated-->
+        insert into transcript
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="cpsgrpId != null">
+                cpsgrp_id,
+            </if>
+            <if test="respondent != null">
+                respondent,
+            </if>
+            <if test="systemScore != null">
+                system_score,
+            </if>
+            <if test="manualScore != null">
+                manual_score,
+            </if>
+            <if test="markTime != null">
+                mark_time,
+            </if>
+            <if test="markUser != null">
+                mark_user,
+            </if>
+            <if test="resJson != null">
+                res_json,
+            </if>
+            <if test="gmtCreate != null">
+                gmt_create,
+            </if>
+            <if test="gmtModified != null">
+                gmt_modified,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="cpsgrpId != null">
+                #{cpsgrpId,jdbcType=VARCHAR},
+            </if>
+            <if test="respondent != null">
+                #{respondent,jdbcType=VARCHAR},
+            </if>
+            <if test="systemScore != null">
+                #{systemScore,jdbcType=DECIMAL},
+            </if>
+            <if test="manualScore != null">
+                #{manualScore,jdbcType=DECIMAL},
+            </if>
+            <if test="markTime != null">
+                #{markTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="markUser != null">
+                #{markUser,jdbcType=VARCHAR},
+            </if>
+            <if test="resJson != null">
+                #{resJson,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="gmtCreate != null">
+                #{gmtCreate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gmtModified != null">
+                #{gmtModified,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="net.ecnu.model.TranscriptDOExample" resultType="java.lang.Long">
+        <!--@mbg.generated-->
+        select count(*) from transcript
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        <!--@mbg.generated-->
+        update transcript
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=VARCHAR},
+            </if>
+            <if test="record.cpsgrpId != null">
+                cpsgrp_id = #{record.cpsgrpId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.respondent != null">
+                respondent = #{record.respondent,jdbcType=VARCHAR},
+            </if>
+            <if test="record.systemScore != null">
+                system_score = #{record.systemScore,jdbcType=DECIMAL},
+            </if>
+            <if test="record.manualScore != null">
+                manual_score = #{record.manualScore,jdbcType=DECIMAL},
+            </if>
+            <if test="record.markTime != null">
+                mark_time = #{record.markTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.markUser != null">
+                mark_user = #{record.markUser,jdbcType=VARCHAR},
+            </if>
+            <if test="record.resJson != null">
+                res_json = #{record.resJson,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="record.gmtCreate != null">
+                gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.gmtModified != null">
+                gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        <!--@mbg.generated-->
+        update transcript
+        set id = #{record.id,jdbcType=VARCHAR},
+        cpsgrp_id = #{record.cpsgrpId,jdbcType=VARCHAR},
+        respondent = #{record.respondent,jdbcType=VARCHAR},
+        system_score = #{record.systemScore,jdbcType=DECIMAL},
+        manual_score = #{record.manualScore,jdbcType=DECIMAL},
+        mark_time = #{record.markTime,jdbcType=TIMESTAMP},
+        mark_user = #{record.markUser,jdbcType=VARCHAR},
+        res_json = #{record.resJson,jdbcType=LONGVARCHAR},
+        gmt_create = #{record.gmtCreate,jdbcType=TIMESTAMP},
+        gmt_modified = #{record.gmtModified,jdbcType=TIMESTAMP}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause" />
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="net.ecnu.model.TranscriptDO">
+        <!--@mbg.generated-->
+        update transcript
+        <set>
+            <if test="cpsgrpId != null">
+                cpsgrp_id = #{cpsgrpId,jdbcType=VARCHAR},
+            </if>
+            <if test="respondent != null">
+                respondent = #{respondent,jdbcType=VARCHAR},
+            </if>
+            <if test="systemScore != null">
+                system_score = #{systemScore,jdbcType=DECIMAL},
+            </if>
+            <if test="manualScore != null">
+                manual_score = #{manualScore,jdbcType=DECIMAL},
+            </if>
+            <if test="markTime != null">
+                mark_time = #{markTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="markUser != null">
+                mark_user = #{markUser,jdbcType=VARCHAR},
+            </if>
+            <if test="resJson != null">
+                res_json = #{resJson,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="gmtCreate != null">
+                gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gmtModified != null">
+                gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="net.ecnu.model.TranscriptDO">
+        <!--@mbg.generated-->
+        update transcript
+        set cpsgrp_id = #{cpsgrpId,jdbcType=VARCHAR},
+        respondent = #{respondent,jdbcType=VARCHAR},
+        system_score = #{systemScore,jdbcType=DECIMAL},
+        manual_score = #{manualScore,jdbcType=DECIMAL},
+        mark_time = #{markTime,jdbcType=TIMESTAMP},
+        mark_user = #{markUser,jdbcType=VARCHAR},
+        res_json = #{resJson,jdbcType=LONGVARCHAR},
+        gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+        gmt_modified = #{gmtModified,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateBatch" parameterType="java.util.List">
+        <!--@mbg.generated-->
+        update transcript
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="cpsgrp_id = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    when id = #{item.id,jdbcType=VARCHAR} then #{item.cpsgrpId,jdbcType=VARCHAR}
+                </foreach>
+            </trim>
+            <trim prefix="respondent = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    when id = #{item.id,jdbcType=VARCHAR} then #{item.respondent,jdbcType=VARCHAR}
+                </foreach>
+            </trim>
+            <trim prefix="system_score = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    when id = #{item.id,jdbcType=VARCHAR} then #{item.systemScore,jdbcType=DECIMAL}
+                </foreach>
+            </trim>
+            <trim prefix="manual_score = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    when id = #{item.id,jdbcType=VARCHAR} then #{item.manualScore,jdbcType=DECIMAL}
+                </foreach>
+            </trim>
+            <trim prefix="mark_time = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    when id = #{item.id,jdbcType=VARCHAR} then #{item.markTime,jdbcType=TIMESTAMP}
+                </foreach>
+            </trim>
+            <trim prefix="mark_user = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    when id = #{item.id,jdbcType=VARCHAR} then #{item.markUser,jdbcType=VARCHAR}
+                </foreach>
+            </trim>
+            <trim prefix="res_json = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    when id = #{item.id,jdbcType=VARCHAR} then #{item.resJson,jdbcType=LONGVARCHAR}
+                </foreach>
+            </trim>
+            <trim prefix="gmt_create = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    when id = #{item.id,jdbcType=VARCHAR} then #{item.gmtCreate,jdbcType=TIMESTAMP}
+                </foreach>
+            </trim>
+            <trim prefix="gmt_modified = case" suffix="end,">
+                <foreach collection="list" index="index" item="item">
+                    when id = #{item.id,jdbcType=VARCHAR} then #{item.gmtModified,jdbcType=TIMESTAMP}
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach close=")" collection="list" item="item" open="(" separator=", ">
+            #{item.id,jdbcType=VARCHAR}
+        </foreach>
+    </update>
+    <insert id="batchInsert" parameterType="map">
+        <!--@mbg.generated-->
+        insert into transcript
+        (id, cpsgrp_id, respondent, system_score, manual_score, mark_time, mark_user, res_json,
+        gmt_create, gmt_modified)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id,jdbcType=VARCHAR}, #{item.cpsgrpId,jdbcType=VARCHAR}, #{item.respondent,jdbcType=VARCHAR},
+            #{item.systemScore,jdbcType=DECIMAL}, #{item.manualScore,jdbcType=DECIMAL}, #{item.markTime,jdbcType=TIMESTAMP},
+            #{item.markUser,jdbcType=VARCHAR}, #{item.resJson,jdbcType=LONGVARCHAR}, #{item.gmtCreate,jdbcType=TIMESTAMP},
+            #{item.gmtModified,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
 
+    <select id="getTranscriptInfo" resultType="net.ecnu.model.dto.resp.TranscriptInfoResp">
+        SELECT
+            t.id AS transcriptId,
+            c.description AS cpsgrpName,
+            c.difficulty AS difficulty,
+            t.respondent AS respondentCode,
+            u.real_name AS respondentName,
+            t.gmt_create AS commitTime,
+            t.system_score AS systemScore,
+            t.manual_score AS manualScore,
+            t.mark_user AS reviewerCode,
+            t.mark_time AS reviewTime
+        FROM
+            transcript t
+        LEFT JOIN
+            cpsgrp c ON c.id = t.cpsgrp_id AND c.del = 0
+        LEFT JOIN
+            user u ON u.account_no = t.respondent AND u.del = 0
+        WHERE
+            1 = 1
+        <if test="transcriptInfoReq.cpsgrpName != null and transcriptInfoReq.cpsgrpName != ''">
+            AND c.description like CONCAT('%',#{transcriptInfoReq.cpsgrpName},'%')
+        </if>
+        <if test="transcriptInfoReq.respondentName != null and transcriptInfoReq.respondentName != ''">
+            AND u.real_name like CONCAT('%',#{transcriptInfoReq.respondentName,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="transcriptInfoReq.reviewStatus != null and transcriptInfoReq.reviewStatus == 0">
+            AND t.mark_time IS NULL
+        </if>
+        <if test="transcriptInfoReq.reviewStatus != null and transcriptInfoReq.reviewStatus == 1">
+            AND t.mark_time IS NOT NULL
+        </if>
+        order by t.gmt_create desc
+    </select>
+
+    <select id="getReviewerName" resultType="java.lang.String">
+        select real_name from user where account_no = #{reviewerCode,jdbcType=VARCHAR} and del = 0
+    </select>
 </mapper>

@@ -14,6 +14,7 @@ import net.ecnu.model.common.PageData;
 import net.ecnu.model.vo.TagVO;
 import net.ecnu.service.TagService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import net.ecnu.util.TimeUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -155,16 +157,15 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagDO> implements Tag
         return "删除成功，共影响了"+i+"行";
     }
 
-    @Scheduled(fixedDelay = 1000*60*60*24)//每24h自动调用该方法，更新标签权重
+    @Scheduled(cron = "59 59 23 * * ?")//在每天的23时59分59秒自动执行任务
     @Override
-    public Object calWeight() {
-//        Integer total = taggingMapper.selectCount(null);
-//        if (total == 0)
-//            return null;
-//        List<TagDO> tagDOS = tagMapper.selectList(null);
-//        tagDOS.forEach(this::updateTagWeight);
-//        return "权重计算成功";
-        return null;
+    public void calWeight() {
+        Integer total = taggingMapper.selectCount(null);
+        if (total == 0)
+            return;
+        List<TagDO> tagDOS = tagMapper.selectList(null);
+        tagDOS.forEach(this::updateTagWeight);
+        System.out.println(LocalDate.now()+"，标签权重计算成功");
     }
 
 
