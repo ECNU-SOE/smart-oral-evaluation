@@ -15,4 +15,9 @@ public class MistakeInfoDto {
      * **/
     private Integer topicCpsId;
 
+    /**
+     * 题目cpsrcd_id
+     * **/
+    private String cpsrcdId;
+
 }

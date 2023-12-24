@@ -196,29 +196,30 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
             //回答成功
             return true;
         } else {
-            TopicCpsDO topicCpsDO = topicCpsMapper.selectById(mistakeInfoDto.getTopicCpsId());
-            if (Objects.isNull(topicCpsDO)) {
-                throw new BizException(BizCodeEnum.TOPIC_CPS_UNEXIST);
-            }
-            //回答失败，将该题加入用户的错题集
-            String questionTypeName = mistakeAudioMapper.getQuestionType(topicCpsDO.getCpsrcdId());
-            /*if (Objects.isNull(questionType) || questionType < 0) {
-                //没有查询到它的题目类型，则默认为0语音评测
-                questionType = 0;
-            }*/
             Integer questionType = QuestionTypeEnum.OTHERS.getCode();
-            if (!StringUtils.isEmpty(questionTypeName)) {
-                questionType = QuestionTypeEnum.getCodeByMsg(questionTypeName);
+            List<MistakeAudioDO> mistakeAudioDOS = new ArrayList<>();
+            if (Objects.nonNull(mistakeInfoDto.getTopicCpsId())) {
+                TopicCpsDO topicCpsDO = topicCpsMapper.selectById(mistakeInfoDto.getTopicCpsId());
+                if (Objects.isNull(topicCpsDO)) {
+                    throw new BizException(BizCodeEnum.TOPIC_CPS_UNEXIST);
+                }
+                //回答失败，将该题加入用户的错题集
+                String questionTypeName = mistakeAudioMapper.getQuestionType(topicCpsDO.getCpsrcdId());
+                if (!StringUtils.isEmpty(questionTypeName)) {
+                    questionType = QuestionTypeEnum.getCodeByMsg(questionTypeName);
+                }
+                /**查询是否已加入错题本**/
+                mistakeAudioDOS = mistakeAudioMapper.getMistakesInfoByCpsrcdIdOrTopcpsId(userId,topicCpsDO);
             }
-            /**查询是否已加入错题本**/
-            MistakeAudioDOExample mistakeAudioDOExample = new MistakeAudioDOExample();
-            mistakeAudioDOExample.createCriteria().andUserIdEqualTo(userId).andTopicCpsIdEqualTo(mistakeInfoDto.getTopicCpsId())
-                    .andDelFlgEqualTo(false);
-            List<MistakeAudioDO> mistakeAudioDOS = mistakeAudioMapper.selectByExample(mistakeAudioDOExample);
+            if (!StringUtils.isEmpty(mistakeInfoDto.getCpsrcdId())) {
+                MistakeAudioDOExample mistakeAudioDOExample = new MistakeAudioDOExample();
+                mistakeAudioDOExample.createCriteria().andUserIdEqualTo(userId).andCpsrcdIdEqualTo(mistakeInfoDto.getCpsrcdId()).andDelFlgEqualTo(false);
+                mistakeAudioDOS = mistakeAudioMapper.selectByExample(mistakeAudioDOExample);
+            }
             if (CollectionUtils.isEmpty(mistakeAudioDOS)) {
                 MistakeAudioDO record = new MistakeAudioDO();
-                record.setCreateTime(new Date()).setTopicCpsId(mistakeInfoDto.getTopicCpsId())
-                        .setTopicCpsId(mistakeInfoDto.getTopicCpsId()).setErrorSum(1)
+                record.setCreateTime(new Date()).setTopicCpsId(Objects.isNull(mistakeInfoDto.getTopicCpsId()) ? null : mistakeInfoDto.getTopicCpsId())
+                        .setCpsrcdId(StringUtils.isEmpty(mistakeInfoDto.getCpsrcdId()) ? "" : mistakeInfoDto.getCpsrcdId()).setErrorSum(1)
                         .setUserId(userId).setUpdateTime(new Date()).setMistakeType(questionType)
                         .setDelFlg(false);
                 if (mistakeAudioMapper.insertSelective(record) <= 0) {
@@ -226,7 +227,8 @@ public class MistakeAudioServiceImpl implements MistakeAudioService {
                 }
             } else {
                 MistakeAudioDO mistakeAudioDO = mistakeAudioDOS.get(0);
-                mistakeAudioDO.setTopicCpsId(mistakeInfoDto.getTopicCpsId());
+                mistakeAudioDO.setTopicCpsId(Objects.isNull(mistakeInfoDto.getTopicCpsId()) ? null : mistakeInfoDto.getTopicCpsId());
+                mistakeAudioDO.setCpsrcdId(StringUtils.isEmpty(mistakeInfoDto.getCpsrcdId()) ? "" : mistakeInfoDto.getCpsrcdId());
                 //答题错误次数增加
                 mistakeAudioDO.setErrorSum(mistakeAudioDO.getErrorSum() + 1);
                 //更新时间

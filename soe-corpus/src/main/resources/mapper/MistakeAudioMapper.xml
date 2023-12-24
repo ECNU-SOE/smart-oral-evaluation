@@ -489,4 +489,21 @@
     </foreach>
     GROUP BY cpsrcdId
   </select>
+
+  <select id="getMistakesInfoByCpsrcdIdOrTopcpsId" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List" />
+    from
+      mistake_audio
+    where
+      del_flg = 0
+    and
+      user_id = #{userId,jdbcType=VARCHAR}
+    <if test="topicCpsDO.cpsrcdId != null and topicCpsDO.cpsrcdId != ''">
+      and cpsrcd_id = #{topicCpsDO.cpsrcdId,jdbcType=VARCHAR}
+    </if>
+    <if test="topicCpsDO.id != null">
+      and topic_cps_id = #{topicCpsDO.id,jdbcType=INTEGER}
+    </if>
+  </select>
 </mapper>

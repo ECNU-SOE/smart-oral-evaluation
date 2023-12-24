@@ -2,6 +2,7 @@ package net.ecnu.mapper;
 
 import net.ecnu.model.MistakeAudioDO;
 import net.ecnu.model.MistakeAudioDOExample;
+import net.ecnu.model.TopicCpsDO;
 import net.ecnu.model.dto.MistakeInfoDto;
 import net.ecnu.model.vo.MistakeTypeVO;
 import net.ecnu.model.vo.MistakesVO;
@@ -62,4 +63,6 @@ public interface MistakeAudioMapper {
     String getQuestionType(@Param("cpsrcdId") String cpsrcdId);
 
     List<MistakesVO> getGrpMistakesInfo(@Param("topicCpsrcdList") List<MistakeInfoDto> topicCpsrcdList);
+
+    List<MistakeAudioDO> getMistakesInfoByCpsrcdIdOrTopcpsId(@Param("userId") String userId,@Param("topicCpsDO") TopicCpsDO topicCpsDO);
 }

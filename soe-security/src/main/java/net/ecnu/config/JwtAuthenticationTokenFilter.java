@@ -54,35 +54,47 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String jwtToken = request.getHeader(jwtProperties.getHeader());
-        if(!StringUtils.isBlank(jwtToken)){
+        if (!StringUtils.isBlank(jwtToken)) {
             String username = null;
             LoginUser loginUser = jwtTokenUtil.checkJWT(jwtToken);
-            if(Objects.isNull(loginUser)){//token校验失败处理
+            if (Objects.isNull(loginUser)) {//token校验失败处理
                 tokenErrorHandler(response);
-            }else{
+            } else {
                 //将用户唯一ID放入请求头中
-                request.setAttribute("accountNo",loginUser.getAccountNo());
-                if(jwtProperties.getAuthenticationKey()){
+                request.setAttribute("accountNo", loginUser.getAccountNo());
+                if (jwtProperties.getAuthenticationKey()) {
                     //用户名暂时只能是手机号，后期再做优化
-                    if(!Objects.isNull(loginUser)&&StringUtils.isNotBlank(loginUser.getPhone())){
+                    if (!Objects.isNull(loginUser) && StringUtils.isNotBlank(loginUser.getPhone())) {
                         username = loginUser.getPhone();
                     }
-                    if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
+                    if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                         UserDetails userDetails = myUserDetailsService.loadUserByUsername(username);
                         //校验JWT令牌有效性及是否过期
-                        if(jwtTokenUtil.validateToken(jwtToken)){
+                        if (jwtTokenUtil.validateToken(jwtToken)) {
                             //给使用该JWT令牌的用户进行授权
                             UsernamePasswordAuthenticationToken authenticationToken
                                     = new UsernamePasswordAuthenticationToken(
-                                    userDetails,null, userDetails.getAuthorities());
+                                    userDetails, null, userDetails.getAuthorities());
                             //Spring Security将可以访问的接口授权访问
                             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                         }
                     }
                 }
             }
+        } else {
+            /**token为空，错误信息处理**/
+            tokenEmptyHandler(response);
         }
         filterChain.doFilter(request,response);
+    }
+
+    public static void tokenEmptyHandler(HttpServletResponse response) throws IOException {
+        response.setContentType("application/json;charset=utf-8");
+        response.setStatus(BizCodeEnum.TOKEN_EXCEPTION.getCode());
+        PrintWriter out = response.getWriter();
+        out.write(JSON.toJSONString(JsonData.buildCodeAndMsg(BizCodeEnum.TOKEN_EXCEPTION.getCode(),"用户认证失败，token为空")));
+        out.flush();
+        out.close();
     }
 
     private static void tokenErrorHandler(HttpServletResponse response) throws IOException {
