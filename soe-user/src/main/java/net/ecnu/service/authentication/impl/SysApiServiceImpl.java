@@ -22,6 +22,9 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -100,13 +103,14 @@ public class SysApiServiceImpl implements SysApiService {
         parent.setId(sysapi.getApiPid());
         parent.setIsLeaf(false);//更新父节点为非子节点。
         parent.setUpdateBy(currentAccountNo);
-        parent.setUpdateTime(LocalDateTime.now());
+        Date date = new Date();
+        parent.setUpdateTime(date);
         sysApiMapper.updateById(parent);
 
         sysapi.setStatus(false);//设置是否禁用，新增节点默认可用
         //添加操作记录
         sysapi.setCreateBy(currentAccountNo);
-        sysapi.setCreateTime(LocalDateTime.now());
+        sysapi.setCreateTime(date);
         sysApiMapper.insert(sysapi);
     }
 
@@ -135,7 +139,7 @@ public class SysApiServiceImpl implements SysApiService {
             if(StringUtils.isBlank(currentAccountNo)){
                 throw new BizException(BizCodeEnum.TOKEN_EXCEPTION.getCode(),"修改接口信息必须携带有效token");
             }
-            sysapi.setUpdateTime(LocalDateTime.now());
+            sysapi.setUpdateTime(new Date());
             sysapi.setUpdateBy(currentAccountNo);
             int updateStatus = sysApiMapper.updateById(sysapi);
             if(updateStatus> 0){
@@ -194,12 +198,16 @@ public class SysApiServiceImpl implements SysApiService {
     @Override
     @Transactional
     public void updateStatus(Long id, Boolean status) {
-        if(Objects.isNull(id)){
-            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(),"修改接口信息操作必须带主键");
+        if (Objects.isNull(id)) {
+            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY.getCode(), "修改接口信息操作必须带主键");
         }
-        SysApi sysApi = new SysApi();
-        sysApi.setId(id);
-        sysApi.setStatus(status);
-        sysApiMapper.updateById(sysApi);
+        List<SysApi> sysApiList = new ArrayList<>();
+        SysApi sysApi = sysApiMapper.selectById(id);
+        sysApiList = sysApiMapper.selectSonApiNode(id);
+        sysApiList.add(sysApi);
+        for (SysApi api : sysApiList) {
+            api.setStatus(status);
+        }
+        sysApiMapper.updateBatch(sysApiList);
     }
 }
