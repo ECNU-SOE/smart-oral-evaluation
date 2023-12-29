@@ -96,6 +96,13 @@ public class SysApiServiceImpl implements SysApiService {
         if(StringUtils.isBlank(currentAccountNo)){
             throw new BizException(BizCodeEnum.TOKEN_EXCEPTION.getCode(),"添加接口操作必须携带有效token");
         }
+        if (StringUtils.isEmpty(sysapi.getUrl()) || StringUtils.isEmpty(sysapi.getApiName())) {
+            throw new BizException(BizCodeEnum.PARAM_CANNOT_BE_EMPTY);
+        }
+        /**接口url校验&&自动补全**/
+        if (!sysapi.getUrl().startsWith("/")) {
+            sysapi.setUrl("/" + sysapi.getUrl());
+        }
         setApiIdsAndLevel(sysapi);
 
         sysapi.setIsLeaf(true); //新增的菜单节点都是子节点，没有下级
